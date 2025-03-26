@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  tardisdcr:
+    image: tardisdcr
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "1234:8080"
+      # - 5005:5005
+    hostname: "P_1"
+    tty: true
+    environment:
+      interface: "eth0"
+      target-name: "P(1)"
+      name: "P_1"
