@@ -1,23 +1,24 @@
 package dcr1.model.events;
 
 import dcr1.common.data.computation.BooleanExpression;
-import dcr1.common.data.types.Type;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 
-public sealed interface ReceiveEventElement<T extends Type>
-        extends EventElement<T>, dcr1.common.events.ReceiveEvent<T>
+public sealed interface ReceiveEventElement
+        extends EventElement, dcr1.common.events.ReceiveEvent
         permits ReceiveEvent {
 
     UserSetExpression getSenderExpr();
 }
 
-final class ReceiveEvent<T extends Type>
-        extends GenericEventElement<T>
-        implements ReceiveEventElement<T> {
+final class ReceiveEvent
+        extends GenericEventElement
+        implements ReceiveEventElement {
 
     ReceiveEvent(String elementId, String localId, String label,
-            UserSetExpression senders, MarkingElement<T> marking, BooleanExpression constraint) {
-        super(elementId, localId, label, marking, senders, constraint);
+            UserSetExpression senders, MarkingElement marking,
+            BooleanExpression instantiationConstraint,
+            BooleanExpression ifcConstraint) {
+        super(elementId, localId, label, marking, senders, instantiationConstraint, ifcConstraint);
     }
 
     // FIXME [.get()]
@@ -30,7 +31,7 @@ final class ReceiveEvent<T extends Type>
     @Override
     public String toString() {
         return String.format("<%s> %s(%s: %s) [%s] (%s) [%s -> ] ", getElementId(),
-                this.marking().toStringPrefix(), localId(), label(), valueType(), getValue(),
+                this.marking().toStringPrefix(), localId(), label(), valueType(), value(),
                 this.getSenderExpr());
     }
 

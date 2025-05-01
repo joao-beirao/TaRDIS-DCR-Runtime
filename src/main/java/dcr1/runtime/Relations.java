@@ -6,33 +6,33 @@ import dcr1.model.relations.ControlFlowRelationElement;
 import dcr1.model.relations.IControlFlowRelationElement;
 import dcr1.model.relations.ISpawnRelationElement;
 import dcr1.model.relations.RelationElement;
-import dcr1.runtime.relations.ControlFlowRelationInstance;
-import dcr1.runtime.relations.RelationInstance;
-import dcr1.runtime.relations.SpawnRelationInstance;
+import dcr1.runtime.elements.relations.ControlFlowRelationInstance;
+import dcr1.runtime.elements.relations.RelationInstance;
+import dcr1.runtime.elements.relations.SpawnRelationInstance;
 
 class Relations {
     static InstantiatedControlFlowRelation newControlFlowRelation(
-            IControlFlowRelationElement baseElement, GenericEventInstance<?> source,
-            GenericEventInstance<?> target) {
+            IControlFlowRelationElement baseElement, GenericEventInstance source,
+            GenericEventInstance target) {
         return new InstantiatedControlFlowRelation(baseElement, source, target);
     }
 
     static InstantiatedSpawnRelation newSpawnRelationInstance(ISpawnRelationElement baseElement,
-            GenericEventInstance<?> source) {
+            GenericEventInstance source) {
         return new InstantiatedSpawnRelation(baseElement, source);
     }
 }
 
-abstract class InstantiatedRelation
+abstract class GenericRelationInstance
         implements RelationInstance {
 
     // TODO [revise] storing baseElement here - it seems we have to map everything but the relation
     //  type; then again, we are still missing the guard, which might be something to eval
     private final RelationElement baseElement;
-    private final GenericEventInstance<?> source;
+    private final GenericEventInstance source;
 
 
-    InstantiatedRelation(RelationElement baseElement, GenericEventInstance<?> source) {
+    GenericRelationInstance(RelationElement baseElement, GenericEventInstance source) {
         this.baseElement = baseElement;
         this.source = source;
     }
@@ -48,27 +48,27 @@ abstract class InstantiatedRelation
     }
 
     @Override
-    public GenericEventInstance<?> getSource() {
+    public GenericEventInstance getSource() {
         return source;
     }
 
-    protected RelationElement getBaseElement() {
-        return baseElement;
+    @Override
+    public RelationElement baseElement() {
+        return null;
     }
 }
 
-
 class InstantiatedSpawnRelation
-        extends InstantiatedRelation
+        extends GenericRelationInstance
         implements SpawnRelationInstance {
 
-    InstantiatedSpawnRelation(ISpawnRelationElement baseElement, GenericEventInstance<?> source) {
+    InstantiatedSpawnRelation(ISpawnRelationElement baseElement, GenericEventInstance source) {
         super(baseElement, source);
     }
 
     @Override
     public GraphModel getSubgraph() {
-        return ((ISpawnRelationElement) getBaseElement()).getSubgraph();
+        return ((ISpawnRelationElement) baseElement()).getSubgraph();
     }
 
     // TODO [not yet implemented]
@@ -89,14 +89,14 @@ class InstantiatedSpawnRelation
 
 
 final class InstantiatedControlFlowRelation
-        extends InstantiatedRelation
+        extends GenericRelationInstance
         implements ControlFlowRelationInstance {
 
-    private final GenericEventInstance<?> target;
+    private final GenericEventInstance target;
 
     InstantiatedControlFlowRelation(IControlFlowRelationElement baseElement,
-            GenericEventInstance<?> source,
-            GenericEventInstance<?> target) {
+            GenericEventInstance source,
+            GenericEventInstance target) {
         super(baseElement, source);
         this.target = target;
     }
@@ -107,13 +107,13 @@ final class InstantiatedControlFlowRelation
     }
 
     @Override
-    public GenericEventInstance<?> getTarget() {
+    public GenericEventInstance getTarget() {
         return target;
     }
 
     @Override
     public ControlFlowRelationElement.Type getRelationType() {
-        return ((IControlFlowRelationElement) getBaseElement()).getRelationType();
+        return ((IControlFlowRelationElement) baseElement()).getRelationType();
     }
 
     // FIXME

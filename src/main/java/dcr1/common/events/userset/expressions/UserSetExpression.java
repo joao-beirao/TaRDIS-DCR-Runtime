@@ -16,5 +16,5 @@ import dcr1.common.events.userset.values.UserVal;
      */
 public sealed interface UserSetExpression
         permits Receiver, RoleExpr, Sender, SetDiffExpr, SetUnionExpr, UserExpr {
-    UserSetVal eval(Environment<Value<?>> valueEnv, Environment<UserVal> userEnv);
+    UserSetVal eval(Environment<Value> valueEnv, Environment<UserVal> userEnv);
 }

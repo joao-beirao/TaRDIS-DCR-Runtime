@@ -11,8 +11,8 @@ public final class SpawnRelationElement
     private final GraphModel subgraph;
 
     public SpawnRelationElement(String elementId, String sourceEventId,
-            RecursiveGraphModel subgraph) {
-        super(elementId, sourceEventId);
+            RecursiveGraphModel subgraph, BooleanExpression instantiationConstraint) {
+        super(elementId, sourceEventId, instantiationConstraint);
         this.subgraph = subgraph;
     }
 
@@ -27,7 +27,6 @@ public final class SpawnRelationElement
         return subgraph;
     }
 
-
     @Override
     public String toString() {
         // TODO
@@ -36,9 +35,13 @@ public final class SpawnRelationElement
         //         getTargetId());
     }
 
-
     @Override
     public String unparse() {
+        return null;
+    }
+
+    @Override
+    public BooleanExpression instantiationConstraint() {
         return null;
     }
 }

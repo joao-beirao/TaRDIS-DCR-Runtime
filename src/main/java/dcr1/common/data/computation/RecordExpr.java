@@ -1,11 +1,11 @@
 package dcr1.common.data.computation;
 
 
+import dcr1.common.Environment;
 import dcr1.common.Record;
-import dcr1.common.data.types.RecordType;
+import dcr1.common.data.values.PropBasedVal;
 import dcr1.common.data.values.RecordVal;
 import dcr1.common.data.values.Value;
-import dcr1.common.Environment;
 
 import java.util.Objects;
 
@@ -13,24 +13,24 @@ import java.util.Objects;
  * A Record node
  */
 public final class RecordExpr
-        implements ComputationExpression<RecordType> {
+        implements PropBasedExpr {
 
-    private final Record<ComputationExpression<?>> exprRecord;
+    private final Record<ComputationExpression> exprRecord;
 
-    private RecordExpr(Record<ComputationExpression<?>> exprRecord) {
+    private RecordExpr(Record<ComputationExpression> exprRecord) {
+
         this.exprRecord = exprRecord;
     }
 
-    public static RecordExpr of(Record<ComputationExpression<?>> recordExpr) {
+    public static RecordExpr of(Record<ComputationExpression> recordExpr) {
         return new RecordExpr(Objects.requireNonNull(recordExpr));
     }
 
     @Override
-    public Value<RecordType> eval(Environment<Value<?>> env)
-           {
-        Record.Builder<Value<?>> builder = new Record.Builder<>();
+    public PropBasedVal eval(Environment<Value> env) {
+        Record.Builder<Value> builder = new Record.Builder<>();
         for (var fieldExpr : exprRecord.fields()) {
-            builder.addField(fieldExpr.name(), fieldExpr.value().eval(env));
+            builder.addFieldWithParams(fieldExpr.name(), fieldExpr.value().eval(env));
         }
         return RecordVal.of(builder.build());
     }
@@ -63,7 +63,7 @@ public final class RecordExpr
                         Record.Field.of("f5", BooleanLiteral.of(false))));
 
         // nested records (mixing builder() and .ofEntries()
-        var recordFromBuilder = new Record.Builder<ComputationExpression<?>>().addField(
+        var recordFromBuilder = new Record.Builder<ComputationExpression>().addField(
                         Record.Field.of("f1", IntegerLiteral.of(1)))
                 .addField(Record.Field.of("f2", StringLiteral.of("2")))
                 .addField(Record.Field.of("f3",

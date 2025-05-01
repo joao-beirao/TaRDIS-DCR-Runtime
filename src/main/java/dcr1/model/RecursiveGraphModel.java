@@ -4,7 +4,6 @@ package dcr1.model;
 import dcr1.common.Environment;
 import dcr1.common.events.InputEvent;
 import dcr1.common.events.ReceiveEvent;
-import dcr1.common.data.types.Type;
 import dcr1.model.events.ComputationEventElement;
 import dcr1.model.events.EventElement;
 import dcr1.model.events.InputEventElement;
@@ -20,10 +19,10 @@ public final class RecursiveGraphModel
         extends GenericElement
         implements GraphModel {
 
-    private final Map<String, EventElement<? extends Type>> eventsByLocalId;
+    private final Map<String, EventElement> eventsByLocalId;
 
     // TODO [revisit] possibly discard computationEvents
-    private final Map<String, ComputationEventElement<? extends Type>> computationEvents;
+    private final Map<String, ComputationEventElement> computationEvents;
     private final Set<IControlFlowRelationElement> controlFlowRelations;
 
     // TODO should eventually be a list of relations per event
@@ -40,12 +39,12 @@ public final class RecursiveGraphModel
 
 
     @Override
-    public Iterable<? extends EventElement<? extends Type>> events() {
+    public Iterable<? extends EventElement> events() {
         return eventsByLocalId.values();
     }
 
     @Override
-    public Iterable<ComputationEventElement<? extends Type>> computationEvents() {
+    public Iterable<ComputationEventElement> computationEvents() {
         return computationEvents.values();
     }
 
@@ -55,13 +54,13 @@ public final class RecursiveGraphModel
     }
 
     @Override
-    public Iterable<? extends InputEvent<?>> inputEvents() {
+    public Iterable<? extends InputEvent> inputEvents() {
         // TODO [implement]
         throw new RuntimeException("Not yet implemented");
     }
 
     @Override
-    public Iterable<? extends ReceiveEvent<?>> receiveEvents() {
+    public Iterable<? extends ReceiveEvent> receiveEvents() {
         return null;
     }
 
@@ -74,19 +73,19 @@ public final class RecursiveGraphModel
     //  gone through this
     // String label, ASTNode expression,
     // Type type, EventMarking marking
-    void addComputationEvent(ComputationEventElement<? extends Type> event) {
+    void addComputationEvent(ComputationEventElement event) {
         // TODO uncomment
         eventsByLocalId.putIfAbsent(event.localId(), event);
         computationEvents.putIfAbsent(event.localId(), event);
     }
 
-    void addInputEvent(InputEventElement<? extends Type> event) {
-        eventsByLocalId.putIfAbsent(event.localId(), event);
-    }
-    void addReceiveEvent(ReceiveEventElement<? extends Type> event) {
+    void addInputEvent(InputEventElement event) {
         eventsByLocalId.putIfAbsent(event.localId(), event);
     }
 
+    void addReceiveEvent(ReceiveEventElement event) {
+        eventsByLocalId.putIfAbsent(event.localId(), event);
+    }
 
 
     void addControlFlowRelation(IControlFlowRelationElement relationElement) {
@@ -116,7 +115,7 @@ public final class RecursiveGraphModel
                 .append(indent)
                 .append("(<")
                 .append(graph.getElementId())
-                        .append(">)");
+                .append(">)");
         graph.eventsByLocalId.values()
                 .forEach(event -> builder.append(System.lineSeparator())
                         .append(indent)
@@ -135,10 +134,10 @@ public final class RecursiveGraphModel
 
     @Override
     public String toString() {
-        return new StringBuilder().append("{")
-                .append(tester(this, "  ", Objects::toString))
-                .append(System.lineSeparator())
-                .append("}").toString();
+        return "{" +
+                tester(this, "  ", Objects::toString) +
+                System.lineSeparator() +
+                "}";
     }
 
     public String toString(String indent) {

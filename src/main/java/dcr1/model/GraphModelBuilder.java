@@ -35,54 +35,55 @@ public class GraphModelBuilder {
     }
 
     public <T extends Type> GraphModelBuilder addLocalComputationEvent(String elementId,
-            String localId, String label, ComputationExpression<T> computation,
-            ImmutableMarkingElement<T> initialMarking, BooleanExpression constraint) {
+            String localId, String label, ComputationExpression computation,
+            ImmutableMarkingElement initialMarking, BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
         registerComputationEventElement(
                 EventElements.newLocalComputationEvent(elementId, localId, label, computation,
-                        initialMarking, constraint));
+                        initialMarking, instantiationConstraint, ifcConstraint));
         return this;
     }
 
     public <T extends Type> GraphModelBuilder addComputationEvent(String elementId, String localId,
-            String label, ComputationExpression<T> computation, UserSetExpression receivers,
-            ImmutableMarkingElement<T> initialMarking, BooleanExpression constraint) {
+            String label, ComputationExpression computation, UserSetExpression receivers,
+            ImmutableMarkingElement initialMarking, BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
         registerComputationEventElement(
                 EventElements.newComputationEvent(elementId, localId, label, computation,
-                        initialMarking, receivers, constraint));
+                        initialMarking, receivers, instantiationConstraint, ifcConstraint));
         return this;
     }
 
     public <T extends Type> GraphModelBuilder addLocalInputEvent(String elementId, String localId,
-            String label, ImmutableMarkingElement<T> initialMarking, BooleanExpression constraint) {
+            String label, ImmutableMarkingElement initialMarking, BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
         registerInputEventElement(
                 EventElements.newLocalInputEvent(elementId, localId, label, initialMarking,
-                        constraint));
+                        instantiationConstraint, ifcConstraint));
         return this;
     }
 
     public <T extends Type> GraphModelBuilder addInputEvent(String elementId, String localId,
-            String label, UserSetExpression receivers, ImmutableMarkingElement<T> initialMarking,
-            BooleanExpression constraint) {
+            String label, UserSetExpression receivers, ImmutableMarkingElement initialMarking,
+            BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
         registerInputEventElement(
                 EventElements.newInputEvent(elementId, localId, label, receivers, initialMarking,
-                        constraint));
+                        instantiationConstraint, ifcConstraint));
         return this;
     }
 
     public <T extends Type> GraphModelBuilder addReceiveEvent(String elementId, String localId,
-            String label, UserSetExpression senders, ImmutableMarkingElement<T> initialMarking,
-            BooleanExpression constraint) {
+            String label, UserSetExpression senders, ImmutableMarkingElement initialMarking,
+            BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
         registerReceiveEventElement(
                 EventElements.newReceiveEvent(elementId, localId, label, senders, initialMarking,
-                        constraint));
+                        instantiationConstraint, ifcConstraint));
         return this;
     }
 
 
     public GraphModelBuilder addControlFlowRelation(String elementId, String srcId, String targetId,
-            ControlFlowRelation.Type relationType) {
+            ControlFlowRelation.Type relationType, BooleanExpression instantiationConstraint) {
         IControlFlowRelationElement element =
-                RelationElements.newControlFlowRelation(elementId, srcId, targetId, relationType);
+                RelationElements.newControlFlowRelation(elementId, srcId, targetId, relationType,
+                        instantiationConstraint);
         controlFlowRelationsConsumers.add(graph -> graph.addControlFlowRelation(element));
         return this;
     }
@@ -92,24 +93,24 @@ public class GraphModelBuilder {
     }
 
     private <T extends Type> void registerComputationEventElement(
-            ComputationEventElement<T> element) {
+            ComputationEventElement element) {
         eventConsumers.add(graph -> graph.addComputationEvent(element));
     }
 
-    private final <T extends Type> void registerInputEventElement(InputEventElement<T> element) {
+    private final <T extends Type> void registerInputEventElement(InputEventElement element) {
         eventConsumers.add(graph -> graph.addInputEvent(element));
     }
 
     private final <T extends Type> void registerReceiveEventElement(
-            ReceiveEventElement<T> element) {
+            ReceiveEventElement element) {
         eventConsumers.add(graph -> graph.addReceiveEvent(element));
     }
 
     // @Override
     public GraphModelBuilder beginSpawn(String relationElementId, String subgraphElementId,
-            String sourceEventId) {
+            String sourceEventId, BooleanExpression instantiationConstraint) {
         return new SpawnGraphModelBuilder(relationElementId, subgraphElementId, sourceEventId,
-                this);
+                instantiationConstraint, this);
     }
 
     // @Override
@@ -145,13 +146,14 @@ public class GraphModelBuilder {
 
         private final String sourceEventId;
         private final String subgraphElementId;
-
+        private final BooleanExpression instantiationConstraint;
         private final GraphModelBuilder outerScope;
 
         private SpawnGraphModelBuilder(String relationElementId, String subgraphElementId,
-                String sourceEventId, GraphModelBuilder outerScope) {
+                String sourceEventId, BooleanExpression instantiationConstraint, GraphModelBuilder outerScope) {
             super(relationElementId);
             this.sourceEventId = sourceEventId;
+            this.instantiationConstraint = instantiationConstraint;
             this.outerScope = outerScope;
             this.subgraphElementId = subgraphElementId;
         }
@@ -172,7 +174,8 @@ public class GraphModelBuilder {
         public void accept(RecursiveGraphModel model) {
             RecursiveGraphModel subgraph = populate(new RecursiveGraphModel(subgraphElementId));
             SpawnRelationElement spawnElement =
-                    new SpawnRelationElement(getElementId(), sourceEventId, subgraph);
+                    new SpawnRelationElement(getElementId(), sourceEventId, subgraph,
+                            instantiationConstraint);
             model.addSpawnRelation(spawnElement);
         }
     }

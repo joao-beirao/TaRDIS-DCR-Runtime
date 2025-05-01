@@ -1,8 +1,6 @@
 package dcr1.common.events.userset;
 
 import dcr1.common.Record;
-import dcr1.common.data.values.PrimitiveValue;
-import dcr1.common.data.values.StringVal;
 
 import java.io.Serializable;
 import java.util.Objects;

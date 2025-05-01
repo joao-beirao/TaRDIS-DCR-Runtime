@@ -19,7 +19,7 @@ public record Sender(String eventId) implements UserSetExpression {
     public static Sender of(String eventId) { return new Sender(eventId);}
 
     @Override
-    public UserSetVal eval(Environment<Value<?>> valueEnv, Environment<UserVal> userEnv) {
+    public UserSetVal eval(Environment<Value> valueEnv, Environment<UserVal> userEnv) {
         return userEnv.lookup(eventId)
                 .orElseThrow(() -> new IllegalStateException(
                         "Internal " + "Error: bad environment - missing binding for event " +

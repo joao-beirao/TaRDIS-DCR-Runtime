@@ -17,22 +17,3 @@ public record RoleParams<V>(Record<? extends V> params) implements Serializable 
 
     public RoleParams {Objects.requireNonNull(params);}
 }
-
-// public final class RoleParams<V>
-//         extends UserSetParams<V> {
-//
-//
-//
-//     public static <V> RoleParams<V> of(Record<? extends V> params) {
-//         return new RoleParams<V>(params);
-//     }
-//
-//
-//     public static <V> RoleParams<V> empty() {
-//         return new RoleParams<>(Record.empty());
-//     }
-//
-//     public RoleParams(Record<? extends V> params) {
-//         super(params);
-//     }
-// }

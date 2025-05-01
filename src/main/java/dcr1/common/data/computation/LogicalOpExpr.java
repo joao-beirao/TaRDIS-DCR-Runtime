@@ -4,6 +4,7 @@ import dcr1.common.Environment;
 import dcr1.common.data.types.Type;
 import dcr1.common.data.values.BooleanVal;
 import dcr1.common.data.values.Value;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -37,7 +38,7 @@ public record LogicalOpExpr(BooleanExpression left, BooleanExpression right, Op 
     }
 
     @Override
-    public BooleanVal eval(Environment<Value<? extends Type>> env) {
+    public BooleanVal eval(Environment<Value> env) {
         var leftBool = left.eval(env).value();
         var rightBool = right.eval(env).value();
         return BooleanVal.of(
@@ -48,6 +49,7 @@ public record LogicalOpExpr(BooleanExpression left, BooleanExpression right, Op 
         );
     }
 
+    @NotNull
     @Override
     public String toString() {
         return String.format("%s %s %s", left, op, right);

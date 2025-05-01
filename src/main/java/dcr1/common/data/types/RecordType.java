@@ -11,7 +11,7 @@ import java.util.Objects;
  * RecordType
  */
 public final class RecordType
-        implements Type {
+        implements Type, DereferableType {
     @Serial
     private static final long serialVersionUID = 3695622628239071917L;
     private static final RecordType EMPTY_INSTANCE = new RecordType(Record.empty());
@@ -70,11 +70,11 @@ public final class RecordType
 
         // mix int string
         var t5 = RecordType.of(Record.ofEntries(Record.Field.of("int", IntegerType.singleton()),
-                Record.Field.of("string", GenericStringType.singleton())));
+                Record.Field.of("string", StringType.singleton())));
 
         // vs t5, swapped order - still true
         var t6 = RecordType.of(Record.ofEntries(Record.Field.of("int", IntegerType.singleton()),
-                Record.Field.of("string", GenericStringType.singleton())));
+                Record.Field.of("string", StringType.singleton())));
 
         // nested records (int, int)
         var t7 = RecordType.of(Record.ofEntries(Record.Field.of("rec", t1)));
@@ -88,11 +88,11 @@ public final class RecordType
         // mixing names in nested records
 
         var t10 = RecordType.of(Record.ofEntries(Record.Field.of("int", IntegerType.singleton()),
-                Record.Field.of("string", GenericStringType.singleton())));
+                Record.Field.of("string", StringType.singleton())));
 
         // vs t10, same fields but diff types
         var t11 = RecordType.of(Record.ofEntries(Record.Field.of("string", IntegerType.singleton()),
-                Record.Field.of("int", GenericStringType.singleton())));
+                Record.Field.of("int", StringType.singleton())));
 
 
         var t12 = RecordType.of(Record.ofEntries(Record.Field.of("rec", t10)));

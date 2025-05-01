@@ -139,7 +139,7 @@ public final class CLI {
     // ========================================================================
     // (!) for the sake of testing and internal demos only - to be replaced by a GUI
 
-    private static Value<?> parseInputVal(String input) {
+    private static Value parseInputVal(String input) {
         input = input.trim();
         // TODO handle empty input values
         if (input.isEmpty()) {
@@ -168,7 +168,7 @@ public final class CLI {
       if (content.isEmpty())
         throw new IllegalArgumentException("Expecting record fields: empty record not        supported");
 
-      var builder = new Record.Builder<Value<?>>();
+      var builder = new Record.Builder<Value>();
       String rest = content;
       while (!rest.isEmpty()) {
         var field_end_pos = -1;
@@ -207,11 +207,11 @@ public final class CLI {
       return RecordVal.of(builder.build());
     }
 
-    private static Record.Field<Value<?>> parseRecordFieldVal(String field) {
+    private static Record.Field<Value> parseRecordFieldVal(String field) {
       var split_pos = field.indexOf(":");
       var name = field.substring(0, split_pos);
       var valueAsString = field.substring(split_pos + 1);
-      Value<?> val = parseInputVal(valueAsString);
+      Value val = parseInputVal(valueAsString);
       return new Record.Field<>(name, val);
     }
 

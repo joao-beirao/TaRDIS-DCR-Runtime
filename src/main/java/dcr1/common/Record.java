@@ -156,7 +156,7 @@ public final class Record<V>
         // replaces if already existed, keeps the order in which entries first appeared
         // TODO [validate args]
         // TODO [throw on repeated field?]
-        public Builder<V> addField(String name, V value) {
+        public Builder<V> addFieldWithParams(String name, V value) {
             fields.put(name, Field.of(name, value));
             return this;
         }

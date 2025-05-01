@@ -8,10 +8,7 @@ import dcr1.common.data.values.Value;
 
 /**
  * A DCR Input event
- *
- * @param <T>
- *         the {@link Type type} of {@link Value value} stored by this event
  */
-public interface InputEvent<T extends Type>
-        extends LocallyInitiatedEvent<T> {
+public interface InputEvent
+        extends LocallyInitiatedEvent {
 }

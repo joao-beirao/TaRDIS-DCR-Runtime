@@ -12,25 +12,19 @@ import java.util.Optional;
 
 /**
  * Common interface for any object representing a DCR event.
- *
- * @param <T>
- *         the {@link Type type} of {@link Value value} stored by this event.
  */
-public interface Event<T extends Type> {
+public interface Event {
 
     /**
      * Common interface for any object representing a DCR marking.
      * <p>
      * DCR {@link Event events} are <i>stateful</i> entities. A Marking captures the mutable state
      * of an event, reflecting its current throughout execution.
-     *
-     * @param <T>
-     *         the {@link Type type} of {@link Value value} stored by this marking.
      */
-    interface Marking<T extends Type> {
+    interface Marking {
         /**
-         * Indicates whether the associated event has already been <i>executed</i> (at any given
-         * point in time).
+         * Indicates whether the event has already been <i>executed</i> (at any given point in
+         * time).
          *
          * @return <code>true</code> if the associated event has already been executed;
          *         <code>false</code> otherwise.
@@ -38,7 +32,7 @@ public interface Event<T extends Type> {
         boolean hasExecuted();
 
         /**
-         * Indicates whether the associated event is currently <i>pending</i>.
+         * Indicates whether the event is currently <i>pending</i>.
          *
          * @return <code>true</code> if the associated event is currently pending;
          *         <code>false</code> otherwise.
@@ -46,31 +40,30 @@ public interface Event<T extends Type> {
         boolean isPending();
 
         /**
-         * Indicates whether the associated event is currently <i>included</i>. An event is said to
-         * be
+         * Indicates whether the event is currently <i>included</i>. An event is said to be
          * <i>excluded</i> otherwise.
          *
-         * @return <code>true</code> if the associated event is currently included;
+         * @return <code>true</code> if the event is currently included;
          *         <code>false</code> otherwise.
          */
         boolean isIncluded();
 
         /**
-         * Returns the current {@link Value value} of the associated event.
+         * Returns the current {@link Value value} of the event.
          *
-         * @return the current {@link Value value} of the associated event.
+         * @return the current {@link Value value} of the event.
          */
-        Value<T> getValue();
+        Value value();
 
         /**
-         * Returns the {@link Type type} of {@link Value values} stored by the associated event.
+         * Returns the {@link Type type} of {@link Value values} stored by the event.
          * <p>
          * The type of event stored by each event is fixed at design time.
          *
-         * @return the type of values stored by the associated event.
+         * @return the type of values stored by the event.
          */
-        default T valueType() {
-            return getValue().type();
+        default Type valueType() {
+            return value().type();
         }
 
         // TODO [rethink] useful, but maybe not the right place
@@ -104,18 +97,21 @@ public interface Event<T extends Type> {
      *
      * @return a marking object reflecting the current state of this event.
      */
-    Marking<T> marking();
+    Marking marking();
+
+
+    BooleanExpression instantiationConstraint();
+
+    BooleanExpression ifcConstraint();
 
     /**
-     * Returns a user-set expression describing the swarm members that participate in this event
-     * as <i>receivers<i></> in an interaction.
+     * Returns a user-set expression describing the swarm members that participate in this event as
+     * <i>receivers<i></> in an interaction.
      *
      * @return an Optional describing the receivers, if this event is an interaction; an empty
-     * Optional otherwise;
+     *         Optional otherwise;
      */
     Optional<? extends UserSetExpression> remoteParticipants();
-
-    BooleanExpression constraint();
 
     default boolean hasExecuted() {return marking().hasExecuted();}
 
@@ -123,7 +119,7 @@ public interface Event<T extends Type> {
 
     default boolean isIncluded() {return marking().isIncluded();}
 
-    default Value<T> getValue() {return marking().getValue();}
+    default Value value() {return marking().value();}
 
-    default T valueType() {return marking().valueType();}
+    default Type valueType() {return marking().valueType();}
 }

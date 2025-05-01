@@ -1,0 +1,525 @@
+{
+  "type": "object",
+  "properties": {
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "marking": {
+      "$ref": "#/$defs/marking"
+    },
+    "val": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/value"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "type": {
+      "$ref": "#/$exprs/typeExpression"
+    },
+    "dataExpr": {
+      "$ref": "#/$defs/dataExpr"
+    }
+  },
+  "$defs": {
+    "value": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "boolLit": {
+              "$ref": "#/$values/boolLit"
+            }
+          },
+          "required": [
+            "boolLit"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "intLit": {
+              "$ref": "#/$values/intLit"
+            }
+          },
+          "required": [
+            "intLit"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stringLit": {
+              "$ref": "#/$values/stringLit"
+            }
+          },
+          "required": [
+            "stringLit"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "refVal": {
+              "$ref": "#/$values/refVal"
+            }
+          },
+          "required": [
+            "refVal"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recordVal": {
+              "type": "array",
+              "items": {
+                "type": "object,",
+                "properties": {
+                  "fieldName": {
+                    "type": "string"
+                  },
+                  "fieldValue": {
+                    "$ref": "#/$defs/value"
+                  }
+                },
+                "required": [
+                  "fieldName",
+                  "fieldValue"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "recordVal"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "dataExpr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "computationExpression": {
+              "$ref": "#/$exprs/computationExpression"
+            }
+          },
+          "required": [
+            "computationExpression"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "typeExpression": {
+              "$ref": "#/$exprs/typeExpression"
+            }
+          },
+          "required": [
+            "typeExpression"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dataExpr": {
+          "$ref": "#/$defs/dataExpr"
+        },
+        "marking": {
+          "$ref": "#/$defs/marking"
+        }
+      },
+      "required": [
+        "uid",
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "marking": {
+      "type": "object",
+      "properties": {
+        "isIncluded": {
+          "type": "boolean"
+        },
+        "isPending": {
+          "type": "boolean"
+        },
+        "value": {
+          "$ref": "#/$defs/value"
+        }
+      },
+      "required": [
+        "isIncluded",
+        "isPending"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$exprs": {
+    "computationExpression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "literal": {
+              "$ref": "#/$exprs/literalExpr"
+            }
+          },
+          "required": [
+            "literal"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "propBasedExpr": {
+              "$ref": "#/$exprs/propBasedExpr"
+            }
+          },
+          "required": [
+            "propBasedExpr"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "additionalProperties": false
+    },
+    "typeExpression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "primitiveTy": {
+              "enum": [
+                "bool",
+                "int",
+                "string"
+              ]
+            }
+          },
+          "required": [
+            "primitiveTy"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recordTy": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fieldName": {
+                    "type": "string"
+                  },
+                  "fieldType": {
+                    "$ref": "#/$exprs/typeExpression"
+                  }
+                },
+                "required": [
+                  "fieldName",
+                  "fieldType"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "recordTy"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "refTy": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "refTy"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "literalExpr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "boolLit": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "boolLit"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "intLit": {
+              "type": "integer"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "stringLit": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "additionalProperties": false
+    },
+    "propBasedExpr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "eventRefLit": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "eventRefLit"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recordExpr": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "field": {
+                    "type": "object,",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "expr": {
+                        "$ref": "#/$exprs/computationExpression"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "expr"
+                    ]
+                  },
+                  "additionalProperties": false
+                },
+                "additionalProperties": false,
+                "required": [
+                  "field"
+                ]
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "recordExpr"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "propDerefExpr": {
+              "type": "object",
+              "properties": {
+                "baseExpr": {
+                  "$ref": "#/$exprs/propBasedExpr"
+                },
+                "prop": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "baseExpr",
+                "prop"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "propDerefExpr"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "$participants": {
+    "communication": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "local": {
+            }
+          },
+          "required": [
+            "local"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "roleParam": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "object",
+              "const": {
+                "$ref": "#/$exprs/literalExpr"
+              }
+            },
+            {
+              "type": "object",
+              "derefExpr": {
+                "$ref": "#/$exprs/propBasedExpr"
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$values": {
+    "propBasedVal": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "refVal": {
+              "$ref": "#/$values/refVal"
+            }
+          },
+          "required": [
+            "refVal"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recordVal": {
+              "$ref": "#/$values/recordVal"
+            }
+          },
+          "required": [
+            "recordVal"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "propDerefVal": {
+              "$ref": "#/$values/propDerefVal"
+            }
+          },
+          "required": [
+            "propDerefVal"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "boolLit": {
+      "type": "boolean"
+    },
+    "intLit": {
+      "type": "integer"
+    },
+    "stringLit": {
+      "type": "string"
+    },
+    "refVal": {
+      "type": "string"
+    },
+    "recordVal": {
+      "type": "array",
+      "items": {
+        "type": "object,",
+        "properties": {
+          "fieldName": {
+            "type": "string"
+          },
+          "fieldValue": {
+            "$ref": "#/$defs/value"
+          }
+        },
+        "required": [
+          "fieldName",
+          "fieldValue"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "propDerefVal": {
+      "type": "object",
+      "properties": {
+        "propBasedVal": {
+          "$ref": "#/$values/propBasedVal"
+        },
+        "propName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "propBasedVal",
+        "propName"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

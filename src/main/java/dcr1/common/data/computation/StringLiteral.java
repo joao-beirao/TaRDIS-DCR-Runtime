@@ -1,7 +1,7 @@
 package dcr1.common.data.computation;
 
 import dcr1.common.data.ASTComparable;
-import dcr1.common.data.types.GenericStringType;
+import dcr1.common.data.types.StringType;
 import dcr1.common.data.values.StringVal;
 import dcr1.common.data.values.Value;
 import dcr1.common.Environment;
@@ -9,7 +9,7 @@ import dcr1.common.Environment;
 import java.util.Objects;
 
 public class StringLiteral
-        implements ComputationExpression<GenericStringType>, ASTComparable<StringVal> {
+        implements ComputationExpression, ASTComparable<StringVal> {
 
     private static final StringLiteral EMPTY_STRING = new StringLiteral(StringVal.empty());
 
@@ -36,7 +36,7 @@ public class StringLiteral
     }
 
     @Override
-    public Value<? extends GenericStringType> eval(Environment<Value<?>> env) {
+    public StringVal eval(Environment<Value> env) {
         return value;
     }
 

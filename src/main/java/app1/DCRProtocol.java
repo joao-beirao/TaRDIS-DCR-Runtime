@@ -57,7 +57,7 @@ public abstract class DCRProtocol
 
     @Override
     public Set<UserVal> uponSendRequest(String eventId, UserSetVal receivers,
-            Event.Marking<?> marking,
+            Event.Marking marking,
             String uidExtension) {
         var neighbours = DummyMembershipLayer.instance().evalUserSetExpr(receivers);
         neighbours.forEach(
@@ -94,7 +94,7 @@ public abstract class DCRProtocol
     }
 
     // called from UI
-    void onExecuteInputEvent(String eventId, Value<?> inputValue) {
+    void onExecuteInputEvent(String eventId, Value inputValue) {
         logger.info("Executing input action '{}' with input value {}", eventId, inputValue);
         try {
             runner.executeInputEvent(eventId, inputValue);
@@ -116,10 +116,10 @@ public abstract class DCRProtocol
 
     // called from Babel's internal network after a remote event has been executed
     private void onExecuteReceiveEvent(GraphRunner runner, String eventId,
-            Event.Marking<?> marking, UserVal sender, String uidExtension) {
+            Event.Marking marking, UserVal sender, String uidExtension) {
         logger.info("Executing receive operation '{}': received {}", eventId, marking);
         try {
-            runner.onReceiveEvent(eventId, marking.getValue(), sender, uidExtension);
+            runner.onReceiveEvent(eventId, marking.value(), sender, uidExtension);
             // TODO pass on something to be printed
             cmdLineRunner.onReceiveEvent();
         } catch (Exception e) {
@@ -144,7 +144,7 @@ public abstract class DCRProtocol
 
     // send a message to another Babel DCR node
     private void sendMessage(DummyMembershipLayer.DummyNeighbour receiver, String eventId,
-            Event.Marking<?> marking, UserVal user, String uidExtension) {
+            Event.Marking marking, UserVal user, String uidExtension) {
         try {
             String hostName = receiver.hostName();
             InetAddress targetAddr = InetAddress.getByName(hostName);

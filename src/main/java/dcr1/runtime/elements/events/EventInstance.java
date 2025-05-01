@@ -1,0 +1,29 @@
+package dcr1.runtime.elements.events;
+
+import dcr1.common.data.computation.BooleanExpression;
+import dcr1.common.events.Event;
+import dcr1.model.ModelElement;
+import dcr1.model.events.EventElement;
+import dcr1.runtime.elements.RuntimeElement;
+
+// Marking is mutable, has a globalId/UUID, participant exprs are a fragment of the same exprs in
+// the model - upon instantiation, Receiver/Sender exprs are replaced with actual User
+// TODO [seal?]
+public interface EventInstance
+        extends Event, RuntimeElement {
+    String getGlobalId();
+
+    @Override
+    EventElement baseElement();
+
+    @Override
+    default BooleanExpression instantiationConstraint() {
+        return baseElement().instantiationConstraint();
+    }
+
+    @Override
+    default BooleanExpression ifcConstraint() {
+        return baseElement().ifcConstraint();
+    }
+}
+

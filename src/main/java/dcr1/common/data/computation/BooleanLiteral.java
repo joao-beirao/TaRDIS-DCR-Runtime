@@ -25,7 +25,7 @@ public final class BooleanLiteral
     }
 
     @Override
-    public BooleanVal eval(Environment<Value<?>> env) {
+    public BooleanVal eval(Environment<Value> env) {
         return value;
     }
 

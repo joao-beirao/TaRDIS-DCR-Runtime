@@ -1,13 +1,15 @@
 package dcr1.common.events.userset.values;
 
 import dcr1.common.data.types.PrimitiveType;
+import dcr1.common.data.values.PrimitiveVal;
 import dcr1.common.data.values.Value;
 import dcr1.common.events.userset.RoleParams;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 // TODO [sanitize args]
-public record RoleVal(String role, RoleParams<Value<? extends PrimitiveType>> params)
+public record RoleVal(String role, RoleParams<PrimitiveVal> params)
         implements UserSetVal {
 
     public RoleVal {
@@ -19,10 +21,11 @@ public record RoleVal(String role, RoleParams<Value<? extends PrimitiveType>> pa
         return new RoleVal(role, RoleParams.empty());
     }
 
-    public static RoleVal of(String role, RoleParams<Value<? extends PrimitiveType>> params) {
+    public static RoleVal of(String role, RoleParams<PrimitiveVal> params) {
         return new RoleVal(role, params);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return String.format("%s(*)", role);

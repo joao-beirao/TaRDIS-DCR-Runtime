@@ -13,10 +13,10 @@ public sealed interface GraphModel
   // TODO query methods - show/navigate graph model (in the future, maybe modify the graph in-place)
 
   @Override
-  Iterable<? extends EventElement<? extends Type>> events();
+  Iterable<? extends EventElement> events();
 
   @Override
-  Iterable<? extends ComputationEventElement<? extends Type>> computationEvents();
+  Iterable<? extends ComputationEventElement> computationEvents();
 
   @Override
   Iterable<? extends IControlFlowRelationElement> controlFlowRelations();

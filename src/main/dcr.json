@@ -1,0 +1,135 @@
+{
+  "events": [
+  ],
+  "marking": {
+    "isIncluded": true,
+    "isPending": true,
+    "value": {
+      "recordVal": [
+        {
+          "fieldName": "request_id",
+          "fieldValue": {
+            "stringLit": "#00834238"
+          }
+        },
+        {
+          "fieldName": "kw",
+          "fieldValue": {
+            "intLit": 13
+          }
+        },
+        {
+          "fieldName": "requester",
+          "fieldValue": {
+            "recordVal": [
+              {
+                "fieldName": "id",
+                "fieldValue": {
+                  "stringLit": "#p4"
+                }
+              },
+              {
+                "fieldName": "cid",
+                "fieldValue": {
+                  "intLit": 5
+                }
+              },
+              {
+                "fieldName": "event",
+                "fieldValue": {
+                  "refVal": "a"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "val": {
+    "value": {
+      "recordVal": [
+        {
+          "fieldName": "request_id",
+          "fieldValue": {
+            "stringLit": "#00834238"
+          }
+        },
+        {
+          "fieldName": "kw",
+          "fieldValue": {
+            "intLit": 13
+          }
+        },
+        {
+          "fieldName": "requester",
+          "fieldValue": {
+            "recordVal": [
+              {
+                "fieldName": "id",
+                "fieldValue": {
+                  "stringLit": "p4"
+                }
+              },
+              {
+                "fieldName": "cid",
+                "fieldValue": {
+                  "intLit": 5
+                }
+              },
+              {
+                "fieldName": "event",
+                "fieldValue": {
+                  "refVal": "consume_04_tx"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "type": {
+    "recordTy": [
+      {
+        "fieldName": "param1",
+        "fieldType": {
+          "refTy": "Consume"
+        }
+      },
+      {
+        "fieldName": "param2",
+        "fieldType": {
+          "recordTy": [
+            {
+              "fieldName": "param3",
+              "fieldType": {
+                "primitiveTy": "string"
+              }
+            },
+            {
+              "fieldName": "param4",
+              "fieldType": {
+                "primitiveTy": "int"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "dataExpr": {
+    "typeExpression": {
+      "recordTy": [
+        {
+          "fieldName": "param1",
+          "fieldType": {
+            "primitiveTy": "string"
+          }
+        }
+      ]
+    }
+  }
+}
+
+

@@ -15,28 +15,28 @@ import java.util.Objects;
  */
 abstract class ASTBinaryLogicalOp implements BooleanExpression {
 
-    protected final ComputationExpression<IntegerType> left;
-    protected final ComputationExpression<IntegerType> right;
+    protected final ComputationExpression left;
+    protected final ComputationExpression right;
 
-    public ASTBinaryLogicalOp(ComputationExpression<IntegerType> left, ComputationExpression<IntegerType> right) {
+    public ASTBinaryLogicalOp(ComputationExpression left, ComputationExpression right) {
         this.left = Objects.requireNonNull(left);
         this.right = Objects.requireNonNull(right);
     }
 
-    public final ComputationExpression<IntegerType> getLeft() {
+    public final ComputationExpression getLeft() {
         return left;
     }
 
-    public final ComputationExpression<IntegerType> getRight() {
+    public final ComputationExpression getRight() {
         return right;
     }
 
 
     @Override
-    public final BooleanVal eval(Environment<Value<?>> env) {
-        Value<? extends IntegerType> lVal = left.eval(env);
+    public final BooleanVal eval(Environment<Value> env) {
+        Value lVal = left.eval(env);
         if (lVal instanceof IntegerVal) {
-            Value<? extends IntegerType> rVal = right.eval(env);
+            Value rVal = right.eval(env);
             if (rVal instanceof IntegerVal)
                 return compute((IntegerVal) lVal, (IntegerVal) rVal);
             // TODO

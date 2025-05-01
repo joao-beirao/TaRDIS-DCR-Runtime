@@ -2,7 +2,7 @@ package dcr1.common.data.types;
 
 import java.io.Serial;
 
-// TODO [javadoc]
+// TODO [revisit]
 
 /**
  * Void Type

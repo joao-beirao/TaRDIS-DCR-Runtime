@@ -171,7 +171,7 @@ public class PingPongProtocol extends GenericProtocol {
      * @param destination Host destination
      * @param message     String message
      */
-    public void sendPingMessage(Host destination, String message, Event.Marking<?> marking,
+    public void sendPingMessage(Host destination, String message, Event.Marking marking,
             String idExtensionToken, UserVal sender) {
       logger.debug("Sending Ping Message to {} on channel {} with message {}", destination, channelId, message);
       sendMessage(channelId, new PingMessage(++nextPingId, message, marking, sender, idExtensionToken),

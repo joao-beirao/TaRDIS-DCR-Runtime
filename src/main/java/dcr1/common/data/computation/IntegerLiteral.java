@@ -9,7 +9,7 @@ import dcr1.common.Environment;
 import java.util.Objects;
 
 public final class IntegerLiteral
-        implements ComputationExpression<IntegerType>, ASTComparable<IntegerVal> {
+        implements ComputationExpression, ASTComparable<IntegerVal> {
 
     // TODO same comment placed in NumberVal -> this just should be renamed to
     // ASTInteger (but ReGraDa would have to go first)
@@ -28,7 +28,7 @@ public final class IntegerLiteral
     }
 
     @Override
-    public IntegerVal eval(Environment<Value<?>> env) {
+    public IntegerVal eval(Environment<Value> env) {
         return this.value;
     }
 

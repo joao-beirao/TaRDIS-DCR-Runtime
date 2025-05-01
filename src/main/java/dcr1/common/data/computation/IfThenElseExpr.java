@@ -4,24 +4,24 @@ import dcr1.common.Environment;
 import dcr1.common.data.types.Type;
 import dcr1.common.data.values.Value;
 
-public record IfThenElseExpr<T extends Type>(
+public record IfThenElseExpr(
         BooleanExpression conditionExpr,
-        ComputationExpression<? extends T> thenExpr,
-        ComputationExpression<? extends T> elseExpr)
-        implements ComputationExpression<T> {
+        ComputationExpression thenExpr,
+        ComputationExpression elseExpr)
+        implements ComputationExpression {
 
     public IfThenElseExpr {
         // TODO validate args
     }
 
-    public static <T extends Type> IfThenElseExpr<T> of(
+    public static <T extends Type> IfThenElseExpr of(
             BooleanExpression conditionExpr,
-            ComputationExpression<? extends T> thenExpr,
-            ComputationExpression<? extends T> elseExpr) {
-        return new IfThenElseExpr<>(conditionExpr, thenExpr, elseExpr);
+            ComputationExpression thenExpr,
+            ComputationExpression elseExpr) {
+        return new IfThenElseExpr(conditionExpr, thenExpr, elseExpr);
     }
 
-    public Value<? extends T> eval(Environment<Value<?>> env) {
+    public Value eval(Environment<Value> env) {
         return conditionExpr.eval(env).value() ? thenExpr.eval(env) : elseExpr.eval(env);
     }
 

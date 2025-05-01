@@ -20,7 +20,7 @@ public record Receiver(String eventId)
     }
 
     @Override
-    public UserSetVal eval(Environment<Value<?>> valueEnv, Environment<UserVal> userEnv) {
+    public UserSetVal eval(Environment<Value> valueEnv, Environment<UserVal> userEnv) {
         return userEnv.lookup(eventId)
                 .orElseThrow(() -> new IllegalStateException(
                         "Internal " + "Error: bad environment - missing binding for event " +

@@ -2,28 +2,24 @@ package dcr1.common.data.computation;
 
 import dcr1.common.Environment;
 import dcr1.common.Record;
-import dcr1.common.data.types.IntegerType;
-import dcr1.common.data.types.RecordType;
-import dcr1.common.data.types.Type;
 import dcr1.common.data.values.IntegerVal;
 import dcr1.common.data.values.RecordVal;
 import dcr1.common.data.values.Value;
 
 // TODO [sanitize args]
 
-public class RecordFieldDeref<T extends Type>
-        implements ComputationExpression<T> {
+public class RecordFieldDeref
+        implements ComputationExpression {
 
-    private final ComputationExpression<? extends RecordType> recordExpr;
+    private final ComputationExpression recordExpr;
     private final String fieldName;
 
-    public static <T extends Type> RecordFieldDeref<T> of(ComputationExpression<?
-            extends RecordType> recordExpr,
+    public static RecordFieldDeref of(ComputationExpression recordExpr,
             String fieldName) {
-        return new RecordFieldDeref<>(recordExpr, fieldName);
+        return new RecordFieldDeref(recordExpr, fieldName);
     }
 
-    public RecordFieldDeref(ComputationExpression<? extends RecordType> recordExpr,
+    public RecordFieldDeref(ComputationExpression recordExpr,
             String fieldName) {
         this.recordExpr = recordExpr;
         this.fieldName = fieldName;
@@ -31,16 +27,14 @@ public class RecordFieldDeref<T extends Type>
 
     // TODO [revisit exceptions] move core part of error messages to static
     @Override
-    public Value<? extends T> eval(Environment<Value<?>> env)
-          {
+    public Value eval(Environment<Value> env) {
         if (recordExpr.eval(env) instanceof RecordVal recordValue) {
-            @SuppressWarnings("unchecked") var fieldValue =
-                    (Value<T>) recordValue.value()
-                            .get(fieldName)
-                            .orElseThrow(() -> new IllegalStateException(
-                                    "Internal Error: attempt to access missing field in record " +
-                                            "value: "));
-            return fieldValue;
+            recordValue.value()
+                    .get(fieldName)
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Internal Error: attempt to access unknown field in record " +
+                                    "value: "));
+            // return fieldValue;
         }
         // FIXME 'recordExpr.eval(env)' shouldn't be evaluating twice - pull up var
         // there are currently no other implementors of Value<RecordType> aside from RecordVal
@@ -68,14 +62,14 @@ public class RecordFieldDeref<T extends Type>
                                 Record.Field.of("f2", StringLiteral.of("2")))))
                 ));
         // {f3: {f1: 1 ; f2: '2'}}.f3
-        var f3FieldDeref = new RecordFieldDeref<RecordType>(nestedRecordExpr, "f3");
+        var f3FieldDeref = new RecordFieldDeref(nestedRecordExpr, "f3");
         // {f1: 1 ; f2: '2'}
         RecordVal rec = (RecordVal) f3FieldDeref.eval(Environment.empty());
 
         // {f3: {f1: 1 ; f2: '2'}}.f3.f1
-        var doubleDerefExpr = new RecordFieldDeref<IntegerType>(
-                        new RecordFieldDeref<RecordType>(nestedRecordExpr, "f3"),
-                        "f1");
+        var doubleDerefExpr = new RecordFieldDeref(
+                new RecordFieldDeref(nestedRecordExpr, "f3"),
+                "f1");
 
         IntegerVal intVal = (IntegerVal) doubleDerefExpr.eval(Environment.empty());
         System.err.println(doubleDerefExpr + "   -->   " + intVal);

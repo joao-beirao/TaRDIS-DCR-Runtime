@@ -11,12 +11,9 @@ import java.util.Optional;
  * <p>
  * A locally initiated event is said to be a <i>local event</i> if it has no passive participants,
  * and a <i>send event</i> otherwise.
- *
- * @param <T>
- *         the {@link Type type} of {@link Value value} stored by this event
  */
-public interface LocallyInitiatedEvent<T extends Type>
-        extends Event<T> {
+public interface LocallyInitiatedEvent
+        extends Event {
 
     /**
      * Returns an optional describing the set of receivers of this event.

@@ -3,19 +3,19 @@ package dcr1.runtime;
 import dcr1.common.events.Event;
 import dcr1.common.events.userset.values.UserSetVal;
 import dcr1.common.relations.Relation;
-import dcr1.runtime.events.EventInstance;
+import dcr1.runtime.elements.events.EventInstance;
 
 import java.util.*;
 
 
 public class ExecutionResult {
 
-    private Event.Marking<?> marking;
+    private Event.Marking marking;
 
     private UserSetVal receiversExpr;
     private Set<String> receivers;
     // DCR Graph "Diff"
-    private Set<EventInstance<?>> diff;
+    private Set<EventInstance> diff;
     // TODO: Add relations when execute a spawn relation (WIP)
     private Set<Relation> newRelations;
 
@@ -25,7 +25,7 @@ public class ExecutionResult {
         this.newRelations = new HashSet<>();
     }
 
-    public ExecutionResult(Set<String> receivers, Event.Marking<?> value) {
+    public ExecutionResult(Set<String> receivers, Event.Marking value) {
         this.receivers = receivers;
         this.marking = value;
         this.diff = new HashSet<>();
@@ -48,15 +48,15 @@ public class ExecutionResult {
         this.receivers.addAll(receivers);
     }
 
-    void addModifiedEvents(EventInstance<?> event) {
+    void addModifiedEvents(EventInstance event) {
         diff.add(event);
     }
 
-    void setMarking(Event.Marking<?> value) {
+    void setMarking(Event.Marking value) {
         this.marking = value;
     }
 
-    public Event.Marking<?> getMarking() {
+    public Event.Marking getMarking() {
         return this.marking;
     }
 

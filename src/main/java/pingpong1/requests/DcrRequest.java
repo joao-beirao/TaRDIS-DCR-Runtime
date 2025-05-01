@@ -12,12 +12,12 @@ public class DcrRequest extends ProtoRequest {
     public static final short REQUEST_ID = 1;
     private final Host destination;
     private final String eventId;
-    private final Event.Marking<?> marking;
+    private final Event.Marking marking;
     private final UserVal user;
     private final String idExtensionToken;
 
     // TODO [sanitize args]
-    public DcrRequest(String eventId, Event.Marking<?> marking, Host destination, UserVal user,
+    public DcrRequest(String eventId, Event.Marking marking, Host destination, UserVal user,
             String idExtensionToken) {
         super(REQUEST_ID);
         this.destination = destination;
@@ -35,7 +35,7 @@ public class DcrRequest extends ProtoRequest {
         return eventId;
     }
 
-    public Event.Marking<?> getMarking() {
+    public Event.Marking getMarking() {
         return marking;
     }
 

@@ -9,13 +9,12 @@ import java.util.Objects;
  *
  * @param alias
  * @param valueType
- * @param <T>
  */
-public record EventType<T extends Type>(String alias, T valueType)
-        implements Type {
+public record EventType(String alias, Type valueType)
+        implements Type, DereferableType {
 
-    public static <T extends Type> EventType<T> of(String alias, T valueType) {
-        return new EventType<>(alias, valueType);
+    public static <T extends Type> EventType of(String alias, T valueType) {
+        return new EventType(alias, valueType);
     }
 
 
@@ -30,7 +29,7 @@ public record EventType<T extends Type>(String alias, T valueType)
     public boolean equals(Object obj) {
         if (this == obj) {return true;}
         if (obj == null) {return false;}
-        if(obj instanceof EventType<?> other) {
+        if(obj instanceof EventType other) {
             return alias.equals(other.alias);
         }
         return false;

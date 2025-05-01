@@ -17,8 +17,8 @@ public final class ControlFlowRelationElement
   // TODO[?] allow adding in bulk as of(src, tgt, EnumSet<Type>)
 
   ControlFlowRelationElement(String elementId, String sourceId, String targetId,
-      Type relationType) {
-    super(elementId, sourceId);
+      Type relationType, BooleanExpression instantiationConstraint) {
+    super(elementId, sourceId, instantiationConstraint);
     this.targetId = targetId;
     this.relationType = relationType;
   }
@@ -39,6 +39,11 @@ public final class ControlFlowRelationElement
   @Override
   public Type getRelationType() {
     return relationType;
+  }
+
+  @Override
+  public BooleanExpression instantiationConstraint() {
+    return null;
   }
 
   @Override

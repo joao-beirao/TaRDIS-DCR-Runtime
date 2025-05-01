@@ -8,6 +8,6 @@ import java.util.Set;
 
 public interface CommunicationLayer {
     public Set<UserVal> uponSendRequest(String eventId, UserSetVal receivers,
-            Event.Marking<?> value,
+            Event.Marking value,
             String uidExtension);
 }

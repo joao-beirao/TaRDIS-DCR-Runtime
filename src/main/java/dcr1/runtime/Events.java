@@ -2,76 +2,75 @@ package dcr1.runtime;
 
 import dcr1.common.data.computation.BooleanExpression;
 import dcr1.common.data.computation.ComputationExpression;
-import dcr1.common.data.types.Type;
 import dcr1.common.data.values.Value;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 import dcr1.model.events.ComputationEventElement;
 import dcr1.model.events.EventElement;
 import dcr1.model.events.InputEventElement;
 import dcr1.model.events.ReceiveEventElement;
-import dcr1.runtime.events.ComputationEventInstance;
-import dcr1.runtime.events.EventInstance;
-import dcr1.runtime.events.InputEventInstance;
-import dcr1.runtime.events.ReceiveEventInstance;
+import dcr1.runtime.elements.events.ComputationEventInstance;
+import dcr1.runtime.elements.events.EventInstance;
+import dcr1.runtime.elements.events.InputEventInstance;
+import dcr1.runtime.elements.events.ReceiveEventInstance;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Optional;
 
 final class Events {
-    public static <T extends Type> ComputationInstance<T> newLocalComputationInstance(
-            String globalId, ComputationEventElement<T> baseElement) {
-        return new ComputationInstance<>(globalId, baseElement);
+    public static ComputationInstance newLocalComputationInstance(
+            String globalId, ComputationEventElement baseElement) {
+        return new ComputationInstance(globalId, baseElement);
     }
 
-    public static <T extends Type> ComputationInstance<T> newComputationInstance(String globalId,
-            ComputationEventElement<T> baseElement) {
-        return new ComputationInstance<>(globalId, baseElement);
+    public static ComputationInstance newComputationInstance(String globalId,
+            ComputationEventElement baseElement) {
+        return new ComputationInstance(globalId, baseElement);
     }
 
-    public static <T extends Type> InputInstance<T> newLocalInputInstance(String globalId,
-            InputEventElement<T> baseElement) {
+    public static InputInstance newLocalInputInstance(String globalId,
+            InputEventElement baseElement) {
         return InputInstance.of(globalId, baseElement);
     }
 
-    public static <T extends Type> InputInstance<T> newInputInstance(String globalId,
-            InputEventElement<T> baseElement) {
+    public static InputInstance newInputInstance(String globalId,
+            InputEventElement baseElement) {
         return InputInstance.of(globalId, baseElement);
     }
 
-    public static ReceiveInstance<?> newReceiveInstance(String globalId,
-            ReceiveEventElement<?> baseElement) {
-        return new ReceiveInstance<>(globalId, baseElement);
+    public static ReceiveInstance newReceiveInstance(String globalId,
+            ReceiveEventElement baseElement) {
+        return new ReceiveInstance(globalId, baseElement);
     }
 }
 
 /**
- * @param <T>
+ * @param
  */
-sealed abstract class GenericEventInstance<T extends Type>
-        implements EventInstance<T>
+sealed abstract class GenericEventInstance
+        implements EventInstance
         permits ComputationInstance, InputInstance, ReceiveInstance {
 
-    private static final class MutableMarking<T extends Type>
-            implements Marking<T>, Serializable {
+    private static final class MutableMarking
+            implements Marking, Serializable {
 
         @Serial
         private static final long serialVersionUID = 1894241710394083158L;
         private boolean hasExecuted, isPending, isIncluded;
-        private Value<T> value;
+        private Value value;
 
-        static <T extends Type> MutableMarking<T> of(EventElement.MarkingElement<T> marking) {
-            return new MutableMarking<>(marking.hasExecuted(), marking.isPending(),
-                    marking.isIncluded(), marking.getValue());
+        static MutableMarking of(EventElement.MarkingElement marking) {
+            return new MutableMarking(marking.hasExecuted(), marking.isPending(),
+                    marking.isIncluded(), marking.value());
         }
 
-        static <T extends Type> MutableMarking<T> of(Marking<T> other) {
-            return new MutableMarking<>(other.hasExecuted(), other.isPending(),
-                    other.isIncluded(), other.getValue());
+        static MutableMarking of(Marking other) {
+            return new MutableMarking(other.hasExecuted(), other.isPending(),
+                    other.isIncluded(), other.value());
         }
 
         private MutableMarking(boolean hasExecuted, boolean isPending, boolean isIncluded,
-                Value<T> value) {
+                Value value) {
             this.hasExecuted = hasExecuted;
             this.isPending = isPending;
             this.isIncluded = isIncluded;
@@ -88,7 +87,7 @@ sealed abstract class GenericEventInstance<T extends Type>
         public boolean isIncluded() {return isIncluded;}
 
         @Override
-        public Value<T> getValue() {return value;}
+        public Value value() {return value;}
 
         @Override
         public String toString() {
@@ -102,20 +101,19 @@ sealed abstract class GenericEventInstance<T extends Type>
     }
 
     private final String globalId;
-    private final EventElement<T> baseElement;
-    private final MutableMarking<T> marking;
+    private final EventElement baseElement;
+    private final MutableMarking marking;
 
     // TODO [revisit] not accounting for subtyping - it should - revisit Type
     // TODO [revisit] proper IllegalValueType exception
-    static <T extends Type> void trySetValue(MutableMarking<T> marking, Value<?> value) {
+    static void trySetValue(MutableMarking marking, Value value) {
         if (!value.type().getClass().equals(marking.valueType().getClass())) {
             throw new RuntimeException("Bad Input val");
         }
-        @SuppressWarnings("unchecked") var typedValue = (Value<T>) value;
-        marking.value = typedValue;
+        marking.value = value;
     }
 
-    GenericEventInstance(String globalId, EventElement<T> baseElement) {
+    GenericEventInstance(String globalId, EventElement baseElement) {
         this.globalId = globalId;
         this.baseElement = baseElement;
         this.marking = MutableMarking.of(baseElement.marking());
@@ -137,8 +135,13 @@ sealed abstract class GenericEventInstance<T extends Type>
     }
 
     @Override
-    public Marking<T> marking() {
+    public Marking marking() {
         return marking;
+    }
+
+    @Override
+    public EventElement baseElement() {
+        return baseElement;
     }
 
     @Override
@@ -146,16 +149,7 @@ sealed abstract class GenericEventInstance<T extends Type>
         return baseElement.remoteParticipants();
     }
 
-    @Override
-    public BooleanExpression constraint() {
-        return baseElement.constraint();
-    }
-
-    protected final EventElement<T> getBaseElement() {
-        return baseElement;
-    }
-
-    void onExecuted(Value<?> value) {
+    void onExecuted(Value value) {
         trySetValue(marking, value);
         marking.hasExecuted = true;
         marking.isPending = false;
@@ -171,33 +165,29 @@ sealed abstract class GenericEventInstance<T extends Type>
 }
 
 /**
- * @param <T>
+ * @param
  */
-final class ComputationInstance<T extends Type>
-        extends GenericEventInstance<T>
-        implements ComputationEventInstance<T> {
+final class ComputationInstance
+        extends GenericEventInstance
+        implements ComputationEventInstance {
 
-    ComputationInstance(String globalId, ComputationEventElement<T> baseElement) {
+    ComputationInstance(String globalId, ComputationEventElement baseElement) {
         super(globalId, baseElement);
     }
 
-    // ComputationInstance(String globalId, ComputationEventElement<T> baseElement) {
-    //     this(globalId, baseElement, null);
-    // }
-
     @Override
-    public ComputationExpression<T> getComputationExpression() {
-        return ((ComputationEventElement<T>) getBaseElement()).getComputationExpression();
+    public ComputationExpression getComputationExpression() {
+        return ((ComputationEventElement) baseElement()).getComputationExpression();
     }
 
     @Override
-    public Optional<? extends UserSetExpression> receivers() {return getBaseElement().remoteParticipants();}
+    public Optional<? extends UserSetExpression> receivers() {return baseElement().remoteParticipants();}
 
     @Override
     public String toString() {
         return String.format("%s - %s(%s: %s) [%s] (%s) [ -> %s]", getGlobalId(),
                 marking().toStringPrefix(), localId(), label(),
-                getComputationExpression(), getValue(), receivers());
+                getComputationExpression(), value(), receivers());
     }
 
     public String unparse(String indentation) {
@@ -207,49 +197,45 @@ final class ComputationInstance<T extends Type>
 }
 
 /**
- * @param <T>
+ * @param
  */
-final class InputInstance<T extends Type>
-        extends GenericEventInstance<T>
-        implements InputEventInstance<T> {
+final class InputInstance
+        extends GenericEventInstance
+        implements InputEventInstance {
 
-    private InputInstance(String globalId, InputEventElement<T> baseElement) {
+    private InputInstance(String globalId, InputEventElement baseElement) {
         super(globalId, baseElement);
     }
 
-    static <T extends Type> InputInstance<T> of(String globalId, InputEventElement<T> baseElement) {
-        return new InputInstance<>(globalId, baseElement);
+    static InputInstance of(String globalId, InputEventElement baseElement) {
+        return new InputInstance(globalId, baseElement);
     }
-    //
-    // static <T extends Type> InputInstance<T> of(String globalId, InputEventElement<T> baseElement) {
-    //     return new InputInstance<>(globalId, baseElement, null);
-    // }
 
     @Override
-    public Optional<? extends UserSetExpression> receivers() {return getBaseElement().remoteParticipants();}
+    public Optional<? extends UserSetExpression> receivers() {return baseElement().remoteParticipants();}
 
     @Override
     public String toString() {
         return String.format("%s - %s(%s: %s) [?:%s] (%s) [ -> %s ]", getGlobalId(),
                 marking().toStringPrefix(), localId(),
-                label(), valueType(), getValue(), receivers());
+                label(), valueType(), value(), receivers());
     }
 
     @Override
     public String unparse(String indentation) {
-        return String.format("%sInput: %s  ( %s )", indentation, getGlobalId(), getValue());
+        return String.format("%sInput: %s  ( %s )", indentation, getGlobalId(), value());
     }
 }
 
 /**
- * @param <T>
+ * @param
  */
-final class ReceiveInstance<T extends Type>
-        extends GenericEventInstance<T>
-        implements ReceiveEventInstance<T> {
+final class ReceiveInstance
+        extends GenericEventInstance
+        implements ReceiveEventInstance {
 
 
-    ReceiveInstance(String globalId, EventElement<T> baseElement) {
+    ReceiveInstance(String globalId, EventElement baseElement) {
         super(globalId, baseElement);
     }
 
@@ -257,12 +243,12 @@ final class ReceiveInstance<T extends Type>
     public String toString() {
         return String.format("%s - %s(%s: %s) [(Rx): %s] (%s) [ %s ->]", getGlobalId(),
                 marking().toStringPrefix(), localId(),
-                label(), valueType(), getValue(), getSenderExpr());
+                label(), valueType(), value(), getSenderExpr());
     }
 
     @Override
     String unparse(String indent) {
-        return String.format("%sReceive: %s  ( %s )", indent, getGlobalId(), getValue());
+        return String.format("%sReceive: %s  ( %s )", indent, getGlobalId(), value());
     }
 
     // FIXME .get()

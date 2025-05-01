@@ -1,6 +1,6 @@
 package dcr1.common.data.values;
 
-import dcr1.common.data.types.GenericStringType;
+import dcr1.common.data.types.StringType;
 
 import java.io.Serial;
 import java.util.Objects;
@@ -15,7 +15,7 @@ public final class StringVal
     @Serial
     private static final long serialVersionUID = -617630784691869772L;
     private static final StringVal EMPTY_STRING = new StringVal("");
-    private static final Undefined<GenericStringType> UNDEFINED = new Undefined<>(GenericStringType.singleton());
+    // private static final Undefined<StringType> UNDEFINED = new Undefined<>(StringType.singleton());
     private final String value;
 
     public static StringVal of(String value) {
@@ -24,7 +24,7 @@ public final class StringVal
 
     public static StringVal empty() {return EMPTY_STRING;}
 
-    public static Undefined<GenericStringType> undefined() {return UNDEFINED;}
+    // public static Undefined<StringType> undefined() {return UNDEFINED;}
 
 
     private StringVal(String value) {this.value = value;}
@@ -33,8 +33,8 @@ public final class StringVal
     public String value() {return value;}
 
     @Override
-    public GenericStringType type() {
-        return GenericStringType.singleton();
+    public StringType type() {
+        return StringType.singleton();
     }
 
     @Override

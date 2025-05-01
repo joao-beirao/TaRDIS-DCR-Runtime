@@ -11,8 +11,8 @@ import java.util.Objects;
 
 // limited comparison for now, only ints; avoiding over-complicating things for now, to be
 // generalised in the future as needed.
-public record IntegerCompareExpr(ComputationExpression<? extends IntegerType> left,
-                                 ComputationExpression<? extends IntegerType> right,
+public record IntegerCompareExpr(ComputationExpression left,
+                                 ComputationExpression right,
                                  CompareOp compareOp)
         implements BooleanExpression {
 
@@ -30,27 +30,27 @@ public record IntegerCompareExpr(ComputationExpression<? extends IntegerType> le
         }
     }
 
-    public static IntegerCompareExpr ofEq(ComputationExpression<? extends IntegerType> left,
-            ComputationExpression<? extends IntegerType> right) {
+    public static IntegerCompareExpr ofEq(ComputationExpression left,
+            ComputationExpression right) {
         return new IntegerCompareExpr(left, right, CompareOp.EQ);
     }
-    public static IntegerCompareExpr ofGt(ComputationExpression<? extends IntegerType> left,
-            ComputationExpression<? extends IntegerType> right) {
+    public static IntegerCompareExpr ofGt(ComputationExpression left,
+            ComputationExpression right) {
         return new IntegerCompareExpr(left, right, CompareOp.GT);
     }
 
-    public static IntegerCompareExpr ofGeq(ComputationExpression<? extends IntegerType> left,
-            ComputationExpression<? extends IntegerType> right) {
+    public static IntegerCompareExpr ofGeq(ComputationExpression left,
+            ComputationExpression right) {
         return new IntegerCompareExpr(left, right, CompareOp.GTE);
     }
 
-    public static IntegerCompareExpr ofLt(ComputationExpression<? extends IntegerType> left,
-            ComputationExpression<? extends IntegerType> right) {
+    public static IntegerCompareExpr ofLt(ComputationExpression left,
+            ComputationExpression right) {
         return new IntegerCompareExpr(left, right, CompareOp.LT);
     }
 
-    public static IntegerCompareExpr ofLeq(ComputationExpression<? extends IntegerType> left,
-            ComputationExpression<? extends IntegerType> right) {
+    public static IntegerCompareExpr ofLeq(ComputationExpression left,
+            ComputationExpression right) {
         return new IntegerCompareExpr(left, right, CompareOp.LTE);
     }
 
@@ -61,7 +61,7 @@ public record IntegerCompareExpr(ComputationExpression<? extends IntegerType> le
     }
 
     @Override
-    public BooleanVal eval(Environment<Value<? extends Type>> env) {
+    public BooleanVal eval(Environment<Value> env) {
         var leftVal = left.eval(env);
         if(leftVal instanceof IntegerVal leftInt) {
             var rightVal = right.eval(env);

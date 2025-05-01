@@ -12,14 +12,15 @@ import java.util.Objects;
  * An immutable integer literal {@link Value value}.
  */
 public final class IntegerVal
-        implements PrimitiveValue<IntegerType>, Comparable<IntegerVal> {
+        implements PrimitiveVal, Comparable<IntegerVal> {
     @Serial
     private static final long serialVersionUID = -6289916328707077719L;
-    private static final Undefined<IntegerType> UNDEFINED = new Undefined<>(IntegerType.singleton());
+    // private static final Undefined<IntegerType> UNDEFINED = new Undefined<>(IntegerType
+    // .singleton());
 
     private final int value;
 
-    public static Undefined<IntegerType> undefined() {return UNDEFINED;}
+    // public static Undefined<IntegerType> undefined() {return UNDEFINED;}
 
     public static IntegerVal of(int value) {return new IntegerVal(value);}
 
@@ -51,8 +52,9 @@ public final class IntegerVal
     public boolean equals(Object obj) {
         if (this == obj) {return true;}
         if (obj == null) {return false;}
-        if (getClass() != obj.getClass()) {return false;};
-        return value == (((IntegerVal)obj).value);
+        if (getClass() != obj.getClass()) {return false;}
+        ;
+        return value == (((IntegerVal) obj).value);
     }
 
     public String toString() {

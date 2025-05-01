@@ -31,7 +31,7 @@ public record SetUnionExpr(Collection<? extends UserSetExpression> userSetExprs)
     }
 
     @Override
-    public SetUnionVal eval(Environment<Value<?>> valueEnv, Environment<UserVal> userEnv) {
+    public SetUnionVal eval(Environment<Value> valueEnv, Environment<UserVal> userEnv) {
         return SetUnionVal.of(
                 userSetExprs.stream().map(expr -> expr.eval(valueEnv, userEnv)).toList());
     }

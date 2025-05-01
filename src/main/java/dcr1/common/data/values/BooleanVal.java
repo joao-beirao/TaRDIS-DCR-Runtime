@@ -9,24 +9,25 @@ import java.util.Objects;
  * An immutable boolean literal {@link Value value}.
  */
 public final class BooleanVal
-        implements PrimitiveValue<BooleanType> {
+        implements PrimitiveVal {
 
     @Serial
     private static final long serialVersionUID = 3976540914858038158L;
-    private static final Undefined<BooleanType> UNDEFINED = new Undefined<>(BooleanType.singleton());
     private static final BooleanVal TRUE = new BooleanVal(true);
-    private static final ConstRefVal<BooleanType> TRUE_REF = ConstRefVal.of(TRUE);
     private static final BooleanVal FALSE = new BooleanVal(false);
-    private static final ConstRefVal<BooleanType> FALSE_REF = ConstRefVal.of(FALSE);
     private final boolean value;
+
+    // private static final Undefined<BooleanType> UNDEFINED = new Undefined<>(BooleanType.singleton());
+    // private static final ConstRefVal<BooleanType> TRUE_REF = ConstRefVal.of(TRUE);
+    // private static final ConstRefVal<BooleanType> FALSE_REF = ConstRefVal.of(FALSE);
 
     public static BooleanVal of(boolean value) {
         return value ? TRUE : FALSE;
     }
 
-    public static Undefined<BooleanType> undefined() {
-        return UNDEFINED;
-    }
+    // public static Undefined<BooleanType> undefined() {
+    //     return UNDEFINED;
+    // }
 
     private BooleanVal(boolean value) {this.value = value;}
 

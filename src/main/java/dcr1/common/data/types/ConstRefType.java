@@ -1,6 +1,6 @@
 package dcr1.common.data.types;
 
-// TODO [arg check] public methods
+// TODO [revisit - deprecate]
 // something that needs to be looked up in the environment and promises to point to something of
 // type T
 public record ConstRefType<T extends Type>(T type)

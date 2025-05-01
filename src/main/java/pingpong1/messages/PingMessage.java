@@ -15,7 +15,7 @@ public class PingMessage
 
     private final int pingId;
     private final String message;
-    private final Event.Marking<?> marking;
+    private final Event.Marking marking;
 
     private final UserVal sender;
     //
@@ -24,7 +24,7 @@ public class PingMessage
     // private final String marking;
 
     // public PingMessage(int pingId, String message, String marking) {
-    public PingMessage(int pingId, String message, Event.Marking<?> marking, UserVal sender,
+    public PingMessage(int pingId, String message, Event.Marking marking, UserVal sender,
             String idExtensionToken) {
         super(MSG_ID);
         this.pingId = pingId;
@@ -42,7 +42,7 @@ public class PingMessage
         return message;
     }
 
-    public Event.Marking<?> getMarking() {
+    public Event.Marking getMarking() {
         return marking;
     }
 
@@ -85,11 +85,11 @@ public class PingMessage
             in.readBytes(markingBytes);
             byte[] senderBytes = new byte[in.readInt()];
             in.readBytes(senderBytes);
-            Event.Marking<?> val = null;
+            Event.Marking val = null;
             UserVal sender = null;
             try (ByteArrayInputStream bis = new ByteArrayInputStream(markingBytes);
                  ObjectInputStream inStream = new ObjectInputStream(bis)) {
-                val = (Event.Marking<?>) inStream.readObject();
+                val = (Event.Marking) inStream.readObject();
                 System.out.println("my marking" + val);
             } catch (ClassNotFoundException e) {
                 // TODO Auto-generated catch block

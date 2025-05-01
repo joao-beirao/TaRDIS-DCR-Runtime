@@ -1,33 +1,35 @@
 package dcr1.model.events;
 
 import dcr1.common.data.computation.BooleanExpression;
-import dcr1.common.data.types.Type;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 import dcr1.model.GenericElement;
 
+import java.util.Objects;
 import java.util.Optional;
 
-public sealed abstract class GenericEventElement<T extends Type>
+public sealed abstract class GenericEventElement
         extends GenericElement
-        implements EventElement<T>
+        implements EventElement
         permits ComputationEvent, InputEvent, ReceiveEvent {
 
     private final String localId;
     private final String label;
-    private final MarkingElement<T> initialMarking;
+    private final MarkingElement initialMarking;
     private final UserSetExpression passiveParticipants;
-    private final BooleanExpression constraint;
+    private final BooleanExpression instantiationConstraint;
+    private final BooleanExpression ifcConstraint;
 
 
     GenericEventElement(String elementId, String localId, String label,
-            MarkingElement<T> initialMarking, UserSetExpression passiveParticipants,
-            BooleanExpression constraint) {
+            MarkingElement initialMarking, UserSetExpression passiveParticipants,
+            BooleanExpression constraint, BooleanExpression ifcConstraint) {
         super(elementId);
-        this.localId = localId;
-        this.label = label;
-        this.initialMarking = initialMarking;
+        this.localId = Objects.requireNonNull(localId);
+        this.label = Objects.requireNonNull(label);
+        this.initialMarking = Objects.requireNonNull(initialMarking);
         this.passiveParticipants = passiveParticipants;
-        this.constraint = constraint;
+        this.instantiationConstraint = Objects.requireNonNull(constraint);
+        this.ifcConstraint = ifcConstraint;
     }
 
     @Override
@@ -41,17 +43,23 @@ public sealed abstract class GenericEventElement<T extends Type>
     }
 
     @Override
-    public MarkingElement<T> marking() {
+    public MarkingElement marking() {
         return initialMarking;
     }
 
+    // TODO Revisit - make abstract, move to concrete class and adjust constructor
     @Override
     public Optional<UserSetExpression> remoteParticipants() {
         return Optional.ofNullable(passiveParticipants);
     }
 
     @Override
-    public BooleanExpression constraint() {
-        return constraint;
+    public BooleanExpression instantiationConstraint() {
+        return instantiationConstraint;
+    }
+
+    @Override
+    public BooleanExpression ifcConstraint() {
+        return ifcConstraint;
     }
 }

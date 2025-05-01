@@ -20,17 +20,22 @@ sealed abstract class GenericRelationElement
 
     private final String sourceEventId;
     private final BooleanExpression guard;
+    private final BooleanExpression instantiationConstraint;
 
-    GenericRelationElement(String elementId, String sourceEventId) {
+    GenericRelationElement(String elementId, String sourceEventId,
+            BooleanExpression instantiationConstraint) {
         super(elementId);
         this.sourceEventId = sourceEventId;
         this.guard = DEFAULT_GUARD;
+        this.instantiationConstraint = instantiationConstraint;
     }
 
-    GenericRelationElement(String elementId, String sourceEventId, BooleanExpression guard) {
+    GenericRelationElement(String elementId, String sourceEventId, BooleanExpression guard,
+            BooleanExpression instantiationConstraint) {
         super(elementId);
         this.sourceEventId = sourceEventId;
         this.guard = guard;
+        this.instantiationConstraint = instantiationConstraint;
     }
 
     @Override

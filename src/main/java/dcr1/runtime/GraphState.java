@@ -1,12 +1,11 @@
 package dcr1.runtime;
 
-import dcr1.common.data.types.Type;
-import dcr1.runtime.events.ComputationEventInstance;
-import dcr1.runtime.events.EventInstance;
-import dcr1.runtime.events.InputEventInstance;
-import dcr1.runtime.events.ReceiveEventInstance;
-import dcr1.runtime.relations.ControlFlowRelationInstance;
-import dcr1.runtime.relations.SpawnRelationInstance;
+import dcr1.runtime.elements.events.ComputationEventInstance;
+import dcr1.runtime.elements.events.EventInstance;
+import dcr1.runtime.elements.events.InputEventInstance;
+import dcr1.runtime.elements.events.ReceiveEventInstance;
+import dcr1.runtime.elements.relations.ControlFlowRelationInstance;
+import dcr1.runtime.elements.relations.SpawnRelationInstance;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,20 +13,20 @@ import java.util.stream.Collectors;
 final class GraphState
         implements GraphInstance {
 
-  private final Map<String, EventInstance<? extends Type>> eventsById;
-  private final Map<String, ComputationEventInstance<? extends Type>> computationEvents;
+  private final Map<String, EventInstance> eventsById;
+  private final Map<String, ComputationEventInstance> computationEvents;
 
   // ==
   // convenience mappings for efficiency reasons
   // -> (outgoing direction) relations for which the execution of the 'source'
   // event may affect the state of the 'target' event - indexed by 'source' event
-  private final Map<EventInstance<?>, List<EventInstance<?>>> includes;
-  private final Map<EventInstance<?>, List<EventInstance<?>>> excludes;
-  private final Map<EventInstance<?>, List<EventInstance<?>>> responses;
+  private final Map<EventInstance, List<EventInstance>> includes;
+  private final Map<EventInstance, List<EventInstance>> excludes;
+  private final Map<EventInstance, List<EventInstance>> responses;
   // -> (incoming direction) - relations for which the 'source' event can actively
   // restrict the execution of the 'target' event - indexed by 'target' event
-  private final Map<EventInstance<?>, List<EventInstance<?>>> conditions;
-  private final Map<EventInstance<?>, List<EventInstance<?>>> milestones;
+  private final Map<EventInstance, List<EventInstance>> conditions;
+  private final Map<EventInstance, List<EventInstance>> milestones;
   // event ids mapped to spawn models
   private final Map<String, List<SpawnRelationInstance>> spawnRelations;
 
@@ -46,25 +45,25 @@ final class GraphState
   }
 
   @Override
-  public Iterable<EventInstance<?>> events() {
+  public Iterable<EventInstance> events() {
     return eventsById.values();
     // TODO not yet implemented
     // throw new RuntimeException("Not yet implemented");
   }
 
   @Override
-  public Iterable<ComputationEventInstance<? extends Type>> computationEvents() {
+  public Iterable<ComputationEventInstance> computationEvents() {
     return computationEvents.values();
   }
 
   @Override
-  public Iterable<InputEventInstance<?>> inputEvents() {
+  public Iterable<InputEventInstance> inputEvents() {
     // TODO not yet implemented
     throw new RuntimeException("Not yet implemented");
   }
 
   @Override
-  public Iterable<ReceiveEventInstance<?>> receiveEvents() {
+  public Iterable<ReceiveEventInstance> receiveEvents() {
     // TODO not yet implemented
     throw new RuntimeException("Not yet implemented");
   }
@@ -75,15 +74,15 @@ final class GraphState
     throw new RuntimeException("Not yet implemented");
   }
 
-  Iterable<EventInstance<?>> includes(String eventId) {
+  Iterable<EventInstance> includes(String eventId) {
     return includes.getOrDefault(eventsById.get(eventId), Collections.emptyList());
   }
 
-  Iterable<EventInstance<?>> excludes(String eventId) {
+  Iterable<EventInstance> excludes(String eventId) {
     return excludes.getOrDefault(eventsById.get(eventId), Collections.emptyList());
   }
 
-  Iterable<EventInstance<?>> responses(String eventId) {
+  Iterable<EventInstance> responses(String eventId) {
     return responses.getOrDefault(eventsById.get(eventId), Collections.emptyList());
   }
 
@@ -95,7 +94,7 @@ final class GraphState
 
 
   // TODO [extend implementation] include guards?
-  boolean isEnabled(EventInstance<?> event) {
+  boolean isEnabled(EventInstance event) {
     // if (!event.getInitiator().equals(projectionRole)) {
     //     return false;
     // }
@@ -103,12 +102,12 @@ final class GraphState
     if (!event.marking().isIncluded()) {
       return false;
     }
-    for (EventInstance<?> e : conditions.getOrDefault(event, Collections.emptyList())) {
+    for (EventInstance e : conditions.getOrDefault(event, Collections.emptyList())) {
       if (e.marking().isIncluded() && !e.marking().hasExecuted()) {
         return false;
       }
     }
-    for (EventInstance<?> e : milestones.getOrDefault(event, Collections.emptyList())) {
+    for (EventInstance e : milestones.getOrDefault(event, Collections.emptyList())) {
       if (e.marking().isIncluded() && e.marking().isPending()) {
         return false;
       }
@@ -121,29 +120,29 @@ final class GraphState
     return spawnRelations.getOrDefault(sourceId, Collections.emptyList());
   }
 
-  Optional<EventInstance<?>> getEventById(String eventId) {
+  Optional<EventInstance> getEventById(String eventId) {
     return Optional.ofNullable(eventsById.get(eventId));
   }
 
-  void addComputationEvent(ComputationEventInstance<? extends Type> event) {
+  void addComputationEvent(ComputationEventInstance event) {
     eventsById.put(event.getGlobalId(), event);
     computationEvents.put(event.getGlobalId(), event);
   }
 
-  void addInputEvent(InputEventInstance<? extends Type> event) {
+  void addInputEvent(InputEventInstance event) {
     eventsById.put(event.getGlobalId(), event);
     // TODO [implement for real]
     // throw new RuntimeException("TODO add to input events");
   }
 
-  void addReceiveEvent(ReceiveEventInstance<? extends Type> event) {
+  void addReceiveEvent(ReceiveEventInstance event) {
     eventsById.put(event.getGlobalId(), event);
     throw new RuntimeException("TODO add to receive events");
   }
 
-  private void addControlFlowRelation(EventInstance<?> key, EventInstance<?> newVal,
-      Map<EventInstance<?>, List<EventInstance<?>>> mapping) {
-    List<EventInstance<?>> entries = mapping.getOrDefault(key, new LinkedList<>());
+  private void addControlFlowRelation(EventInstance key, EventInstance newVal,
+      Map<EventInstance, List<EventInstance>> mapping) {
+    List<EventInstance> entries = mapping.getOrDefault(key, new LinkedList<>());
     if (entries.isEmpty()) {
       mapping.put(key, entries);
     }
@@ -151,8 +150,8 @@ final class GraphState
   }
 
   void addControlFlowRelation(ControlFlowRelationInstance relation) {
-    EventInstance<?> src = eventsById.get(relation.getSourceId());
-    EventInstance<?> tgt = eventsById.get(relation.getTargetId());
+    EventInstance src = eventsById.get(relation.getSourceId());
+    EventInstance tgt = eventsById.get(relation.getTargetId());
     switch (relation.getRelationType()) {
       case INCLUDE -> addControlFlowRelation(src, tgt, includes);
       case EXCLUDE -> addControlFlowRelation(src, tgt, excludes);

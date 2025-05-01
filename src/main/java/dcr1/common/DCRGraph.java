@@ -8,13 +8,13 @@ import dcr1.common.relations.ControlFlowRelation;
 import dcr1.common.relations.SpawnRelation;
 
 public interface DCRGraph {
-    Iterable<? extends Event<?>> events();
+    Iterable<? extends Event> events();
 
-    Iterable<? extends ComputationEvent<?>> computationEvents();
+    Iterable<? extends ComputationEvent> computationEvents();
 
-    Iterable<? extends InputEvent<?>> inputEvents();
+    Iterable<? extends InputEvent> inputEvents();
 
-    Iterable<? extends ReceiveEvent<?>> receiveEvents();
+    Iterable<? extends ReceiveEvent> receiveEvents();
 
     Iterable<? extends ControlFlowRelation> controlFlowRelations();
 

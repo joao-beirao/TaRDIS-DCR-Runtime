@@ -10,51 +10,61 @@ import java.io.Serial;
  * (the  value of any event which has not yet executed and for which an initial default value has
  * not been provided.
  */
-public final class Undefined<T extends Type>
-        implements Value<T> {
+public final class Undefined
+        implements Value {
 
     @Serial
     private static final long serialVersionUID = -1588707935989188517L;
-    private static final Undefined<VoidType> VOID = new Undefined<>(VoidType.instance());
+    // private static final Undefined VOID = new Undefined(VoidType.instance());
     private static final String TO_STRING_VAL = "<undefined>";
 
     //  TODO [revise] any workaround to avoid storing typeInstance? thinking no
-    private final T typeInstance;
+    // private final T typeInstance;
 
-    public static Undefined<VoidType> ofVoid() {
-        return VOID;
-    }
+    // public static Undefined ofVoid() {
+    //     return VOID;
+    // }
 
-    public static <T extends Type> Undefined<T> of(T typeInstance) {
-        return new Undefined<>(typeInstance);
-    }
+    // public static <T extends Type> Undefined of(T typeInstance) {
+    //     return new Undefined(typeInstance);
+    // }
 
-    Undefined(T typeInstance) {
-        this.typeInstance = typeInstance;
-    }
+    // Undefined(T typeInstance) {
+    //     this.typeInstance = typeInstance;
+    // }
 
-    public T type() {
-        return typeInstance;
+    // public T type() {
+    //     return typeInstance;
+    // }
+
+    @Override
+    public String unparse() {
+        return "";
     }
 
     @Override
-    public int hashCode() {
-        return typeInstance.hashCode();
+    public Type type() {
+        return null;
     }
+    // @Override
+    // public int hashCode() {
+    //     return typeInstance.hashCode();
+    // }
+    //
+    // @Override
+    // public boolean equals(Object obj) {
+    //     if (obj == null) {return false;}
+    //     if (this == obj) {return true;}
+    //     if (getClass() != obj.getClass()) {return false;}
+    //     return typeInstance.equals(((Undefined<?>) obj).typeInstance);
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {return false;}
-        if (this == obj) {return true;}
-        if (getClass() != obj.getClass()) {return false;}
-        return typeInstance.equals(((Undefined<?>) obj).typeInstance);
-    }
+    // }
 
     @Override
     public String toString() {return TO_STRING_VAL;}
 
-    @Override
-    public String unparse() {
-        return String.format("UnitVal<%s>", typeInstance);
-    }
+    // @Override
+    // public String unparse() {
+    //     return String.format("UnitVal<%s>", typeInstance);
+    // }
 }

@@ -23,7 +23,7 @@ public record SetDiffExpr(UserSetExpression positiveSet, UserSetExpression negat
     }
 
     @Override
-    public UserSetVal eval(Environment<Value<?>> valueEnv, Environment<UserVal> userEnv) {
+    public UserSetVal eval(Environment<Value> valueEnv, Environment<UserVal> userEnv) {
         return SetDiffVal.of(positiveSet.eval(valueEnv, userEnv),
                 negativeSet.eval(valueEnv, userEnv));
     }

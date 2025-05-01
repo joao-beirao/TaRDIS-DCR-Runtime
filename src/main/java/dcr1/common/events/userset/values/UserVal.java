@@ -1,13 +1,12 @@
 package dcr1.common.events.userset.values;
 
-import dcr.ast.RecordBuilder;
 import dcr1.common.Record;
 import dcr1.common.data.computation.*;
 import dcr1.common.data.computation.StringLiteral;
-import dcr1.common.data.types.PrimitiveType;
 import dcr1.common.data.values.*;
 import dcr1.common.events.userset.UserParams;
 import dcr1.common.events.userset.expressions.UserExpr;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -15,10 +14,10 @@ import java.util.Objects;
 // TODO [sanitize args]
 // TODO remove Serializable - have a DTO on the DRCProtocol instead
 
-public record UserVal(String role, UserParams<PrimitiveValue<?>> params)
+public record UserVal(String role, UserParams<PrimitiveVal> params)
         implements UserSetVal, Serializable {
 
-    public static UserVal of(String role, UserParams<PrimitiveValue<?>> params) {
+    public static UserVal of(String role, UserParams<PrimitiveVal> params) {
         return new UserVal(role, params);
     }
 
@@ -43,9 +42,9 @@ public record UserVal(String role, UserParams<PrimitiveValue<?>> params)
 
     // TODO revise - quick patch
     public RecordVal getParamsAsRecordVal() {
-        Record.Builder<Value<?>> builder = Record.builder();
+        Record.Builder<Value> builder = Record.builder();
         for (var param : params.params().fields()) {
-            builder.addField(param.name(), param.value());
+            builder.addFieldWithParams(param.name(), param.value());
         }
         return RecordVal.of(builder.build());
     }
@@ -53,19 +52,20 @@ public record UserVal(String role, UserParams<PrimitiveValue<?>> params)
 
 
     public UserExpr toUserSetExpr() {
-        var recordBuilder = new Record.Builder<ComputationExpression<? extends PrimitiveType>>();
+        var recordBuilder = new Record.Builder<ComputationExpression>();
         for (var param : params.params().fields()) {
             var expr = switch (param.value()) {
                 case BooleanVal bool -> BooleanLiteral.of(bool);
                 case IntegerVal integer -> IntegerLiteral.of(integer);
                 case StringVal str -> StringLiteral.of(str);
             };
-            recordBuilder.addField(param.name(), expr);
+            recordBuilder.addFieldWithParams(param.name(), expr);
         }
         return UserExpr.of(role(), UserParams.of(recordBuilder.build()));
     }
 
 
+    @NotNull
     @Override
     public String toString() {
         return String.format("%s(%s))", role, params);

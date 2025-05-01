@@ -2,12 +2,10 @@ package dcr1.runtime;
 
 import app1.membership.DummyMembershipLayer;
 import dcr1.common.Record;
-import dcr1.common.data.computation.StringLiteral;
 import dcr1.common.data.computation.*;
-import dcr1.common.data.types.*;
+import dcr1.common.data.computation.StringLiteral;
 import dcr1.common.data.values.*;
 import dcr1.common.events.Event;
-import dcr1.common.events.userset.RoleParams;
 import dcr1.common.events.userset.UserParams;
 import dcr1.common.events.userset.expressions.RoleExpr;
 import dcr1.common.events.userset.expressions.SetDiffExpr;
@@ -40,7 +38,7 @@ public class UsageTestsLocal {
 
         @Override
         public Set<UserVal> uponSendRequest(String eventId, UserSetVal receivers,
-                Event.Marking<?> value, String uidExtension) {
+                Event.Marking value, String uidExtension) {
             return DummyMembershipLayer.instance()
                     .evalUserSetExpr(receivers)
                     .stream()
@@ -62,13 +60,13 @@ public class UsageTestsLocal {
     //             new GraphModelBuilder("graph0").addLocalComputationEvent("elem_1", "e1",
     //                             "E1",
     //                             StringLiteral.of("a_string"),
-    //                             new ImmutableMarkingElement<>(false, true, StringVal.undefined
+    //                             new ImmutableMarkingElement(false, true, StringVal.undefined
     //                             ()))
     //                     .beginSpawn("spawn_1", "graph1", "e1")
     //                     .addLocalComputationEvent("elem_2", "e2", "E2",
     //                             EventIdExpr.of(EventIdVal.of("@trigger", EventType.of("E1",
     //                                     GenericStringType.singleton()))),
-    //                             new ImmutableMarkingElement<>(false, true,
+    //                             new ImmutableMarkingElement(false, true,
     //                                     EventVal.undefined("E1",
     //                                             GenericStringType.singleton())))
     //                     .endSpawn()
@@ -87,9 +85,9 @@ public class UsageTestsLocal {
                 // e1 [?:Int]
                 .addLocalComputationEvent("event_1", "e1", "E1", RecordExpr.of(
                                 Record.ofEntries(Record.Field.of("kw", IntegerLiteral.of(2)))),
-                        new ImmutableMarkingElement<>(false, true, RecordVal.of(
-                                Record.ofEntries(Record.Field.of("kw", IntegerVal.undefined())))),
-                        BooleanLiteral.of(true)).build();
+                        new ImmutableMarkingElement(false, true, RecordVal.of(
+                                Record.ofEntries(Record.Field.of("kw", null)))),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
         GraphRunner runner =
                 new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
         runner.init(model);
@@ -106,18 +104,17 @@ public class UsageTestsLocal {
         RecursiveGraphModel model = new GraphModelBuilder("graph0")
                 // e1 [?:Int]
                 .addLocalInputEvent("event_1", "e1", "E1",
-                        new ImmutableMarkingElement<>(false, true, IntegerVal.undefined()),
-                        BooleanLiteral.of(true))
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true))
                 // e2 [e1.value > 0 ? true : false]
                 .addLocalComputationEvent("event", "e2", "E2", IfThenElseExpr.of(
                                 IntegerCompareExpr.ofGt(EventValueDeref.of(EventIdExpr.of(
-                                                EventIdVal.of("e1", EventType.of("E1",
-                                                        IntegerType.singleton())))),
+                                                EventIdVal.of("e1"))),
                                         IntegerLiteral.of(IntegerVal.of(0))),
                                 BooleanLiteral.of(true),
                                 BooleanLiteral.of(false)),
-                        new ImmutableMarkingElement<>(false, true, BooleanVal.undefined()),
-                        BooleanLiteral.of(true)).build();
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
         GraphRunner runner =
                 new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
         runner.init(model);
@@ -136,17 +133,13 @@ public class UsageTestsLocal {
                 .addLocalComputationEvent("event_1", "e1", "E1", RecordExpr.of(
                                 Record.ofEntries(Record.Field.of("kw", IntegerLiteral.of(1)),
                                         Record.Field.of("t", IntegerLiteral.of(3)))),
-                        new ImmutableMarkingElement<>(false, true, RecordVal.undefined()),
-                        BooleanLiteral.of(true))
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true))
                 // e2 [e1.value.kw]
                 .addLocalComputationEvent("event", "e2", "E2", RecordFieldDeref.of(
-                                EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e1",
-                                        EventType.of("E1",
-                                        RecordType.of(Record.ofEntries(
-                                                Record.Field.of("kw", IntegerType.singleton()),
-                                                Record.Field.of("t", IntegerType.singleton()))))))), "kw"),
-                        new ImmutableMarkingElement<>(false, true, IntegerVal.undefined()),
-                        BooleanLiteral.of(true)).build();
+                                EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e1"))), "kw"),
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
         GraphRunner runner =
                 new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
         runner.init(model);
@@ -168,33 +161,33 @@ public class UsageTestsLocal {
         RecursiveGraphModel model = new GraphModelBuilder("graph0")
 
 
-                .addLocalInputEvent("0_RxO", "cp", "createProsumer", new ImmutableMarkingElement<>(false, true, RecordVal.undefined(RecordType.of(Record.ofEntries(Record.Field.of("pInfo",GenericStringType.singleton()),Record.Field.of("id",GenericStringType.singleton()))))), LogicalOpExpr.and(BooleanLiteral.of(true), LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of(RecordFieldDeref.of(EventValueDeref.of(EventIdExpr.of(EventIdVal.of("@self",EventType.of("@self", RecordType.of(Record.ofEntries(Record.Field.of("id",GenericStringType.singleton()),Record.Field.of("cid",IntegerType.singleton()))))))),"P#cid"), IntegerLiteral.of(0)))))
+                .addLocalInputEvent("0_RxO", "cp", "createProsumer",
+                        new ImmutableMarkingElement(false, true, null),
+                        LogicalOpExpr.and(BooleanLiteral.of(true),
+                                LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of(
+                                        RecordFieldDeref.of(EventValueDeref.of(EventIdExpr.of(
+                                                        EventIdVal.of("@self"))),
+                                                "P#cid"), IntegerLiteral.of(0)))), BooleanLiteral.of(true))
 
                 // e1 ['a_string']
                 .addLocalComputationEvent("elem_1", "e1", "E1", StringLiteral.of("a_string"),
-                        new ImmutableMarkingElement<>(false, true, StringVal.undefined()),
-                        BooleanLiteral.of(true)).beginSpawn("spawn_1", "graph1", "e1")
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true)).beginSpawn("spawn_1", "graph1", "e1", BooleanLiteral.of(true))
                 //   e2 [@trigger]
                 .addLocalComputationEvent("elem_2", "e2", "E2", EventIdExpr.of(
-                                EventIdVal.of("@trigger",
-                                        EventType.of("E1", GenericStringType.singleton()))),
-                        new ImmutableMarkingElement<>(false, true, EventVal.undefined("E1",
-                                EventType.of("E1", GenericStringType.singleton()))),
-                        BooleanLiteral.of(true))
+                                EventIdVal.of("@trigger")),
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true))
                 //   e3 [e2.value]
                 .addLocalComputationEvent("elem_3", "e3", "E3", EventValueDeref.of(EventIdExpr.of(
-                                EventIdVal.of("e2", EventType.of("E2",
-                                        EventType.of("E1", GenericStringType.singleton()))))),
-                        new ImmutableMarkingElement<>(false, true, EventVal.undefined("E2",
-                                EventType.of("E1", GenericStringType.singleton()))),
-                        BooleanLiteral.of(true))
+                                EventIdVal.of("e2"))),
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true))
                 //   e4 [e2.value.value]
                 .addLocalComputationEvent("elem_4", "e4", "E4", EventValueDeref.of(
-                                EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e2",
-                                        EventType.of("E2",
-                                        EventType.of("E1", GenericStringType.singleton())))))),
-                        new ImmutableMarkingElement<>(false, true, StringVal.undefined()),
-                        BooleanLiteral.of(true)).endSpawn().build();
+                                EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e2")))),
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true)).endSpawn().build();
 
         GraphRunner runner =
                 new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
@@ -213,22 +206,18 @@ public class UsageTestsLocal {
 
                 // e1 ['a_string']
                 .addLocalComputationEvent("elem_1", "e1", "E1", BooleanLiteral.of(true),
-                        new ImmutableMarkingElement<>(false, true, BooleanVal.of(false)),
-                        BooleanLiteral.of(true))
+                        new ImmutableMarkingElement(false, true, BooleanVal.of(false)),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true))
                 // e2 [e1]
                 .addLocalComputationEvent("elem_2", "e2", "E2", EventIdExpr.of(
-                                EventIdVal.of("e1", EventType.of("E1",
-                                        GenericStringType.singleton()))),
-                        new ImmutableMarkingElement<>(false, true,
-                                EventVal.undefined("E1", GenericStringType.singleton())),
-                        BooleanLiteral.of(true))
+                                EventIdVal.of("e1")),
+                        new ImmutableMarkingElement(false, true,
+                                null), BooleanLiteral.of(true), BooleanLiteral.of(true))
                 // e3 [e2.value.value]
                 .addLocalComputationEvent("elem_3", "e3", "E3", EventValueDeref.of(
-                                EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e2",
-                                        EventType.of("E2", EventType.of("E1",
-                                                BooleanType.singleton())))))),
-                        new ImmutableMarkingElement<>(false, true, BooleanVal.undefined()),
-                        BooleanLiteral.of(true)).build();
+                                EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e2")))),
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
         GraphRunner runner =
                 new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
         runner.init(model);
@@ -244,13 +233,12 @@ public class UsageTestsLocal {
         RecursiveGraphModel model =
                 new GraphModelBuilder("graph0").addLocalComputationEvent("elem_1", "e1", "E1",
                                 StringLiteral.of("a_string"),
-                                new ImmutableMarkingElement<>(false, true, StringVal.undefined()),
-                                BooleanLiteral.of(true))
+                                new ImmutableMarkingElement(false, true, null),
+                                BooleanLiteral.of(true), BooleanLiteral.of(true))
                         .addLocalComputationEvent("elem_2", "e2", "E2", EventValueDeref.of(
-                                        EventIdExpr.of(EventIdVal.of("e1",
-                                                EventType.of("E1", GenericStringType.singleton())))),
-                                new ImmutableMarkingElement<>(false, true, StringVal.undefined()),
-                                BooleanLiteral.of(true))
+                                        EventIdExpr.of(EventIdVal.of("e1"))),
+                                new ImmutableMarkingElement(false, true, null),
+                                BooleanLiteral.of(true), BooleanLiteral.of(true))
                         .build();
         GraphRunner runner =
                 new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
@@ -271,8 +259,8 @@ public class UsageTestsLocal {
                                 StringLiteral.of("a_string"), new SetUnionExpr(
                                         List.of(UserExpr.of("Prosumer", "p2"),
                                                 UserExpr.of("Prosumer", "p3"))),
-                                new ImmutableMarkingElement<>(false, true, StringVal.undefined()),
-                                BooleanLiteral.of(true))
+                                new ImmutableMarkingElement(false, true, null),
+                                BooleanLiteral.of(true), BooleanLiteral.of(true))
 
 
                         .addComputationEvent("elem_1", "locId_1", "label_1",
@@ -281,14 +269,14 @@ public class UsageTestsLocal {
                                                         UserParams.of(Record.ofEntries(Record.Field.of(
                                                                 "id", IntegerLiteral.of(1))))),
                                                 UserExpr.of("Prosumer", "p3"))),
-                                new ImmutableMarkingElement<>(false, true, StringVal.undefined()),
-                                BooleanLiteral.of(true))
+                                new ImmutableMarkingElement(false, true, null),
+                                BooleanLiteral.of(true), BooleanLiteral.of(true))
 
-                        .beginSpawn("spawn_1", "graph1", "locId_1")
+                        .beginSpawn("spawn_1", "graph1", "locId_1", BooleanLiteral.of(true))
                         .addLocalComputationEvent("elem_2", "locId_2", "label_2",
                                 BooleanLiteral.of(false),
-                                new ImmutableMarkingElement<>(false, true, BooleanVal.undefined()),
-                                BooleanLiteral.of(true))
+                                new ImmutableMarkingElement(false, true, null),
+                                BooleanLiteral.of(true), BooleanLiteral.of(true))
                         .endSpawn()
                         .build();
 
@@ -305,17 +293,16 @@ public class UsageTestsLocal {
     public static void testInputSimpleDataDependency() {
         RecursiveGraphModel model =
                 new GraphModelBuilder("graph0").addLocalInputEvent("elem_1", "e1", "E1",
-                                new ImmutableMarkingElement<>(false, true, StringVal.undefined()),
-                                BooleanLiteral.of(true))
+                                new ImmutableMarkingElement(false, true, null),
+                                BooleanLiteral.of(true), BooleanLiteral.of(true))
                         .addLocalComputationEvent("elem_2", "e2", "E2", EventValueDeref.of(
-                                        EventIdExpr.of(EventIdVal.of("e1",
-                                                EventType.of("E1", GenericStringType.singleton())))),
-                                new ImmutableMarkingElement<>(false, true, StringVal.of("in")),
-                                BooleanLiteral.of(true))
+                                        EventIdExpr.of(EventIdVal.of("e1"))),
+                                new ImmutableMarkingElement(false, true, StringVal.of("in")),
+                                BooleanLiteral.of(true), BooleanLiteral.of(true))
                         .addControlFlowRelation("flow_1", "e1", "e2",
-                                ControlFlowRelation.Type.RESPONSE)
+                                ControlFlowRelation.Type.RESPONSE, BooleanLiteral.of(true))
                         .addControlFlowRelation("flow_1", "e1", "e2",
-                                ControlFlowRelation.Type.CONDITION)
+                                ControlFlowRelation.Type.CONDITION, BooleanLiteral.of(true))
                         .build();
         GraphRunner runner =
                 new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
@@ -333,14 +320,14 @@ public class UsageTestsLocal {
     public static void testEmptyInput() {
         RecursiveGraphModel model =
                 new GraphModelBuilder("graph0").addLocalInputEvent("1", "e1", "E1",
-                                new ImmutableMarkingElement<>(false, true, Undefined.ofVoid()),
-                                BooleanLiteral.of(true))
+                                new ImmutableMarkingElement(false, true, null),
+                                BooleanLiteral.of(true), BooleanLiteral.of(true))
                         .addLocalComputationEvent("2", "e2", "E2",
                                 BooleanLiteral.of(BooleanVal.of(true)),
-                                new ImmutableMarkingElement<>(false, true, BooleanVal.of(false)),
-                                BooleanLiteral.of(true))
-                        .addControlFlowRelation("3", "e1", "e2", ControlFlowRelation.Type.RESPONSE)
-                        .addControlFlowRelation("4", "e1", "e2", ControlFlowRelation.Type.CONDITION)
+                                new ImmutableMarkingElement(false, true, BooleanVal.of(false)),
+                                BooleanLiteral.of(true), BooleanLiteral.of(true))
+                        .addControlFlowRelation("3", "e1", "e2", ControlFlowRelation.Type.RESPONSE, BooleanLiteral.of(true))
+                        .addControlFlowRelation("4", "e1", "e2", ControlFlowRelation.Type.CONDITION, BooleanLiteral.of(true))
                         .build();
         GraphRunner runner =
                 new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
@@ -355,8 +342,8 @@ public class UsageTestsLocal {
     public static void testSimpleInputEvent() {
         RecursiveGraphModel model =
                 new GraphModelBuilder("graph0").addLocalInputEvent("elem_1", "e1", "E1",
-                        new ImmutableMarkingElement<>(false, true, StringVal.undefined()),
-                        BooleanLiteral.of(true)).build();
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
         GraphRunner runner =
                 new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
         runner.init(model);
@@ -372,8 +359,8 @@ public class UsageTestsLocal {
                 new GraphModelBuilder("graph0").addComputationEvent("elem_1", "e1", "E1",
                         StringLiteral.of("a_string"),
                         SetDiffExpr.of(RoleExpr.of("Prosumer"), UserExpr.of("Prosumer", "p1")),
-                        new ImmutableMarkingElement<>(false, true, StringVal.undefined()),
-                        BooleanLiteral.of(true)).build();
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
         GraphRunner runner =
                 new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
         runner.init(model);
@@ -398,14 +385,14 @@ public class UsageTestsLocal {
         // build & return model
         var model = new GraphModelBuilder("0").addComputationEvent("1", "e1", "E1",
                         IntegerLiteral.of(2), UserExpr.of("Prosumer", "p2"),
-                        new ImmutableMarkingElement<>(false, true, IntegerVal.undefined()),
-                        BooleanLiteral.of(true))
-                .addControlFlowRelation("2", "e1", "e1", ControlFlowRelation.Type.EXCLUDE)
-                .beginSpawn("3", "4", "e1")
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true))
+                .addControlFlowRelation("2", "e1", "e1", ControlFlowRelation.Type.EXCLUDE, BooleanLiteral.of(true))
+                .beginSpawn("3", "4", "e1", BooleanLiteral.of(true))
                 .addReceiveEvent("5", "e2", "E2", UserExpr.of("Prosumer", "p2"),
-                        new ImmutableMarkingElement<>(false, true, BooleanVal.of(false)),
-                        BooleanLiteral.of(true))
-                .addControlFlowRelation("6", "e2", "e1", ControlFlowRelation.Type.INCLUDE)
+                        new ImmutableMarkingElement(false, true, BooleanVal.of(false)),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true))
+                .addControlFlowRelation("6", "e2", "e1", ControlFlowRelation.Type.INCLUDE, BooleanLiteral.of(true))
                 .endSpawn()
                 .build();
 
@@ -439,51 +426,47 @@ public class UsageTestsLocal {
 
         var model = new GraphModelBuilder("0")
                 //(e0:readId) [?:{pId:String}}] [C0(1)]
-                .addLocalInputEvent("01", "e0", "readId", new ImmutableMarkingElement<>(false, true,
-                                RecordVal.undefined(RecordType.of(Record.ofEntries(
-                                        Record.Field.of("pId", GenericStringType.singleton()))))),
-                        BooleanLiteral.of(true))
+                .addLocalInputEvent("01", "e0", "readId", new ImmutableMarkingElement(false, true,
+                                null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true))
                 // (e1:createProsumer) [?] [P(e0.value.pId)]
                 .addInputEvent("02", "e1", "createProsumer", UserExpr.of("Prosumer",
-                                RecordFieldDeref.of(EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e0",
-                                                EventType.of("readId",
-                                                        RecordType.of(Record.ofEntries(
-                                                        Record.Field.of("pId",
-                                                                GenericStringType.singleton()))))))),
+                                RecordFieldDeref.of(EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e0"))),
                                         "pId")),
-                        new ImmutableMarkingElement<>(false, true, Undefined.ofVoid()),
-                        BooleanLiteral.of(true))
-                .addLocalComputationEvent("1", "e1", "E1", EventIdExpr.of(EventIdVal.of("e0",
-                                EventType.of("E0", RecordType.of(Record.ofEntries(
-                                        Record.Field.of("id", GenericStringType.singleton())))))),
-                        new ImmutableMarkingElement<>(false, true, EventVal.undefined("E0",
-                                RecordType.of(Record.ofEntries(
-                                        Record.Field.of("id", GenericStringType.singleton()))))),
-                        BooleanLiteral.of(true))
-
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true))
+                .addLocalComputationEvent("1", "e1", "E1", EventIdExpr.of(EventIdVal.of("e0")),
+                        new ImmutableMarkingElement(false, true, null),
+                        BooleanLiteral.of(true), BooleanLiteral.of(true))
 
 
                 // .addLocalComputationEvent("1", "e1", "E1",
                 //         EqualsExpr.of(EventValueDeref.of(EventIdExpr.of(EventIdVal.of("@V0",
                 //                 EventType.of("E0",
                 //                         BooleanType.singleton())))), BooleanLiteral.of(false)),
-                //         new ImmutableMarkingElement<>(false, true,
+                //         new ImmutableMarkingElement(false, true,
                 //                 BooleanVal.undefined()),
-                //         LogicalOpExpr.and(LogicalOpExpr.and(BooleanLiteral.of(true), LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of(EventValueDeref.of(EventIdExpr.of(EventIdVal.of("P#cid",EventType.of("P#cid", IntegerType.singleton())))), IntegerLiteral.of(0)))), LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of(EventValueDeref.of(EventIdExpr.of(EventIdVal.of("P#id",EventType.of("P#id", GenericStringType.singleton())))), StringLiteral.of("p1"))))
+                //         LogicalOpExpr.and(LogicalOpExpr.and(BooleanLiteral.of(true),
+                //         LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of
+                //         (EventValueDeref.of(EventIdExpr.of(EventIdVal.of("P#cid",EventType.of
+                //         ("P#cid", IntegerType.singleton())))), IntegerLiteral.of(0)))),
+                //         LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of
+                //         (EventValueDeref.of(EventIdExpr.of(EventIdVal.of("P#id",EventType.of
+                //         ("P#id", GenericStringType.singleton())))), StringLiteral.of("p1"))))
                 //         )
 
                 // e0 *--> e1
                 .addControlFlowRelation("03", "e0", "e1",
                         // e0 -->+ e1
-                        ControlFlowRelation.Type.RESPONSE)
+                        ControlFlowRelation.Type.RESPONSE, BooleanLiteral.of(true))
                 .addControlFlowRelation("04", "e0", "e1",
                         // e1 -->% e1
-                        ControlFlowRelation.Type.INCLUDE)
-                .addControlFlowRelation("05", "e1", "e1", ControlFlowRelation.Type.EXCLUDE)
-                .beginSpawn("06", "1", "e1")
+                        ControlFlowRelation.Type.INCLUDE, BooleanLiteral.of(true))
+                .addControlFlowRelation("05", "e1", "e1", ControlFlowRelation.Type.EXCLUDE, BooleanLiteral.of(true))
+                .beginSpawn("06", "1", "e1", BooleanLiteral.of(true))
                 // .addReceiveEvent("event_elem_2", "e2", "E2", User.of
                 // ("Prosumer", "p2"),
-                //         new ImmutableMarkingElement<>(false, true, BooleanVal
+                //         new ImmutableMarkingElement(false, true, BooleanVal
                 //         .of(false)))
                 // .addControlFlowRelation("rel_elem_1", "e2", "e1",
                 //         ControlFlowRelation.Type.INCLUDE)
@@ -546,7 +529,7 @@ public class UsageTestsLocal {
         System.exit(0);
     }
 
-    private static Value<?> parseInputVal(String input) {
+    private static Value parseInputVal(String input) {
         input = input.trim();
         // TODO handle empty input values
         if (input.isEmpty()) {
@@ -575,7 +558,7 @@ public class UsageTestsLocal {
                     "Expecting record fields: empty record not        supported");
         }
 
-        var builder = new Record.Builder<Value<?>>();
+        var builder = new Record.Builder<Value>();
         String rest = content;
         while (!rest.isEmpty()) {
             var field_end_pos = -1;
@@ -617,11 +600,11 @@ public class UsageTestsLocal {
         return RecordVal.of(builder.build());
     }
 
-    private static Record.Field<Value<?>> parseRecordFieldVal(String field) {
+    private static Record.Field<Value> parseRecordFieldVal(String field) {
         var split_pos = field.indexOf(":");
         var name = field.substring(0, split_pos);
         var valueAsString = field.substring(split_pos + 1);
-        Value<?> val = parseInputVal(valueAsString);
+        Value val = parseInputVal(valueAsString);
         return new Record.Field<>(name, val);
     }
 }
