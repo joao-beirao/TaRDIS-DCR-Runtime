@@ -8,6 +8,7 @@ import dto.endpoint.data.types.PrimitiveTypeDTO;
 import dto.endpoint.data.types.RecordTypeDTO;
 import dto.endpoint.data.types.RefTypeDTO;
 import dto.endpoint.data.types.TypeDTO;
+import dto.endpoint.data.values.tmp.RefValDTO;
 import dto.endpoint.events.ComputationEventDTO;
 import dto.endpoint.events.EventDTO;
 import dto.endpoint.participants.ReceiverExprDTO;
@@ -30,6 +31,9 @@ public class Tester {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new Jdk8Module());
 
+        // ==== Marking test =====
+
+
         IntValDTO intVal = new IntValDTO(3);
 
         // Map<String, ValueDTO> fields = new HashMap<>();
@@ -46,7 +50,7 @@ public class Tester {
         {
             var requesterFields = List.of(new RecordValDTO.FieldDTO("id", new StringValDTO("#p4")),
                     new RecordValDTO.FieldDTO("cid", new IntValDTO(5)),
-                    new RecordValDTO.FieldDTO("event", new RefValDTO("a")));
+                    new RecordValDTO.FieldDTO("event", new BoolValDTO(false)));
             recordVal = new RecordValDTO(
                     List.of(new RecordValDTO.FieldDTO("request_id", new StringValDTO("#00834238")),
                             new RecordValDTO.FieldDTO("kw", new IntValDTO(13)),

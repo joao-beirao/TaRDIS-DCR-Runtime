@@ -1,10 +1,12 @@
-package dto.endpoint.data.values;
+package dto.endpoint.data.values.tmp;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dto.endpoint.data.values.ValueDTO;
 
 // @JsonTypeName(value = "refval")
-public final class RefValDTO extends ValueDTO implements PropBasedValueDTO {
+public final class RefValDTO
+        implements PropBasedValueDTO {
     public final String refVal;
 
     @JsonCreator

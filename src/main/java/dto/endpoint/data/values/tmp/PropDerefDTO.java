@@ -1,4 +1,4 @@
-package dto.endpoint.data.values;
+package dto.endpoint.data.values.tmp;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

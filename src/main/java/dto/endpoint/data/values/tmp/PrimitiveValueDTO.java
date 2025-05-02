@@ -1,4 +1,4 @@
-package dto.endpoint.data.values;
+package dto.endpoint.data.values.tmp;
 
 
 public interface PrimitiveValueDTO {

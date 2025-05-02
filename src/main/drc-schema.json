@@ -29,88 +29,116 @@
       "$ref": "#/$defs/dataExpr"
     }
   },
+  "value": {
+    "$ref": "#/$defs/value"
+  },
   "$defs": {
-    "value": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "boolLit": {
-              "$ref": "#/$values/boolLit"
-            }
-          },
-          "required": [
-            "boolLit"
-          ],
-          "additionalProperties": false
+
+  "value": {
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "boolLit": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "bool"
+              }
+            },
+            "required": [
+              "value"
+            ],
+            "additionalProperties": false
+          }
         },
-        {
-          "type": "object",
-          "properties": {
-            "intLit": {
-              "$ref": "#/$values/intLit"
-            }
-          },
-          "required": [
-            "intLit"
-          ],
-          "additionalProperties": false
+        "required": [
+          "boolLit"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "intLit": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "int"
+              }
+            },
+            "required": [
+              "value"
+            ],
+            "additionalProperties": false
+          }
         },
-        {
-          "type": "object",
-          "properties": {
-            "stringLit": {
-              "$ref": "#/$values/stringLit"
-            }
-          },
-          "required": [
-            "stringLit"
-          ],
-          "additionalProperties": false
+        "required": [
+          "intLit"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "stringLit": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value"
+            ],
+            "additionalProperties": false
+          }
         },
-        {
-          "type": "object",
-          "properties": {
-            "refVal": {
-              "$ref": "#/$values/refVal"
-            }
-          },
-          "required": [
-            "refVal"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "recordVal": {
-              "type": "array",
-              "items": {
-                "type": "object,",
-                "properties": {
-                  "fieldName": {
-                    "type": "string"
+        "required": [
+          "stringLit"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "recordVal": {
+            "type": "object",
+            "properties": {
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "object,",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "$ref": "#/$defs/value"
+                    }
                   },
-                  "fieldValue": {
-                    "$ref": "#/$defs/value"
-                  }
+                  "required": [
+                    "name",
+                    "value"
+                  ],
+                  "additionalProperties": false
                 },
-                "required": [
-                  "fieldName",
-                  "fieldValue"
-                ],
-                "additionalProperties": false
-              },
-              "minItems": 1
-            }
-          },
-          "required": [
-            "recordVal"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "fields"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "recordVal"
+        ],
+        "additionalProperties": false
+      }
+    ]
+  },
     "dataExpr": {
       "oneOf": [
         {
@@ -428,96 +456,6 @@
       },
       "required": [
         "name"
-      ],
-      "additionalProperties": false
-    }
-  },
-  "$values": {
-    "propBasedVal": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "refVal": {
-              "$ref": "#/$values/refVal"
-            }
-          },
-          "required": [
-            "refVal"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "recordVal": {
-              "$ref": "#/$values/recordVal"
-            }
-          },
-          "required": [
-            "recordVal"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "propDerefVal": {
-              "$ref": "#/$values/propDerefVal"
-            }
-          },
-          "required": [
-            "propDerefVal"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "boolLit": {
-      "type": "boolean"
-    },
-    "intLit": {
-      "type": "integer"
-    },
-    "stringLit": {
-      "type": "string"
-    },
-    "refVal": {
-      "type": "string"
-    },
-    "recordVal": {
-      "type": "array",
-      "items": {
-        "type": "object,",
-        "properties": {
-          "fieldName": {
-            "type": "string"
-          },
-          "fieldValue": {
-            "$ref": "#/$defs/value"
-          }
-        },
-        "required": [
-          "fieldName",
-          "fieldValue"
-        ],
-        "additionalProperties": false
-      },
-      "minItems": 1
-    },
-    "propDerefVal": {
-      "type": "object",
-      "properties": {
-        "propBasedVal": {
-          "$ref": "#/$values/propBasedVal"
-        },
-        "propName": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "propBasedVal",
-        "propName"
       ],
       "additionalProperties": false
     }

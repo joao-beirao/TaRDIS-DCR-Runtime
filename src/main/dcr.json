@@ -1,92 +1,54 @@
 {
   "events": [
   ],
-  "marking": {
-    "isIncluded": true,
-    "isPending": true,
-    "value": {
-      "recordVal": [
-        {
-          "fieldName": "request_id",
-          "fieldValue": {
-            "stringLit": "#00834238"
-          }
-        },
-        {
-          "fieldName": "kw",
-          "fieldValue": {
-            "intLit": 13
-          }
-        },
-        {
-          "fieldName": "requester",
-          "fieldValue": {
-            "recordVal": [
-              {
-                "fieldName": "id",
-                "fieldValue": {
-                  "stringLit": "#p4"
-                }
-              },
-              {
-                "fieldName": "cid",
-                "fieldValue": {
-                  "intLit": 5
-                }
-              },
-              {
-                "fieldName": "event",
-                "fieldValue": {
-                  "refVal": "a"
-                }
-              }
-            ]
-          }
-        }
-      ]
-    }
-  },
   "val": {
     "value": {
-      "recordVal": [
-        {
-          "fieldName": "request_id",
-          "fieldValue": {
-            "stringLit": "#00834238"
-          }
-        },
-        {
-          "fieldName": "kw",
-          "fieldValue": {
-            "intLit": 13
-          }
-        },
-        {
-          "fieldName": "requester",
-          "fieldValue": {
-            "recordVal": [
-              {
-                "fieldName": "id",
-                "fieldValue": {
-                  "stringLit": "p4"
-                }
-              },
-              {
-                "fieldName": "cid",
-                "fieldValue": {
-                  "intLit": 5
-                }
-              },
-              {
-                "fieldName": "event",
-                "fieldValue": {
-                  "refVal": "consume_04_tx"
-                }
+      "recordVal": {
+        "fields": [
+          {
+            "name": "p3",
+            "value": {
+              "stringLit": {
+                "value": "a_string"
               }
-            ]
+            }
+          },
+          {
+            "name": "p4",
+            "value": {
+              "recordVal": {
+                "fields": [
+                  {
+                    "name": "p5",
+                    "value": {
+                      "recordVal": {
+                        "fields": [
+                          {
+                            "name": "p1",
+                            "value": {
+                              "boolLit": {
+                                "value": true
+                              }
+                            }
+                          },
+                          {
+                            "name": "p2",
+                            "value": {
+                              "intLit": {
+                                "value": 3
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
           }
-        }
-      ]
+        ]
+      }
     }
   },
   "type": {

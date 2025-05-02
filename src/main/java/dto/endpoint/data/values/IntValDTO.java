@@ -2,16 +2,14 @@ package dto.endpoint.data.values;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.jetbrains.annotations.NotNull;
 
-// @JsonTypeName(value = "stringLit")
-public final class IntValDTO extends ValueDTO implements PrimitiveValueDTO {
-    public final int intLit;
+@JsonTypeName(value = "intLit")
+public record IntValDTO(@JsonProperty(value="value", required = true) int intLit)
+        implements ValueDTO {
 
-    @JsonCreator
-    public IntValDTO(@JsonProperty("intLit") int intLit) {
-        this.intLit = intLit;
-    }
-
+    @NotNull
     @Override
     public String toString() {
         return Integer.toString(intLit);
