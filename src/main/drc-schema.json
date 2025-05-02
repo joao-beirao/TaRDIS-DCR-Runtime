@@ -406,10 +406,10 @@
     "roleParam": {
       "type": "object",
       "properties": {
-        "name": {
+        "paramName": {
           "type": "string"
         },
-        "value": {
+        "paramExpr": {
           "oneOf": [
             {
               "type": "object",

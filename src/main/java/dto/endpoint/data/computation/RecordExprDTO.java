@@ -1,26 +1,26 @@
 package dto.endpoint.data.computation;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @JsonTypeName("recordExpr")
-public record RecordExprDTO( @JsonUnwrapped  @JsonProperty(value = "fields") List<FieldDTO> recordExpr)
-        implements ComputationExprDTO {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public record RecordExprDTO(
+        @JsonProperty(value = "fields", required = true) List<FieldDTO> recordExpr)
+        implements PropBasedExprDTO {
 
-
-
-    public record FieldDTO(@JsonProperty(value = "fieldName", required = true) String fieldName,
-                           @JsonProperty(value = "fieldExpr", required = true) ComputationExprDTO fieldExpr) {
+    public record FieldDTO(@JsonProperty(value = "fieldName", required = true) String name,
+                           @JsonProperty(value = "fieldExpr", required = true) ComputationExprDTO expr) {
 
         @NotNull
         @Override
         public String toString() {
-            return String.format("%s: %s", fieldName, fieldExpr.toString());
+            return String.format("%s = %s", name, expr.toString());
         }
     }
 
@@ -29,7 +29,7 @@ public record RecordExprDTO( @JsonUnwrapped  @JsonProperty(value = "fields") Lis
     public String toString() {
         return recordExpr.stream()
                 .map(FieldDTO::toString)
-                .collect(Collectors.joining(", ", "{", "}"));
+                .collect(Collectors.joining("; ", "{", "}"));
     }
 
 }

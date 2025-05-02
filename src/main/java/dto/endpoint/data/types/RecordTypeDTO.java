@@ -1,15 +1,17 @@
 package dto.endpoint.data.types;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record RecordTypeDTO(@JsonProperty(value = "recordTy") List<FieldDTO> recordType)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public record RecordTypeDTO(@JsonProperty(value = "recordTy",required = true) List<FieldDTO> recordType)
         implements TypeDTO {
 
-    public record FieldDTO(@JsonProperty(value = "fieldName", required = true) String fieldName,
+    public record FieldDTO(@JsonProperty(value = "name", required = true) String fieldName,
                            @JsonProperty(value = "fieldType", required = true) TypeDTO fieldType) {
 
         @NotNull

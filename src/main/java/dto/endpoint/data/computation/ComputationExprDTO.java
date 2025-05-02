@@ -10,11 +10,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({@JsonSubTypes.Type(BoolLiteralDTO.class), @JsonSubTypes.Type(IntLiteralDTO.class),
         @JsonSubTypes.Type(StringLiteralDTO.class),
-         @JsonSubTypes.Type(RecordExprDTO.class),
+        @JsonSubTypes.Type(PropDerefExprDTO.class),
+        @JsonSubTypes.Type(RecordExprDTO.class),
+        @JsonSubTypes.Type(RefExprDTO.class),
         @JsonSubTypes.Type(BinaryOpExprDTO.class)})
 public sealed interface ComputationExprDTO
         permits BinaryOpExprDTO,
                 BoolLiteralDTO,
                 IntLiteralDTO,
-                RecordExprDTO,
+                PropBasedExprDTO,
                 StringLiteralDTO {}
