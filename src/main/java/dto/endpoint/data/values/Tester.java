@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import dto.endpoint.data.computation.*;
-import dto.endpoint.data.types.PrimitiveTypeDTO;
-import dto.endpoint.data.types.RecordTypeDTO;
-import dto.endpoint.data.types.RefTypeDTO;
 import dto.endpoint.data.types.TypeDTO;
-import dto.endpoint.data.values.tmp.RefValDTO;
+import dto.endpoint.data.types.ValueTypeDTO;
+import dto.endpoint.data.types.RecordTypeDTO;
+import dto.endpoint.data.types.EventRefTypeDTO;
 import dto.endpoint.events.ComputationEventDTO;
 import dto.endpoint.events.EventDTO;
 import dto.endpoint.participants.ReceiverExprDTO;
@@ -130,12 +129,16 @@ public class Tester {
 
             TypeDTO recordTypeDTO;
             {
+                // var nestedParams = List.of(new RecordTypeDTO.FieldDTO("param3",
+                //                 new ValueTypeDTO(ValueTypeDTO.TypeDTO.STRING)),
+                //         new RecordTypeDTO.FieldDTO("param4",
+                //                 new ValueTypeDTO(ValueTypeDTO.TypeDTO.INT)));
                 var nestedParams = List.of(new RecordTypeDTO.FieldDTO("param3",
-                                new PrimitiveTypeDTO(PrimitiveTypeDTO.PrimitiveType.STRING)),
+                                ValueTypeDTO.STRING),
                         new RecordTypeDTO.FieldDTO("param4",
-                                new PrimitiveTypeDTO(PrimitiveTypeDTO.PrimitiveType.INT)));
+                                ValueTypeDTO.INT));
                 var params =
-                        List.of(new RecordTypeDTO.FieldDTO("param1", new RefTypeDTO("Consume")),
+                        List.of(new RecordTypeDTO.FieldDTO("param1", new EventRefTypeDTO("Consume")),
                                 new RecordTypeDTO.FieldDTO("param2",
                                         new RecordTypeDTO(nestedParams)));
                 recordTypeDTO = new RecordTypeDTO(params);

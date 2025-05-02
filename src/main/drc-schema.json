@@ -23,7 +23,7 @@
       "additionalProperties": false
     },
     "type": {
-      "$ref": "#/$exprs/typeExpression"
+      "$ref": "#/$defs/type"
     },
     "dataExpr": {
       "$ref": "#/$defs/dataExpr"
@@ -33,112 +33,214 @@
     "$ref": "#/$defs/value"
   },
   "$defs": {
-
-  "value": {
-    "oneOf": [
-      {
-        "type": "object",
-        "properties": {
-          "boolLit": {
-            "type": "object",
-            "properties": {
-              "value": {
-                "type": "bool"
-              }
-            },
-            "required": [
-              "value"
-            ],
-            "additionalProperties": false
-          }
+    "value": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "boolLit": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "bool"
+                }
+              },
+              "required": [
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "boolLit"
+          ],
+          "additionalProperties": false
         },
-        "required": [
-          "boolLit"
-        ],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "properties": {
-          "intLit": {
-            "type": "object",
-            "properties": {
-              "value": {
-                "type": "int"
-              }
-            },
-            "required": [
-              "value"
-            ],
-            "additionalProperties": false
-          }
+        {
+          "type": "object",
+          "properties": {
+            "intLit": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "int"
+                }
+              },
+              "required": [
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "intLit"
+          ],
+          "additionalProperties": false
         },
-        "required": [
-          "intLit"
-        ],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "properties": {
-          "stringLit": {
-            "type": "object",
-            "properties": {
-              "value": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "value"
-            ],
-            "additionalProperties": false
-          }
+        {
+          "type": "object",
+          "properties": {
+            "stringLit": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "stringLit"
+          ],
+          "additionalProperties": false
         },
-        "required": [
-          "stringLit"
-        ],
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "properties": {
-          "recordVal": {
-            "type": "object",
-            "properties": {
-              "fields": {
-                "type": "array",
-                "items": {
-                  "type": "object,",
-                  "properties": {
-                    "name": {
-                      "type": "string"
+        {
+          "type": "object",
+          "properties": {
+            "recordVal": {
+              "type": "object",
+              "properties": {
+                "fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "object,",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "value": {
+                        "$ref": "#/$defs/value"
+                      }
                     },
-                    "value": {
-                      "$ref": "#/$defs/value"
-                    }
+                    "required": [
+                      "name",
+                      "value"
+                    ],
+                    "additionalProperties": false
                   },
-                  "required": [
-                    "name",
-                    "value"
-                  ],
-                  "additionalProperties": false
-                },
-                "minItems": 1
-              }
-            },
-            "required": [
-              "fields"
-            ],
-            "additionalProperties": false
-          }
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "fields"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "recordVal"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "type": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "valueType": {
+              "enum": [
+                "bool",
+                "int",
+                "string",
+                "void"
+              ]
+            }
+          },
+          "required": [
+            "valueType"
+          ],
+          "additionalProperties": false
         },
-        "required": [
-          "recordVal"
-        ],
-        "additionalProperties": false
-      }
-    ]
-  },
+        {
+          "type": "object",
+          "properties": {
+            "recordType": {
+              "type": "object",
+              "properties": {
+                "fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "type": {
+                        "$ref": "#/$defs/type"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "fields"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "recordType"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "eventType": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "eventType"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "marking": {
+      "type": "object",
+      "properties": {
+        "isIncluded": {
+          "type": "boolean"
+        },
+        "isPending": {
+          "type": "boolean"
+        },
+        "defaultValue": {
+          "$ref": "#/$defs/value"
+        }
+      },
+      "required": [
+        "isIncluded",
+        "isPending"
+      ],
+      "additionalProperties": false
+    },
     "dataExpr": {
       "oneOf": [
         {
@@ -156,8 +258,8 @@
         {
           "type": "object",
           "properties": {
-            "typeExpression": {
-              "$ref": "#/$exprs/typeExpression"
+            "type": {
+              "$ref": "#/$defs/type"
             }
           },
           "required": [
@@ -171,10 +273,12 @@
       "type": "object",
       "properties": {
         "uid": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "id": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "dataExpr": {
           "$ref": "#/$defs/dataExpr"
@@ -186,25 +290,6 @@
       "required": [
         "uid",
         "id"
-      ],
-      "additionalProperties": false
-    },
-    "marking": {
-      "type": "object",
-      "properties": {
-        "isIncluded": {
-          "type": "boolean"
-        },
-        "isPending": {
-          "type": "boolean"
-        },
-        "value": {
-          "$ref": "#/$defs/value"
-        }
-      },
-      "required": [
-        "isIncluded",
-        "isPending"
       ],
       "additionalProperties": false
     }
@@ -239,67 +324,6 @@
       ],
       "additionalProperties": false
     },
-    "typeExpression": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "primitiveTy": {
-              "enum": [
-                "bool",
-                "int",
-                "string"
-              ]
-            }
-          },
-          "required": [
-            "primitiveTy"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "recordTy": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "fieldName": {
-                    "type": "string"
-                  },
-                  "fieldType": {
-                    "$ref": "#/$exprs/typeExpression"
-                  }
-                },
-                "required": [
-                  "fieldName",
-                  "fieldType"
-                ],
-                "additionalProperties": false
-              },
-              "minItems": 1
-            }
-          },
-          "required": [
-            "recordTy"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "refTy": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "refTy"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
     "literalExpr": {
       "oneOf": [
         {
@@ -327,7 +351,8 @@
           "type": "object",
           "properties": {
             "stringLit": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           },
           "additionalProperties": false
@@ -341,7 +366,8 @@
           "type": "object",
           "properties": {
             "eventRefLit": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           },
           "required": [
@@ -361,7 +387,8 @@
                     "type": "object,",
                     "properties": {
                       "name": {
-                        "type": "string"
+                        "type": "string",
+                        "minLength": 1
                       },
                       "expr": {
                         "$ref": "#/$exprs/computationExpression"
@@ -397,7 +424,8 @@
                   "$ref": "#/$exprs/propBasedExpr"
                 },
                 "prop": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 }
               },
               "required": [
@@ -435,7 +463,8 @@
       "type": "object",
       "properties": {
         "paramName": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "paramExpr": {
           "oneOf": [

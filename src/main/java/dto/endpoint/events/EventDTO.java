@@ -6,10 +6,7 @@ import dto.endpoint.data.values.ValueDTO;
 import dto.endpoint.participants.UserSetExprDTO;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -49,9 +46,11 @@ public sealed abstract class EventDTO
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public record MarkingDTO(
-            @JsonProperty(value = "isIncluded", required = true) boolean isIncluded,
-            @JsonProperty(value = "isPending", required = true) boolean isPending,
-            @JsonProperty("value") Optional<ValueDTO> value) {
+            @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "isIncluded",
+                    required = true) boolean isIncluded,
+            @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "isPending",
+                    required = true) boolean isPending,
+            @JsonProperty("defaultValue") Optional<ValueDTO> value) {
 
         @NotNull
         @Override

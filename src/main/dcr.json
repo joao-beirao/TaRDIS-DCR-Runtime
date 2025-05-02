@@ -1,6 +1,11 @@
 {
   "events": [
   ],
+  "marking":{
+    "isPending": false,
+    "isIncluded": true,
+    "defaultValue": { "intLit": { "value": 3 } }
+  },
   "val": {
     "value": {
       "recordVal": {
@@ -52,45 +57,43 @@
     }
   },
   "type": {
-    "recordTy": [
-      {
-        "fieldName": "param1",
-        "fieldType": {
-          "refTy": "Consume"
-        }
-      },
-      {
-        "fieldName": "param2",
-        "fieldType": {
-          "recordTy": [
+    "recordType": {
+      "fields": [
+        {
+          "name": "p3",
+          "type": {
+            "recordType": {
+              "fields": [
+                { "name": "p2", "type": { "valueType": "bool" } },
+                { "name": "p1", "type": { "valueType": "string" } }
+              ]
+            }
+          }
+        },
+        { "name": "pp4", "type": { "eventType": { "label": "E0" } } }
+      ]
+    }
+  },
+  "another": {
+    "typeExpr": {
+      "valueType": "bool/int/string/void",
+      "refType" : {
+        "eventType" : {
+          "label": "E0"
+        },
+        "recordType": {
+          "fieldTypes": [
             {
-              "fieldName": "param3",
-              "fieldType": {
-                "primitiveTy": "string"
-              }
+
             },
             {
-              "fieldName": "param4",
-              "fieldType": {
-                "primitiveTy": "int"
-              }
+
             }
           ]
         }
       }
-    ]
-  },
-  "dataExpr": {
-    "typeExpression": {
-      "recordTy": [
-        {
-          "fieldName": "param1",
-          "fieldType": {
-            "primitiveTy": "string"
-          }
-        }
-      ]
     }
+
   }
 }
 
