@@ -27,6 +27,9 @@
     },
     "dataExpr": {
       "$ref": "#/$defs/dataExpr"
+    },
+    "userSet": {
+      "$ref": "#/$defs/userSetExpression"
     }
   },
   "value": {
@@ -241,60 +244,6 @@
       ],
       "additionalProperties": false
     },
-    "dataExpr": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "computationExpression": {
-              "$ref": "#/$exprs/computationExpression"
-            }
-          },
-          "required": [
-            "computationExpression"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "$ref": "#/$defs/type"
-            }
-          },
-          "required": [
-            "typeExpression"
-          ],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "event": {
-      "type": "object",
-      "properties": {
-        "uid": {
-          "type": "string",
-          "minLength": 1
-        },
-        "id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "dataExpr": {
-          "$ref": "#/$defs/dataExpr"
-        },
-        "marking": {
-          "$ref": "#/$defs/marking"
-        }
-      },
-      "required": [
-        "uid",
-        "id"
-      ],
-      "additionalProperties": false
-    }
-  },
-  "$exprs": {
     "computationExpression": {
       "oneOf": [
         {
@@ -399,7 +348,7 @@
                         "minLength": 1
                       },
                       "value": {
-                        "$ref": "#/$exprs/computationExpression"
+                        "$ref": "#/$defs/computationExpression"
                       }
                     },
                     "required": [
@@ -429,7 +378,7 @@
               "type": "object",
               "properties": {
                 "propBasedExpr": {
-                  "$ref": "#/$exprs/computationExpression"
+                  "$ref": "#/$defs/computationExpression"
                 },
                 "prop": {
                   "type": "string",
@@ -455,10 +404,10 @@
               "type": "object",
               "properties": {
                 "expr1": {
-                  "$ref": "#/$exprs/computationExpression"
+                  "$ref": "#/$defs/computationExpression"
                 },
                 "expr2": {
-                  "$ref": "#/$exprs/computationExpression"
+                  "$ref": "#/$defs/computationExpression"
                 },
                 "op": {
                   "enum": [
@@ -488,6 +437,150 @@
           ],
           "additionalProperties": false
         }
+      ],
+      "additionalProperties": false
+    },
+    "userSetExpression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "roleExpr": {
+              "type": "object",
+              "properties": {
+                "roleLabel": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "params": {
+                  "type": "array",
+                  "items": {
+
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "value": {
+                          "$ref": "#/$defs/computationExpression"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "additionalProperties": false
+
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "roleLabel"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "roleExpr"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "initiatorExpr": {
+              "type": "object",
+              "properties": {
+                "eventId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "eventId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "initiatorExpr"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "receiverExpr": {
+              "type": "object",
+              "properties": {
+                "eventId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "eventId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "receiverExpr"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "dataExpr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "computationExpression": {
+              "$ref": "#/$defs/computationExpression"
+            }
+          },
+          "required": [
+            "computationExpression"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "$ref": "#/$defs/type"
+            }
+          },
+          "required": [
+            "typeExpression"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataExpr": {
+          "$ref": "#/$defs/dataExpr"
+        },
+        "marking": {
+          "$ref": "#/$defs/marking"
+        }
+      },
+      "required": [
+        "uid",
+        "id"
       ],
       "additionalProperties": false
     }

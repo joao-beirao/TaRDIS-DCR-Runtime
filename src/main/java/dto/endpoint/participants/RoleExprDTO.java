@@ -14,13 +14,13 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonTypeName("roleExpr")
-public record RoleExprDTO(@JsonProperty(value = "roleName", required = true) String roleName,
+public record RoleExprDTO(@JsonProperty(value = "roleLabel", required = true) String roleName,
                           @JsonProperty(value = "params", required = true) List<Param> params)
         implements UserSetExprDTO {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    public record Param(@JsonProperty(value = "paramName", required = true) String name,
-                        @JsonProperty(value = "paramExpr") Optional<ComputationExprDTO> expr) {
+    public record Param(@JsonProperty(value = "name", required = true) String name,
+                        @JsonProperty(value = "value") Optional<ComputationExprDTO> expr) {
         @NotNull
         @Override
         public String toString() {

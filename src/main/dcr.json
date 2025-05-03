@@ -99,14 +99,35 @@
     "computationExpression": {
       "record": {
         "fields": [
-          { "name": "p3", "value": { "boolLit": { "value": true } } },
+          {
+            "name": "p3",
+            "value": {
+              "boolLit": {
+                "value": true
+              }
+            }
+          },
           {
             "name": "p4",
             "value": {
               "record": {
                 "fields": [
-                  { "name": "p1", "value": { "boolLit": { "value": true } } },
-                  { "name": "p2", "value": { "eventRef": { "value": "E0" } } }
+                  {
+                    "name": "p1",
+                    "value": {
+                      "boolLit": {
+                        "value": true
+                      }
+                    }
+                  },
+                  {
+                    "name": "p2",
+                    "value": {
+                      "eventRef": {
+                        "value": "E0"
+                      }
+                    }
+                  }
                 ]
               }
             }
@@ -117,7 +138,11 @@
               "propDeref": {
                 "propBasedExpr": {
                   "propDeref": {
-                    "propBasedExpr": { "eventRef": { "value": "E0" } },
+                    "propBasedExpr": {
+                      "eventRef": {
+                        "value": "E0"
+                      }
+                    },
                     "prop": "value"
                   }
                 },
@@ -129,14 +154,40 @@
             "name": "p6",
             "value": {
               "binaryOp": {
-                "expr1": { "intLit": { "value": 2 } },
-                "expr2": { "intLit": { "value": 3 } },
+                "expr1": {
+                  "intLit": {
+                    "value": 2
+                  }
+                },
+                "expr2": {
+                  "intLit": {
+                    "value": 3
+                  }
+                },
                 "op": "intAdd"
               }
             }
           }
         ]
       }
+    }
+  },
+  "userSet": {
+    "roleExpr": {
+      "roleLabel": "P",
+      "params": [
+        {
+          "name": "p1"
+        },
+        {
+          "name": "p2",
+          "value": {
+            "intLit": {
+              "value": 2
+            }
+          }
+        }
+      ]
     }
   }
 }

@@ -6,6 +6,7 @@ import dto.endpoint.data.computation.ComputationExprDTO;
 import dto.endpoint.data.types.TypeDTO;
 import dto.endpoint.data.values.ValueDTO;
 import dto.endpoint.events.EventDTO;
+import dto.endpoint.participants.UserSetExprDTO;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -197,6 +198,53 @@ public class JsonEncodingTests {
         {
             assertEquals(objectMapper.readTree(testSrc), objectMapper.readTree(serializedExprDTO));
         }
+    }
+
+    @Test
+    public void givenSerializedUserSetExpr_ifDeserializeAndThenSerialize_thenSameJson()
+            throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
+
+        {
+            var testSrc = """
+                    {
+                         "roleExpr": {
+                           "roleLabel": "P",
+                           "params": [
+                             { "name": "p1" },
+                             { "name": "p2", "value": { "intLit": { "value": 2 } } }
+                           ]
+                         }
+                       }
+                    """;
+            UserSetExprDTO deserializedUserSetExprDTO =
+                    objectMapper.readValue(testSrc, UserSetExprDTO.class);
+            String serializedUserSetExprDTO =
+                    objectMapper.writeValueAsString(deserializedUserSetExprDTO);
+
+            assertEquals(objectMapper.readTree(testSrc),
+                    objectMapper.readTree(serializedUserSetExprDTO));
+        }
+
+        {
+            var testSrc = """
+                    {
+                        "receiverExpr": {
+                            "eventId": "e0"
+                        }
+                    }
+                    """;
+            UserSetExprDTO deserializedUserSetExprDTO =
+                    objectMapper.readValue(testSrc, UserSetExprDTO.class);
+            String serializedUserSetExprDTO =
+                    objectMapper.writeValueAsString(deserializedUserSetExprDTO);
+
+            assertEquals(objectMapper.readTree(testSrc),
+                    objectMapper.readTree(serializedUserSetExprDTO));
+        }
+
+
     }
 
 
