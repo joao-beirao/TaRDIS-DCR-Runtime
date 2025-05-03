@@ -8,14 +8,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@JsonTypeName("recordExpr")
+@JsonTypeName("record")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public record RecordExprDTO(
         @JsonProperty(value = "fields", required = true) List<FieldDTO> recordExpr)
         implements PropBasedExprDTO {
 
-    public record FieldDTO(@JsonProperty(value = "fieldName", required = true) String name,
-                           @JsonProperty(value = "fieldExpr", required = true) ComputationExprDTO expr) {
+    public record FieldDTO(@JsonProperty(value = "name", required = true) String name,
+                           @JsonProperty(value = "value", required = true) ComputationExprDTO expr) {
 
         @NotNull
         @Override

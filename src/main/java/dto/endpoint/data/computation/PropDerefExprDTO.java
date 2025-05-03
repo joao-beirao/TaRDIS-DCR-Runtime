@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.jetbrains.annotations.NotNull;
 
-@JsonTypeName("propDerefExpr")
+@JsonTypeName("propDeref")
 public record PropDerefExprDTO(
         @JsonProperty(value = "propBasedExpr", required = true) PropBasedExprDTO expr,
         @JsonProperty(value = "prop", required = true) String prop

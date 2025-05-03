@@ -2,6 +2,7 @@ package dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import dto.endpoint.data.computation.ComputationExprDTO;
 import dto.endpoint.data.types.TypeDTO;
 import dto.endpoint.data.values.ValueDTO;
 import dto.endpoint.events.EventDTO;
@@ -140,5 +141,64 @@ public class JsonEncodingTests {
             assertEquals(objectMapper.readTree(testSrc), objectMapper.readTree(serializedTypeDTO));
         }
     }
+
+    @Test
+    public void givenNestedSerializedExpr_ifDeserializeAndThenSerialize_thenSameJson()
+            throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        var testSrc = """
+                {
+                  "record": {
+                    "fields": [
+                      { "name": "p3", "value": { "boolLit": { "value": true } } },
+                      {
+                        "name": "p4",
+                        "value": {
+                          "record": {
+                            "fields": [
+                              { "name": "p1", "value": { "boolLit": { "value": true } } },
+                              { "name": "p2", "value": { "eventRef": { "value": "E0" } } }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "name": "p5",
+                        "value": {
+                          "propDeref": {
+                            "propBasedExpr": {
+                              "propDeref": {
+                                "propBasedExpr": { "eventRef": { "value": "E0" } },
+                                "prop": "value"
+                              }
+                            },
+                            "prop": "cid"
+                          }
+                        }
+                      },
+                      {
+                        "name": "p6",
+                        "value": {
+                          "binaryOp": {
+                            "expr1": { "intLit": { "value": 2 } },
+                            "expr2": { "intLit": { "value": 3 } },
+                            "op": "intAdd"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+                """;
+        ComputationExprDTO deserializedExprDTO =
+                objectMapper.readValue(testSrc, ComputationExprDTO.class);
+        String serializedExprDTO = objectMapper.writeValueAsString(deserializedExprDTO);
+        {
+            assertEquals(objectMapper.readTree(testSrc), objectMapper.readTree(serializedExprDTO));
+        }
+    }
+
+
 }
 

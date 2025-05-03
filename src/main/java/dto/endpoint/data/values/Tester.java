@@ -166,7 +166,7 @@ public class Tester {
                                 new RecordExprDTO.FieldDTO("p2",
                                         new BinaryOpExprDTO(new IntLiteralDTO(3),
                                                 new IntLiteralDTO(4),
-                                                BinaryOpExprDTO.OpTypeDTO.INT_EQ)),
+                                                BinaryOpExprDTO.OpTypeDTO.INT_ADD)),
                                 new RecordExprDTO.FieldDTO("p3", new RefExprDTO("e0")),
                                 new RecordExprDTO.FieldDTO("p4", new PropDerefExprDTO(
                                         new PropDerefExprDTO(new RefExprDTO("e5"), "value"), "cid"))

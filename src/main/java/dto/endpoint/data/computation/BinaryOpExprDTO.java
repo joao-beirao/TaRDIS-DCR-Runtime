@@ -1,18 +1,23 @@
 package dto.endpoint.data.computation;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.jetbrains.annotations.NotNull;
 
-@JsonTypeName("binaryOpExpr")
+@JsonTypeName("binaryOp")
 public record BinaryOpExprDTO(
         @JsonProperty(value = "expr1", required = true) ComputationExprDTO left,
         @JsonProperty(value = "expr2", required = true) ComputationExprDTO right,
         @JsonProperty(value = "op", required = true) OpTypeDTO optType)
         implements ComputationExprDTO {
 
-
+    @JsonTypeName("op")
     public enum OpTypeDTO {
-        AND("and"), OR("or"), BOOL_EQ("bool_equals"), INT_EQ("int_equals"), STR_EQ("str_equals");
+        AND("and"), OR("or"), NEG("neg"), EQ("equals"), NEQ("notEquals"), INT_ADD(
+                "intAdd"), STR_CONCAT("stringConcat"), INT_LT("intLessThan"), INT_GT(
+                "intGreaterThan"), INT_LEQ("intLessThanOrEqual"), INT_GEQ("intGreaterThanOrEqual");
 
         @JsonProperty(value = "op")
         private final String op;
@@ -29,7 +34,14 @@ public record BinaryOpExprDTO(
             return switch (this) {
                 case AND -> "&&";
                 case OR -> "||";
-                case BOOL_EQ, INT_EQ, STR_EQ -> "==";
+                case NEG -> "!";
+                case EQ -> "==";
+                case NEQ -> "<>";
+                case INT_ADD, STR_CONCAT -> "+";
+                case INT_LT -> "<";
+                case INT_GT -> ">";
+                case INT_LEQ -> "<=";
+                case INT_GEQ -> ">=";
             };
         }
     }
