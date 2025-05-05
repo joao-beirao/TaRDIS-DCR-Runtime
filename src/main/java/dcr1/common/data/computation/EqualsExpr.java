@@ -1,8 +1,8 @@
 package dcr1.common.data.computation;
 
 import dcr1.common.Environment;
-import dcr1.common.data.values.BooleanVal;
-import dcr1.common.data.values.IntegerVal;
+import dcr1.common.data.values.BoolVal;
+import dcr1.common.data.values.IntVal;
 import dcr1.common.data.values.StringVal;
 import dcr1.common.data.values.Value;
 import org.jetbrains.annotations.NotNull;
@@ -17,17 +17,17 @@ public record EqualsExpr(ComputationExpression left,
     }
 
     @Override
-    public BooleanVal eval(Environment<Value> env) {
+    public BoolVal eval(Environment<Value> env) {
         var leftVal = left.eval(env);
         var rightVal = right.eval(env);
         boolean isEqual = switch (leftVal) {
-            case BooleanVal booleanVal -> booleanVal.value() == (((BooleanVal) rightVal).value());
-            case IntegerVal integerVal -> integerVal.value() == (((IntegerVal) rightVal).value());
+            case BoolVal booleanVal -> booleanVal.value() == (((BoolVal) rightVal).value());
+            case IntVal integerVal -> integerVal.value() == (((IntVal) rightVal).value());
             case StringVal stringVal -> stringVal.value().equals(((StringVal) rightVal).value());
             default ->
                     throw new IllegalStateException("Internal error. Unexpected value: " + leftVal);
         };
-        return BooleanVal.of(isEqual);
+        return BoolVal.of(isEqual);
     }
 
     @NotNull

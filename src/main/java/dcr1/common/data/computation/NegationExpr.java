@@ -1,7 +1,7 @@
 package dcr1.common.data.computation;
 
 import dcr1.common.Environment;
-import dcr1.common.data.values.BooleanVal;
+import dcr1.common.data.values.BoolVal;
 import dcr1.common.data.values.Value;
 
 public class NegationExpr
@@ -16,8 +16,8 @@ public class NegationExpr
     }
 
     @Override
-    public BooleanVal eval(Environment<Value> env) {
-        return BooleanVal.of(!expr.eval(env).value());
+    public BoolVal eval(Environment<Value> env) {
+        return BoolVal.of(!expr.eval(env).value());
     }
 
     @Override

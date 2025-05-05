@@ -195,6 +195,17 @@ public final class Record<V>
         return builder.build();
     }
 
+    public static <V> Record<V> ofEntries(Map<String, ? extends V> entries) {
+        if (entries.isEmpty()) { // implicit null check of entries array
+            return empty();
+        }
+        var builder = new Builder<V>();
+        for (var field : entries.entrySet()) {
+            builder.addFieldWithParams(field.getKey(), field.getValue());
+        }
+        return builder.build();
+    }
+
 
     public static <V> Builder<V> builder() {
         return new Builder<>();

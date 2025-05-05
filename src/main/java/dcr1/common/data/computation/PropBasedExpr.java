@@ -6,7 +6,7 @@ import dcr1.common.data.values.Value;
 
 
 public sealed interface PropBasedExpr extends ComputationExpression
-        permits EventIdExpr, RecordExpr {
+        permits RefExpr, RecordExpr {
     @Override
     PropBasedVal eval(Environment<Value> env);
 }

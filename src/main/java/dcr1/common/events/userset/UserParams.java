@@ -11,9 +11,9 @@ public record UserParams<V>(Record<? extends V> params) implements Serializable 
 
     private static final String ID_FIELD_LABEL = "id";
 
-    public static <V> UserParams<V> of(V id) {
-        return new UserParams<>(Record.ofEntries(Record.Field.of(ID_FIELD_LABEL, id)));
-    }
+    // public static <V> UserParams<V> of(V id) {
+    //     return new UserParams<>(Record.ofEntries(Record.Field.of(ID_FIELD_LABEL, id)));
+    // }
 
     public static <V> UserParams<V> of(Record<? extends V> params) {
         return new UserParams<>(params);

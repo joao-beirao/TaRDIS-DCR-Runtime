@@ -15,7 +15,7 @@ public final class DummyMembershipLayer {
 
         String role() {return user().role();}
 
-        String id() {return user().getId().value();}
+        // String id() {return user().getId().value();}
     }
 
     private static final DummyMembershipLayer singleton = new DummyMembershipLayer();
@@ -52,7 +52,7 @@ public final class DummyMembershipLayer {
                         .remove(dummyNeighbour));
     }
 
-    public Set<DummyNeighbour> evalUserSetExpr(UserSetVal receivers) {
+    public Set<DummyNeighbour> resolveParticipants(UserSetVal receivers) {
         Set<DummyNeighbour> evalResult = new HashSet<>();
         switch (receivers) {
             case UserVal user -> {
@@ -62,25 +62,26 @@ public final class DummyMembershipLayer {
                 // System.err.printf("userval: %s, hashcode: %d%n: ", user, user.hashCode());
                     Optional.ofNullable(neighbourMapping.get(user)).ifPresent(evalResult::add);
             }
+            // TODO subsequent filter according to params
             case RoleVal role -> evalResult.addAll(
                     neighboursByRole.getOrDefault(role.role(), Collections.emptySet()));
             case SetDiffVal setDiff -> {
-                var positiveSet = new HashSet<>(evalUserSetExpr(setDiff.positiveSet()));
-                var negativeSet = new HashSet<>(evalUserSetExpr(setDiff.negativeSet()));
+                var positiveSet = new HashSet<>(resolveParticipants(setDiff.positiveSet()));
+                var negativeSet = new HashSet<>(resolveParticipants(setDiff.negativeSet()));
                 positiveSet.removeAll(negativeSet);
                 // System.err.println(
-                //         "positive set in evalUserSetExpr:DummyMembershipt Layer: " + positiveSet);
+                //         "positive set in evalUserSetExpr:DummyMembership Layer: " + positiveSet);
                 evalResult.addAll(positiveSet);
             }
             case SetUnionVal unionSet ->
-                    unionSet.userSetVals().forEach(expr -> evalResult.addAll(evalUserSetExpr(expr)));
+                    unionSet.userSetVals().forEach(expr -> evalResult.addAll(resolveParticipants(expr)));
         }
         System.err.println("eval result on membership: " + evalResult);
         return evalResult;
     }
 
     private Set<UserVal> dummySend(UserSetVal receivers) {
-        var evalResult = evalUserSetExpr(receivers);
+        var evalResult = resolveParticipants(receivers);
         // TODO [not yet implemented] actual send (a DCR Protocol callback?)
         return evalResult.stream()
                 .map(DummyNeighbour::user)

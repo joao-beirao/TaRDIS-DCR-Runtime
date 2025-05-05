@@ -11,7 +11,7 @@ import java.util.Objects;
  * An immutable String literal {@link Value value}
  */
 public final class StringVal
-        implements StringLiteral, Comparable<StringVal> {
+        implements PrimitiveVal, Comparable<StringVal> {
     @Serial
     private static final long serialVersionUID = -617630784691869772L;
     private static final StringVal EMPTY_STRING = new StringVal("");
@@ -29,7 +29,7 @@ public final class StringVal
 
     private StringVal(String value) {this.value = value;}
 
-    @Override
+
     public String value() {return value;}
 
     @Override
@@ -61,5 +61,4 @@ public final class StringVal
 
     @Override
     public String toString() {return String.format("'%s'", value);}
-
 }

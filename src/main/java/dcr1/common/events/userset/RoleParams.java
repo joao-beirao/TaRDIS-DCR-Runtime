@@ -8,8 +8,9 @@ import java.util.Objects;
 public record RoleParams<V>(Record<? extends V> params) implements Serializable {
 
     public static <V> RoleParams<V> of(Record<? extends V> params) {
-        return new RoleParams<V>(params);
+        return new RoleParams<>(params);
     }
+
 
     public static <V> RoleParams<V> empty() {
         return new RoleParams<>(Record.empty());

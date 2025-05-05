@@ -20,12 +20,12 @@ public sealed abstract class GenericEventElement
     private final BooleanExpression ifcConstraint;
 
 
-    GenericEventElement(String elementId, String localId, String label,
+    GenericEventElement(String elementId, String localId, String eventType,
             MarkingElement initialMarking, UserSetExpression passiveParticipants,
             BooleanExpression constraint, BooleanExpression ifcConstraint) {
         super(elementId);
         this.localId = Objects.requireNonNull(localId);
-        this.label = Objects.requireNonNull(label);
+        this.label = Objects.requireNonNull(eventType);
         this.initialMarking = Objects.requireNonNull(initialMarking);
         this.passiveParticipants = passiveParticipants;
         this.instantiationConstraint = Objects.requireNonNull(constraint);

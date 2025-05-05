@@ -3,7 +3,6 @@ package dcr1.common.data.values;
 import dcr1.common.data.types.EventType;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.util.Optional;
 
 // TODO remove type - add to Value interface a default so that a value can return the EventType
 //  of an Event enclosing it
@@ -17,10 +16,6 @@ public record EventVal(Value value, EventType type)
     public static EventVal of(Value value, EventType type) {
         return new EventVal(value, type);
     }
-
-    // public static  Undefined<EventType> undefined(String label, T type) {
-    //     return new Undefined<>(EventType.of(label, type));
-    // }
 
     @Override
     public boolean equals(Object obj) {
@@ -37,12 +32,12 @@ public record EventVal(Value value, EventType type)
 
     @Override
     public String toString() {
-        return String.format("%s:[value:%s]", type.alias(), value);
+        return String.format("%s:[value:%s]", type.typeAlias(), value);
     }
 
     @Override
     public String unparse() {
-        return String.format("EventVal(%s, :%s)", type().alias(), value.unparse());
+        return String.format("EventVal(%s, :%s)", type().typeAlias(), value.unparse());
     }
 
     @Override

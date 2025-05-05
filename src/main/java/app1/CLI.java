@@ -1,7 +1,7 @@
 package app1;
 
 import dcr1.common.Record;
-import dcr1.common.data.values.IntegerVal;
+import dcr1.common.data.values.IntVal;
 import dcr1.common.data.values.RecordVal;
 import dcr1.common.data.values.StringVal;
 import dcr1.common.data.values.Value;
@@ -155,7 +155,7 @@ public final class CLI {
         }
         // Boolean
         try {
-            return IntegerVal.of(Integer.parseInt(input));
+            return IntVal.of(Integer.parseInt(input));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Unable to parse input value");
         }

@@ -6,21 +6,19 @@ import java.util.Objects;
 // TODO [javadoc]
 
 /**
- *
- * @param alias
- * @param valueType
+ * @param typeAlias
  */
-public record EventType(String alias, Type valueType)
+public record EventType(String typeAlias)
         implements Type, DereferableType {
 
-    public static <T extends Type> EventType of(String alias, T valueType) {
-        return new EventType(alias, valueType);
+    public static  EventType of(String typeAlias) {
+        return new EventType(typeAlias);
     }
 
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(alias);
+        return Objects.hashCode(typeAlias);
     }
 
     // note: equality-check trusts the contract, where an event's label determines its value type;
@@ -29,8 +27,8 @@ public record EventType(String alias, Type valueType)
     public boolean equals(Object obj) {
         if (this == obj) {return true;}
         if (obj == null) {return false;}
-        if(obj instanceof EventType other) {
-            return alias.equals(other.alias);
+        if(obj instanceof EventType(String typeAlias1)) {
+            return typeAlias.equalsIgnoreCase(typeAlias1);
         }
         return false;
     }

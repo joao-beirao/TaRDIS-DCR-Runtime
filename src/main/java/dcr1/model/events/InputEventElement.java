@@ -1,6 +1,7 @@
 package dcr1.model.events;
 
 import dcr1.common.data.computation.BooleanExpression;
+import dcr1.common.data.types.EventType;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 
 import java.util.Optional;
@@ -17,10 +18,10 @@ public sealed interface InputEventElement
 final class InputEvent
         extends GenericEventElement
         implements InputEventElement {
-    InputEvent(String elementId, String localId, String label,
+    InputEvent(String elementId, String localId, String eventType,
             MarkingElement marking, UserSetExpression receivers, BooleanExpression instantiationConstraint,
             BooleanExpression ifcConstraint) {
-        super(elementId, localId, label, marking, receivers, instantiationConstraint, ifcConstraint);
+        super(elementId, localId, eventType, marking, receivers, instantiationConstraint, ifcConstraint);
     }
 
     @Override

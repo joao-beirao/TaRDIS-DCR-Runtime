@@ -15,7 +15,7 @@ public final class VoidType
     private static final VoidType SINGLETON = new VoidType();
     private static final String TO_STRING_VAL = "Void";
 
-    public static VoidType instance() {return SINGLETON;}
+    public static VoidType singleton() {return SINGLETON;}
 
     private VoidType() {}
 

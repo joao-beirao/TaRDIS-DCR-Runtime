@@ -1,12 +1,12 @@
 package dto;
 
+import app1.presentation.endpoint.data.computation.ComputationExprDTO;
+import app1.presentation.endpoint.data.types.TypeDTO;
+import app1.presentation.endpoint.data.values.ValueDTO;
+import app1.presentation.endpoint.events.EventDTO;
+import app1.presentation.endpoint.events.participants.UserSetExprDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import dto.endpoint.data.computation.ComputationExprDTO;
-import dto.endpoint.data.types.TypeDTO;
-import dto.endpoint.data.values.ValueDTO;
-import dto.endpoint.events.EventDTO;
-import dto.endpoint.participants.UserSetExprDTO;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -226,7 +226,6 @@ public class JsonEncodingTests {
             assertEquals(objectMapper.readTree(testSrc),
                     objectMapper.readTree(serializedUserSetExprDTO));
         }
-
         {
             var testSrc = """
                     {
@@ -243,8 +242,120 @@ public class JsonEncodingTests {
             assertEquals(objectMapper.readTree(testSrc),
                     objectMapper.readTree(serializedUserSetExprDTO));
         }
+    }
 
 
+    @Test
+    public void givenComputationEvent_ifDeserializeAndThenSerialize_thenSameJson()
+            throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
+        {
+            var testSrc = """
+                    {
+                         "computationEvent": {
+                           "common": {
+                             "uid": "e0_0_tx",
+                             "id": "e0",
+                             "label": "e0",
+                             "dataType": { "valueType": "bool" },
+                             "marking": {
+                               "isPending": false,
+                               "isIncluded": true,
+                               "defaultValue": { "boolLit": { "value": true } }
+                             },
+                             "ifcConstraint": { "boolLit": { "value": true } }
+                           },
+                           "dataExpr": { "boolLit": { "value": true } },
+                           "receivers": [
+                             {
+                               "roleExpr": {
+                                 "roleLabel": "P",
+                                 "params": [
+                                   { "name": "p1" },
+                                   { "name": "p2", "value": { "intLit": { "value": 2 } } }
+                                 ]
+                               }
+                             }
+                           ]
+                         }
+                       }
+                    """;
+            EventDTO deserializedEventDTO = objectMapper.readValue(testSrc, EventDTO.class);
+            String serializedUserEventDTO = objectMapper.writeValueAsString(deserializedEventDTO);
+            assertEquals(objectMapper.readTree(testSrc),
+                    objectMapper.readTree(serializedUserEventDTO));
+        }
+        {
+            var testSrc = """
+                    {
+                       "inputEvent": {
+                         "common": {
+                           "uid": "e0_0_tx",
+                           "id": "e0",
+                           "label": "e0",
+                           "dataType": { "valueType": "bool" },
+                           "marking": {
+                             "isPending": false,
+                             "isIncluded": true,
+                             "defaultValue": { "boolLit": { "value": true } }
+                           },
+                           "instantiationConstraint": { "boolLit": { "value": true } },
+                           "ifcConstraint": { "boolLit": { "value": true } }
+                         },
+                         "receivers": [
+                           {
+                             "roleExpr": {
+                               "roleLabel": "P",
+                               "params": [
+                                 { "name": "p1" },
+                                 { "name": "p2", "value": { "intLit": { "value": 2 } } }
+                               ]
+                             }
+                           }
+                         ]
+                       }
+                     }
+                    """;
+            EventDTO deserializedEventDTO = objectMapper.readValue(testSrc, EventDTO.class);
+            String serializedUserEventDTO = objectMapper.writeValueAsString(deserializedEventDTO);
+            assertEquals(objectMapper.readTree(testSrc),
+                    objectMapper.readTree(serializedUserEventDTO));
+        }
+
+        {
+            var testSrc = """
+                     {
+                         "receiveEvent": {
+                           "common": {
+                             "uid": "e0_0_tx",
+                             "id": "e0",
+                             "label": "e0",
+                             "dataType": { "valueType": "bool" },
+                             "marking": {
+                               "isPending": false,
+                               "isIncluded": true,
+                               "defaultValue": { "boolLit": { "value": true } }
+                             },
+                             "instantiationConstraint": { "boolLit": { "value": true } }
+                           },
+                           "initiators": {
+                             "roleExpr": {
+                               "roleLabel": "P",
+                               "params": [
+                                 { "name": "p1" },
+                                 { "name": "p2", "value": { "intLit": { "value": 2 } } }
+                               ]
+                             }
+                           }
+                         }
+                    }
+                    """;
+            EventDTO deserializedEventDTO = objectMapper.readValue(testSrc, EventDTO.class);
+            String serializedUserEventDTO = objectMapper.writeValueAsString(deserializedEventDTO);
+            assertEquals(objectMapper.readTree(testSrc),
+                    objectMapper.readTree(serializedUserEventDTO));
+        }
     }
 
 

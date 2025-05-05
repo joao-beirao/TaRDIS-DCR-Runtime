@@ -59,7 +59,7 @@ public abstract class DCRProtocol
     public Set<UserVal> uponSendRequest(String eventId, UserSetVal receivers,
             Event.Marking marking,
             String uidExtension) {
-        var neighbours = DummyMembershipLayer.instance().evalUserSetExpr(receivers);
+        var neighbours = DummyMembershipLayer.instance().resolveParticipants(receivers);
         neighbours.forEach(
                 neighbour -> sendMessage(neighbour, eventId, marking, self, uidExtension));
         return neighbours.stream()

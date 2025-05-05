@@ -2,13 +2,8 @@ package dcr1.common.data.computation;
 
 
 import dcr1.common.Environment;
-import dcr1.common.TypeRegister;
-import dcr1.common.data.types.EventType;
-import dcr1.common.data.types.IntegerType;
 import dcr1.common.data.types.Type;
-import dcr1.common.data.values.EventIdVal;
 import dcr1.common.data.values.EventVal;
-import dcr1.common.data.values.IntegerVal;
 import dcr1.common.data.values.Value;
 
 import java.util.Objects;

@@ -1,6 +1,7 @@
 package dcr1.common.events;
 
 import dcr1.common.data.computation.BooleanExpression;
+import dcr1.common.data.types.EventType;
 import dcr1.common.data.types.Type;
 import dcr1.common.data.values.Value;
 import dcr1.common.events.userset.expressions.UserSetExpression;
@@ -92,6 +93,7 @@ public interface Event {
      */
     String label();
 
+
     /**
      * Returns a marking object reflecting the current state of this event.
      *
@@ -120,6 +122,12 @@ public interface Event {
     default boolean isIncluded() {return marking().isIncluded();}
 
     default Value value() {return marking().value();}
+
+    default EventType eventType() {
+        return new EventType(label());
+    }
+
+    ;
 
     default Type valueType() {return marking().valueType();}
 }

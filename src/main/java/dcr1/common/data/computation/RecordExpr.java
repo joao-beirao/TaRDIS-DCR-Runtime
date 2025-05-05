@@ -49,26 +49,26 @@ public final class RecordExpr
 
         // flat record (via .ofEntries())
         RecordExpr flatExpr = RecordExpr.of(
-                Record.ofEntries(Record.Field.of("f1", IntegerLiteral.of(1)),
+                Record.ofEntries(Record.Field.of("f1", IntLiteral.of(1)),
                         Record.Field.of("f2", StringLiteral.of("2"))));
 
         // nested records (via .ofEntries())
         RecordExpr nestedExpr = RecordExpr.of(
-                Record.ofEntries(Record.Field.of("f1", IntegerLiteral.of(1)),
+                Record.ofEntries(Record.Field.of("f1", IntLiteral.of(1)),
                         Record.Field.of("f2", StringLiteral.of("2")), Record.Field.of("f3",
                                 RecordExpr.of(Record.ofEntries(
-                                        Record.Field.of("f1", IntegerLiteral.of(1)),
+                                        Record.Field.of("f1", IntLiteral.of(1)),
                                         Record.Field.of("f2", StringLiteral.of("2"))))),
-                        Record.Field.of("f4", BooleanLiteral.of(true)),
-                        Record.Field.of("f5", BooleanLiteral.of(false))));
+                        Record.Field.of("f4", BoolLiteral.of(true)),
+                        Record.Field.of("f5", BoolLiteral.of(false))));
 
         // nested records (mixing builder() and .ofEntries()
         var recordFromBuilder = new Record.Builder<ComputationExpression>().addField(
-                        Record.Field.of("f1", IntegerLiteral.of(1)))
+                        Record.Field.of("f1", IntLiteral.of(1)))
                 .addField(Record.Field.of("f2", StringLiteral.of("2")))
                 .addField(Record.Field.of("f3",
                         RecordExpr.of(Record.ofEntries(
-                                Record.Field.of("f1", IntegerLiteral.of(1)),
+                                Record.Field.of("f1", IntLiteral.of(1)),
                                 Record.Field.of("f2", StringLiteral.of("2"))))))
                 .build();
         System.err.println(flatExpr);

@@ -1,11 +1,13 @@
 package dcr1.common.events.userset.values;
 
 import dcr1.common.Record;
-import dcr1.common.data.computation.*;
+import dcr1.common.data.computation.BoolLiteral;
+import dcr1.common.data.computation.ComputationExpression;
+import dcr1.common.data.computation.IntLiteral;
 import dcr1.common.data.computation.StringLiteral;
 import dcr1.common.data.values.*;
-import dcr1.common.events.userset.UserParams;
-import dcr1.common.events.userset.expressions.UserExpr;
+import dcr1.common.events.userset.RoleParams;
+import dcr1.common.events.userset.expressions.RoleExpr;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -14,31 +16,35 @@ import java.util.Objects;
 // TODO [sanitize args]
 // TODO remove Serializable - have a DTO on the DRCProtocol instead
 
-public record UserVal(String role, UserParams<PrimitiveVal> params)
+public record UserVal(String role, RoleParams<Value> params)
         implements UserSetVal, Serializable {
 
-    public static UserVal of(String role, UserParams<PrimitiveVal> params) {
+    public static UserVal of(String role, RoleParams<Value> params) {
         return new UserVal(role, params);
     }
 
+    // deprecating...
     public static UserVal of(String role, String id) {
-        return new UserVal(role, UserParams.of(StringVal.of(id)));
+        return new UserVal(role, RoleParams.of(Record.ofEntries(Record.Field.of("id",
+                StringVal.of(Objects.requireNonNull(id))))));
     }
 
     public UserVal {
         Objects.requireNonNull(role);
         Objects.requireNonNull(params);// ok by construction
-        if (!(params.getId() instanceof StringVal)) {
-            // TODO BadState.. Internal Error instead - should be compiled this way
-            throw new IllegalArgumentException(
-                    "'id' field of UserVal value must be a String" + " field");
-        }
+        // deprecating...
+        // if (!(params.getId() instanceof StringVal)) {
+        //     // TODO BadState.. Internal Error instead - should be compiled this way
+        //     throw new IllegalArgumentException(
+        //             "'id' field of UserVal value must be a String" + " field");
+        // }
     }
 
-    public StringVal getId() {
-        // cast safe by construction
-        return (StringVal) params.getId();
-    }
+    // deprecating
+    // public StringVal getId() {
+    //     // cast safe by construction
+    //     return (StringVal) params.getId();
+    // }
 
     // TODO revise - quick patch
     public RecordVal getParamsAsRecordVal() {
@@ -50,18 +56,19 @@ public record UserVal(String role, UserParams<PrimitiveVal> params)
     }
 
 
-
-    public UserExpr toUserSetExpr() {
+    public RoleExpr toRoleExpr() {
         var recordBuilder = new Record.Builder<ComputationExpression>();
         for (var param : params.params().fields()) {
             var expr = switch (param.value()) {
-                case BooleanVal bool -> BooleanLiteral.of(bool);
-                case IntegerVal integer -> IntegerLiteral.of(integer);
+                case BoolVal bool -> BoolLiteral.of(bool);
+                case IntVal integer -> IntLiteral.of(integer);
                 case StringVal str -> StringLiteral.of(str);
+                default ->
+                        throw new IllegalStateException("[TODO] Unexpected value" + param.value());
             };
             recordBuilder.addFieldWithParams(param.name(), expr);
         }
-        return UserExpr.of(role(), UserParams.of(recordBuilder.build()));
+        return RoleExpr.of(role(), recordBuilder.build());
     }
 
 

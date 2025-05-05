@@ -2,7 +2,7 @@ package dcr1.model.relations;
 
 
 import dcr1.common.data.computation.BooleanExpression;
-import dcr1.common.data.computation.BooleanLiteral;
+import dcr1.common.data.computation.BoolLiteral;
 import dcr1.common.relations.Relation;
 import dcr1.model.GenericElement;
 import dcr1.model.ModelElement;
@@ -16,7 +16,7 @@ sealed abstract class GenericRelationElement
         implements RelationElement
         permits ControlFlowRelationElement, SpawnRelationElement {
 
-    private static final BooleanExpression DEFAULT_GUARD = BooleanLiteral.of(true);
+    private static final BooleanExpression DEFAULT_GUARD = BoolLiteral.of(true);
 
     private final String sourceEventId;
     private final BooleanExpression guard;

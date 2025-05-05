@@ -2,6 +2,7 @@ package dcr1.model.events;
 
 import dcr1.common.data.computation.BooleanExpression;
 import dcr1.common.data.computation.ComputationExpression;
+import dcr1.common.data.types.EventType;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 import dcr1.runtime.elements.events.ComputationEventInstance;
 
@@ -22,11 +23,11 @@ final class ComputationEvent
     private final ComputationExpression computationExpression;
     Function<ComputationEvent, ComputationEventInstance> builder;
 
-    ComputationEvent(String elementId, String localId, String label,
+    ComputationEvent(String elementId, String localId, String eventType,
             ComputationExpression computationExpression, MarkingElement marking,
             UserSetExpression receivers, BooleanExpression instantiationConstraint,
             BooleanExpression ifcConstraint) {
-        super(elementId, localId, label, marking, receivers, instantiationConstraint, ifcConstraint);
+        super(elementId, localId, eventType, marking, receivers, instantiationConstraint, ifcConstraint);
         this.computationExpression = computationExpression;
     }
 

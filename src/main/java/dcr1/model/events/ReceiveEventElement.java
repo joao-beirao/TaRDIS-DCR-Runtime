@@ -1,6 +1,7 @@
 package dcr1.model.events;
 
 import dcr1.common.data.computation.BooleanExpression;
+import dcr1.common.data.types.EventType;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 
 public sealed interface ReceiveEventElement
@@ -14,11 +15,11 @@ final class ReceiveEvent
         extends GenericEventElement
         implements ReceiveEventElement {
 
-    ReceiveEvent(String elementId, String localId, String label,
+    ReceiveEvent(String elementId, String localId, String eventType,
             UserSetExpression senders, MarkingElement marking,
             BooleanExpression instantiationConstraint,
             BooleanExpression ifcConstraint) {
-        super(elementId, localId, label, marking, senders, instantiationConstraint, ifcConstraint);
+        super(elementId, localId, eventType, marking, senders, instantiationConstraint, ifcConstraint);
     }
 
     // FIXME [.get()]

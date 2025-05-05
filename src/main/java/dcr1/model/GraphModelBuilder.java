@@ -2,6 +2,7 @@ package dcr1.model;
 
 import dcr1.common.data.computation.BooleanExpression;
 import dcr1.common.data.computation.ComputationExpression;
+import dcr1.common.data.types.EventType;
 import dcr1.common.data.types.Type;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 import dcr1.common.relations.ControlFlowRelation;
@@ -23,66 +24,73 @@ public class GraphModelBuilder {
     private final List<Consumer<RecursiveGraphModel>> controlFlowRelationsConsumers;
     private final List<Consumer<RecursiveGraphModel>> spawnGraphConsumers;
 
-    public GraphModelBuilder(String elementId) {
+    public GraphModelBuilder() {
+        // DUMMY elementId - not a spawn
+        this("_");
+    }
+
+    private GraphModelBuilder(String elementId) {
+
         this.elementId = elementId;
         eventConsumers = new LinkedList<>();
         controlFlowRelationsConsumers = new LinkedList<>();
         spawnGraphConsumers = new LinkedList<>();
     }
 
+
     protected String getElementId() {
         return elementId;
     }
 
-    public <T extends Type> GraphModelBuilder addLocalComputationEvent(String elementId,
-            String localId, String label, ComputationExpression computation,
+    public GraphModelBuilder addLocalComputationEvent(String uid,
+            String localId, String eventType, ComputationExpression computation,
             ImmutableMarkingElement initialMarking, BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
         registerComputationEventElement(
-                EventElements.newLocalComputationEvent(elementId, localId, label, computation,
+                EventElements.newLocalComputationEvent(uid, localId, eventType, computation,
                         initialMarking, instantiationConstraint, ifcConstraint));
         return this;
     }
 
-    public <T extends Type> GraphModelBuilder addComputationEvent(String elementId, String localId,
-            String label, ComputationExpression computation, UserSetExpression receivers,
+    public GraphModelBuilder addComputationEvent(String uid, String localId,
+            String eventType, ComputationExpression computation, UserSetExpression receivers,
             ImmutableMarkingElement initialMarking, BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
         registerComputationEventElement(
-                EventElements.newComputationEvent(elementId, localId, label, computation,
+                EventElements.newComputationEvent(uid, localId, eventType, computation,
                         initialMarking, receivers, instantiationConstraint, ifcConstraint));
         return this;
     }
 
-    public <T extends Type> GraphModelBuilder addLocalInputEvent(String elementId, String localId,
-            String label, ImmutableMarkingElement initialMarking, BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
+    public GraphModelBuilder addLocalInputEvent(String uid, String localId,
+            String eventType, ImmutableMarkingElement initialMarking, BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
         registerInputEventElement(
-                EventElements.newLocalInputEvent(elementId, localId, label, initialMarking,
+                EventElements.newLocalInputEvent(uid, localId, eventType, initialMarking,
                         instantiationConstraint, ifcConstraint));
         return this;
     }
 
-    public <T extends Type> GraphModelBuilder addInputEvent(String elementId, String localId,
-            String label, UserSetExpression receivers, ImmutableMarkingElement initialMarking,
+    public GraphModelBuilder addInputEvent(String uid, String localId,
+            String eventType, UserSetExpression receivers, ImmutableMarkingElement initialMarking,
             BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
         registerInputEventElement(
-                EventElements.newInputEvent(elementId, localId, label, receivers, initialMarking,
+                EventElements.newInputEvent(uid, localId, eventType, receivers, initialMarking,
                         instantiationConstraint, ifcConstraint));
         return this;
     }
 
-    public <T extends Type> GraphModelBuilder addReceiveEvent(String elementId, String localId,
-            String label, UserSetExpression senders, ImmutableMarkingElement initialMarking,
+    public GraphModelBuilder addReceiveEvent(String uid, String localId,
+            String eventType, UserSetExpression senders, ImmutableMarkingElement initialMarking,
             BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint ) {
         registerReceiveEventElement(
-                EventElements.newReceiveEvent(elementId, localId, label, senders, initialMarking,
+                EventElements.newReceiveEvent(uid, localId, eventType, senders, initialMarking,
                         instantiationConstraint, ifcConstraint));
         return this;
     }
 
 
-    public GraphModelBuilder addControlFlowRelation(String elementId, String srcId, String targetId,
+    public GraphModelBuilder addControlFlowRelation(String uid, String srcId, String targetId,
             ControlFlowRelation.Type relationType, BooleanExpression instantiationConstraint) {
         IControlFlowRelationElement element =
-                RelationElements.newControlFlowRelation(elementId, srcId, targetId, relationType,
+                RelationElements.newControlFlowRelation(uid, srcId, targetId, relationType,
                         instantiationConstraint);
         controlFlowRelationsConsumers.add(graph -> graph.addControlFlowRelation(element));
         return this;
@@ -92,16 +100,16 @@ public class GraphModelBuilder {
         controlFlowRelationsConsumers.add(graph -> graph.addControlFlowRelation(element));
     }
 
-    private <T extends Type> void registerComputationEventElement(
+    private void registerComputationEventElement(
             ComputationEventElement element) {
         eventConsumers.add(graph -> graph.addComputationEvent(element));
     }
 
-    private final <T extends Type> void registerInputEventElement(InputEventElement element) {
+    private final void registerInputEventElement(InputEventElement element) {
         eventConsumers.add(graph -> graph.addInputEvent(element));
     }
 
-    private final <T extends Type> void registerReceiveEventElement(
+    private final void registerReceiveEventElement(
             ReceiveEventElement element) {
         eventConsumers.add(graph -> graph.addReceiveEvent(element));
     }

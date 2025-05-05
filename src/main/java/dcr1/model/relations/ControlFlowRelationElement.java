@@ -1,8 +1,6 @@
 package dcr1.model.relations;
 
 import dcr1.common.data.computation.BooleanExpression;
-import dcr1.common.data.computation.BooleanLiteral;
-import dcr1.common.relations.ControlFlowRelation;
 
 public final class ControlFlowRelationElement
     extends GenericRelationElement

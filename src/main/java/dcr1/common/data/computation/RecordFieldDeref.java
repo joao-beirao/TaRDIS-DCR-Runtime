@@ -2,7 +2,7 @@ package dcr1.common.data.computation;
 
 import dcr1.common.Environment;
 import dcr1.common.Record;
-import dcr1.common.data.values.IntegerVal;
+import dcr1.common.data.values.IntVal;
 import dcr1.common.data.values.RecordVal;
 import dcr1.common.data.values.Value;
 
@@ -58,7 +58,7 @@ public class RecordFieldDeref
         var nestedRecordExpr = RecordExpr.of(
                 Record.ofEntries(Record.Field.of("f3",
                         RecordExpr.of(Record.ofEntries(
-                                Record.Field.of("f1", IntegerLiteral.of(1)),
+                                Record.Field.of("f1", IntLiteral.of(1)),
                                 Record.Field.of("f2", StringLiteral.of("2")))))
                 ));
         // {f3: {f1: 1 ; f2: '2'}}.f3
@@ -71,7 +71,7 @@ public class RecordFieldDeref
                 new RecordFieldDeref(nestedRecordExpr, "f3"),
                 "f1");
 
-        IntegerVal intVal = (IntegerVal) doubleDerefExpr.eval(Environment.empty());
+        IntVal intVal = (IntVal) doubleDerefExpr.eval(Environment.empty());
         System.err.println(doubleDerefExpr + "   -->   " + intVal);
     }
 }

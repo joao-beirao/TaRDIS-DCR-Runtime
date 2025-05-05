@@ -1,10 +1,8 @@
 package dcr1.common.data.computation;
 
 import dcr1.common.Environment;
-import dcr1.common.data.types.IntegerType;
-import dcr1.common.data.types.Type;
-import dcr1.common.data.values.BooleanVal;
-import dcr1.common.data.values.IntegerVal;
+import dcr1.common.data.values.BoolVal;
+import dcr1.common.data.values.IntVal;
 import dcr1.common.data.values.Value;
 
 import java.util.Objects;
@@ -61,12 +59,12 @@ public record IntegerCompareExpr(ComputationExpression left,
     }
 
     @Override
-    public BooleanVal eval(Environment<Value> env) {
+    public BoolVal eval(Environment<Value> env) {
         var leftVal = left.eval(env);
-        if(leftVal instanceof IntegerVal leftInt) {
+        if(leftVal instanceof IntVal leftInt) {
             var rightVal = right.eval(env);
-            if(rightVal instanceof IntegerVal rightInt) {
-                return BooleanVal.of(
+            if(rightVal instanceof IntVal rightInt) {
+                return BoolVal.of(
                         switch (compareOp) {
                             case EQ -> leftInt.value() == rightInt.value();
                             case GT -> leftInt.value() > rightInt.value();

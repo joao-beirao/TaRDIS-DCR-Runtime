@@ -2,9 +2,8 @@ package dcr1.common.data;
 
 import dcr1.common.data.computation.BooleanExpression;
 import dcr1.common.data.computation.ComputationExpression;
-import dcr1.common.data.types.IntegerType;
-import dcr1.common.data.values.BooleanVal;
-import dcr1.common.data.values.IntegerVal;
+import dcr1.common.data.values.BoolVal;
+import dcr1.common.data.values.IntVal;
 import dcr1.common.data.values.Value;
 import dcr1.common.Environment;
 
@@ -33,12 +32,12 @@ abstract class ASTBinaryLogicalOp implements BooleanExpression {
 
 
     @Override
-    public final BooleanVal eval(Environment<Value> env) {
+    public final BoolVal eval(Environment<Value> env) {
         Value lVal = left.eval(env);
-        if (lVal instanceof IntegerVal) {
+        if (lVal instanceof IntVal) {
             Value rVal = right.eval(env);
-            if (rVal instanceof IntegerVal)
-                return compute((IntegerVal) lVal, (IntegerVal) rVal);
+            if (rVal instanceof IntVal)
+                return compute((IntVal) lVal, (IntVal) rVal);
             // TODO
             throw new RuntimeException("Not yet implemented");
             // throw new DynamicTypeCheckException(this, right, lVal.getClass(), IntegerVal.class,
@@ -57,5 +56,5 @@ abstract class ASTBinaryLogicalOp implements BooleanExpression {
     }
 
     // specialized class must define the operation it performs
-    protected abstract BooleanVal compute(IntegerVal leftVal, IntegerVal rightVal);
+    protected abstract BoolVal compute(IntVal leftVal, IntVal rightVal);
 }

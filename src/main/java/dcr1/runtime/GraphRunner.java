@@ -2,7 +2,7 @@ package dcr1.runtime;
 
 import dcr1.common.Environment;
 import dcr1.common.data.computation.BooleanExpression;
-import dcr1.common.data.values.BooleanVal;
+import dcr1.common.data.values.BoolVal;
 import dcr1.common.data.values.Value;
 import dcr1.common.events.userset.values.UserVal;
 import dcr1.model.GraphModel;
@@ -159,7 +159,8 @@ public final class GraphRunner {
     public void init(GraphModel graphModel) {
         this.graphModel = graphModel;
         // TODO initialize spawn context
-        instantiateGraphElement(Objects.requireNonNull(graphModel), SpawnContext.init(this.owner), "");
+        instantiateGraphElement(Objects.requireNonNull(graphModel), SpawnContext.init(this.owner),
+                "");
     }
 
     // comment: DCR semantics on eventInfo execution
@@ -170,7 +171,8 @@ public final class GraphRunner {
     // computation expression;
     // 2. set eventInfo as 'executed' and 'not-pending'
     // 3. Propagate side effects (relations) - all guards evaluated against the previous
-    // marking, except for the computation eventInfo being executed, for which the updated marking is
+    // marking, except for the computation eventInfo being executed, for which the updated
+    // marking is
     // taken instead
     // ..3.1 Evaluate responses first: if there's a self-response relation, the eventInfo becomes
     // pending again
@@ -197,7 +199,9 @@ public final class GraphRunner {
         responses.getOrDefault(eventInfo.event, Collections.emptyList()).forEach(response -> {
             if (!response.target().isPending()) {
                 // TODO test guards
-                if(response.guard().eval(eventInfo.evalContext.valueEnv()).equals(BooleanVal.of(true))) {
+                if (response.guard()
+                        .eval(eventInfo.evalContext.valueEnv())
+                        .equals(BoolVal.of(true))) {
                     result.addModifiedEvents(response.target());
                     response.target().onResponse();
                 }
@@ -391,7 +395,6 @@ public final class GraphRunner {
     }
 
 
-
     // ====== Entry points ======
 
     // TODO [revisit] is an UndeclaredIdentifierException acceptable here?
@@ -406,8 +409,9 @@ public final class GraphRunner {
         ExecutionResult executionResult = new ExecutionResult();
         // TODO [tmp] IFC evaluation duplicated and unfriendly - extract method and return proper
         //  result
-        if(!event.ifcConstraint().eval(info.evalContext.valueEnv()).value())
+        if (!event.ifcConstraint().eval(info.evalContext.valueEnv()).value()) {
             throw new RuntimeException("IFC leak");
+        }
         locallyUpdateOnEventExecution(info, executionResult, recomputedValue);
         onLocallyInitiatedEvent(event, info.evalContext);
         return executionResult;
@@ -427,8 +431,9 @@ public final class GraphRunner {
         ExecutionResult executionResult = new ExecutionResult();
         // TODO [tmp] IFC evaluation duplicated and unfriendly - extract method and return proper
         //  result
-        if(!event.ifcConstraint().eval(info.evalContext.valueEnv()).value())
+        if (!event.ifcConstraint().eval(info.evalContext.valueEnv()).value()) {
             throw new RuntimeException("IFC leak");
+        }
         locallyUpdateOnEventExecution(info, executionResult, inputValue);
         onLocallyInitiatedEvent(event, info.evalContext);
         return executionResult;
@@ -449,8 +454,9 @@ public final class GraphRunner {
         ExecutionResult executionResult = new ExecutionResult();
         // TODO [tmp] IFC evaluation duplicated and unfriendly - extract method and return proper
         //  result
-        if(!event.ifcConstraint().eval(info.evalContext.valueEnv()).value())
+        if (!event.ifcConstraint().eval(info.evalContext.valueEnv()).value()) {
             throw new RuntimeException("IFC leak");
+        }
         locallyUpdateOnEventExecution(info, executionResult, voidInput);
         //
         onLocallyInitiatedEvent(info.event(), info.evalContext);
@@ -524,7 +530,8 @@ public final class GraphRunner {
             SpawnContext spawnContext) {
         if (!canInstantiate(baseElement.instantiationConstraint(), spawnContext.evalEnv)) {
             System.err.println("Unable to instantiate " + baseElement.getElementId());
-        } else {
+        }
+        else {
             InstantiatedSpawnRelation instance =
                     newSpawnRelationInstanceOf(baseElement, spawnContext);
             List<SpawnRelationInfo> spawnRelations =
@@ -549,7 +556,8 @@ public final class GraphRunner {
             SpawnContext spawnContext) {
         if (!canInstantiate(baseElement.instantiationConstraint(), spawnContext.evalEnv)) {
             System.err.println("Unable to instantiate " + baseElement.getElementId());
-        } else {
+        }
+        else {
             InstantiatedControlFlowRelation instance =
                     newControlFlowRelationInstanceOf(baseElement, spawnContext);
             ControlFlowRelationInfo value =
@@ -566,7 +574,7 @@ public final class GraphRunner {
     }
 
     private boolean canInstantiate(BooleanExpression constraint, Environment<Value> evalEnv) {
-        return constraint.eval(evalEnv).equals(BooleanVal.of(true));
+        return constraint.eval(evalEnv).equals(BoolVal.of(true));
     }
 
     // TODO [revisit] also add to specific computation/input/receive mappings?
@@ -576,8 +584,8 @@ public final class GraphRunner {
         if (!canInstantiate(baseElement.instantiationConstraint(), spawnContext.evalEnv)) {
             System.err.println("Unable to instantiate " + baseElement.getElementId());
             return;
-        } else
-            System.err.println("Instantiating " + baseElement.getElementId());
+        }
+        else {System.err.println("Instantiating " + baseElement.getElementId());}
         String uuid = newEventUuidOf(baseElement.localId(), idExtension);
         GenericEventInstance instance;
         EventInfo eventInfo;
@@ -629,7 +637,7 @@ public final class GraphRunner {
         // TODO use bindIfAbsent above
         eventInfo.valueEnv()
                 .bindIfAbsent(instance.localId(), instanceValue);
-                        // .wrap(baseElement.label()));
+        // .wrap(baseElement.label()));
         spawnContext.alphaRenamings.bindIfAbsent(baseElement.localId(), instance);
     }
 
@@ -716,11 +724,12 @@ public final class GraphRunner {
                         Environment<GenericEventInstance> alphaRenamings,
                         Environment<UserVal> triggerCounterparts) {
         // cumulative register keeping track of actual sender/receiver of each interaction
-        // triggering a spawn (either a send, or a receive) - so that we can instantiate Receiver
-        // (e1) and Sender (e1) type of expressions - will be empty for events not within a spawn
+        // triggering a spawn (either Tx or Rx) - enables resolving of Receiver(e1)
+        // and Sender(e1) type of expressions - empty for top-level events
 
         // static SpawnContext empty() {
-        //     return new SpawnContext(Environment.empty(), Environment.empty(), Environment.empty());
+        //     return new SpawnContext(Environment.empty(), Environment.empty(), Environment
+        //     .empty());
         // }
 
         static SpawnContext init(UserVal self) {
@@ -737,7 +746,7 @@ public final class GraphRunner {
         SpawnContext beginScope(EventInstance triggerEvent, UserVal triggerCounterpart) {
             var newEvalEnv = evalEnv.beginScope("@trigger",
                     triggerEvent.value());
-                            // .wrap(triggerEvent.label()));
+            // .wrap(triggerEvent.label()));
             var newAlphaRenamings = alphaRenamings.beginScope();
             var newTriggerCounterparts =
                     triggerCounterparts.beginScope(triggerEvent.localId(), triggerCounterpart);
@@ -752,7 +761,7 @@ public final class GraphRunner {
             // TODO defensive copy triggerVal - immutable snapshot
             var newEvalEnv = evalEnv.beginScope("@trigger",
                     triggerEvent.value());
-                            // .wrap(triggerEvent.label()));
+            // .wrap(triggerEvent.label()));
             return new SpawnContext(newEvalEnv, alphaRenamings.beginScope(), triggerCounterparts);
         }
     }
@@ -775,7 +784,7 @@ public final class GraphRunner {
     private record EvalContext(Environment<Value> valueEnv, Environment<UserVal> userEnv) {}
 
     private record EventInfo<E extends GenericEventInstance>(E event,
-                                                                EvalContext evalContext) {
+                                                             EvalContext evalContext) {
         Environment<Value> valueEnv() {return evalContext().valueEnv;}
 
         Environment<UserVal> userEnv() {return evalContext().userEnv;}

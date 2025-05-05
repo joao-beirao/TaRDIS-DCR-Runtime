@@ -7,7 +7,7 @@ import java.io.Serializable;
 // TODO [?] consider @Overriding equals across values?
 public sealed interface Value
         extends Serializable
-        permits EventIdVal, PrimitiveVal, PropBasedVal, Undefined {
+        permits EventIdVal, PrimitiveVal, PropBasedVal, UndefinedVal, VoidVal {
 
     // TODO ensure this across values - any benefit of a 'default'? probably preferable to have
     //  the static version as currently - more efficient

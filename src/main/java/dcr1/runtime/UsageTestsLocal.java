@@ -4,13 +4,12 @@ import app1.membership.DummyMembershipLayer;
 import dcr1.common.Record;
 import dcr1.common.data.computation.*;
 import dcr1.common.data.computation.StringLiteral;
+import dcr1.common.data.types.EventType;
 import dcr1.common.data.values.*;
 import dcr1.common.events.Event;
-import dcr1.common.events.userset.UserParams;
 import dcr1.common.events.userset.expressions.RoleExpr;
 import dcr1.common.events.userset.expressions.SetDiffExpr;
 import dcr1.common.events.userset.expressions.SetUnionExpr;
-import dcr1.common.events.userset.expressions.UserExpr;
 import dcr1.common.events.userset.values.UserSetVal;
 import dcr1.common.events.userset.values.UserVal;
 import dcr1.common.relations.ControlFlowRelation;
@@ -40,16 +39,16 @@ public class UsageTestsLocal {
         public Set<UserVal> uponSendRequest(String eventId, UserSetVal receivers,
                 Event.Marking value, String uidExtension) {
             return DummyMembershipLayer.instance()
-                    .evalUserSetExpr(receivers)
+                    .resolveParticipants(receivers)
                     .stream()
                     .map(DummyMembershipLayer.DummyNeighbour::user)
                     .collect(Collectors.toSet());
         }
     }
 
-    public static void main(String[] args) {
-        simpleSendReceiveWithSpawn();
-    }
+    // public static void main(String[] args) {
+    //     simpleSendReceiveWithSpawn();
+    // }
 
     // FIXME
     // look into this - EventVal.undefined("E1",GenericStringType.singleton())
@@ -57,7 +56,7 @@ public class UsageTestsLocal {
     // program not detecting the difference - fails at runtime
     // public static void testSimpleTriggerDataDependency() {
     //     RecursiveGraphModel model =
-    //             new GraphModelBuilder("graph0").addLocalComputationEvent("elem_1", "e1",
+    //             new GraphModelBuilder().addLocalComputationEvent("elem_1", "e1",
     //                             "E1",
     //                             StringLiteral.of("a_string"),
     //                             new ImmutableMarkingElement(false, true, StringVal.undefined
@@ -80,406 +79,406 @@ public class UsageTestsLocal {
     // }
 
 
-    public static void testComputationWithRecord() {
-        RecursiveGraphModel model = new GraphModelBuilder("graph0")
-                // e1 [?:Int]
-                .addLocalComputationEvent("event_1", "e1", "E1", RecordExpr.of(
-                                Record.ofEntries(Record.Field.of("kw", IntegerLiteral.of(2)))),
-                        new ImmutableMarkingElement(false, true, RecordVal.of(
-                                Record.ofEntries(Record.Field.of("kw", null)))),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println("== Initial State\n==");
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
-
-
-    // e1 [?:Int]
-    // e2 [e1.value > 0 ? true : false]
-    public static void testConditionalExprWithDataDep() {
-        RecursiveGraphModel model = new GraphModelBuilder("graph0")
-                // e1 [?:Int]
-                .addLocalInputEvent("event_1", "e1", "E1",
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true))
-                // e2 [e1.value > 0 ? true : false]
-                .addLocalComputationEvent("event", "e2", "E2", IfThenElseExpr.of(
-                                IntegerCompareExpr.ofGt(EventValueDeref.of(EventIdExpr.of(
-                                                EventIdVal.of("e1"))),
-                                        IntegerLiteral.of(IntegerVal.of(0))),
-                                BooleanLiteral.of(true),
-                                BooleanLiteral.of(false)),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println("== Initial State\n==");
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
-
-
-    // e1 [{kw:1, t:3}]
-    // e2 [e1.value.kw]
-    public static void testRecordExprWithDataDep() {
-        RecursiveGraphModel model = new GraphModelBuilder("graph0")
-                // e1 [{kw:1, t:3}]
-                .addLocalComputationEvent("event_1", "e1", "E1", RecordExpr.of(
-                                Record.ofEntries(Record.Field.of("kw", IntegerLiteral.of(1)),
-                                        Record.Field.of("t", IntegerLiteral.of(3)))),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true))
-                // e2 [e1.value.kw]
-                .addLocalComputationEvent("event", "e2", "E2", RecordFieldDeref.of(
-                                EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e1"))), "kw"),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println("== Initial State\n==");
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
-
-
-    // e1 ['a_string']
-    // ;
-    // e1 -->> {
-    //   e2 [@trigger]
-    //   e3 [e2.value]
-    //   e4 [e2.value.value]
+    // public static void testComputationWithRecord() {
+    //     RecursiveGraphModel model = new GraphModelBuilder()
+    //             // e1 [?:Int]
+    //             .addLocalComputationEvent("event_1", "e1", EventType.of("E1"), RecordExpr.of(
+    //                             Record.ofEntries(Record.Field.of("kw", IntLiteral.of(2)))),
+    //                     new ImmutableMarkingElement(false, true, RecordVal.of(
+    //                             Record.ofEntries(Record.Field.of("kw", null)))),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true)).build();
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println("== Initial State\n==");
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
     // }
-    public static void testSimpleTriggerDataDependency() {
-        RecursiveGraphModel model = new GraphModelBuilder("graph0")
-
-
-                .addLocalInputEvent("0_RxO", "cp", "createProsumer",
-                        new ImmutableMarkingElement(false, true, null),
-                        LogicalOpExpr.and(BooleanLiteral.of(true),
-                                LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of(
-                                        RecordFieldDeref.of(EventValueDeref.of(EventIdExpr.of(
-                                                        EventIdVal.of("@self"))),
-                                                "P#cid"), IntegerLiteral.of(0)))), BooleanLiteral.of(true))
-
-                // e1 ['a_string']
-                .addLocalComputationEvent("elem_1", "e1", "E1", StringLiteral.of("a_string"),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true)).beginSpawn("spawn_1", "graph1", "e1", BooleanLiteral.of(true))
-                //   e2 [@trigger]
-                .addLocalComputationEvent("elem_2", "e2", "E2", EventIdExpr.of(
-                                EventIdVal.of("@trigger")),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true))
-                //   e3 [e2.value]
-                .addLocalComputationEvent("elem_3", "e3", "E3", EventValueDeref.of(EventIdExpr.of(
-                                EventIdVal.of("e2"))),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true))
-                //   e4 [e2.value.value]
-                .addLocalComputationEvent("elem_4", "e4", "E4", EventValueDeref.of(
-                                EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e2")))),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true)).endSpawn().build();
-
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
-
-
-    // e1 ['a_string']
-    // e2 [e1]
-    // e3 [e2.value.value]
-    public static void testSimpleNestedDataDependency() {
-        RecursiveGraphModel model = new GraphModelBuilder("graph0")
-
-
-                // e1 ['a_string']
-                .addLocalComputationEvent("elem_1", "e1", "E1", BooleanLiteral.of(true),
-                        new ImmutableMarkingElement(false, true, BooleanVal.of(false)),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true))
-                // e2 [e1]
-                .addLocalComputationEvent("elem_2", "e2", "E2", EventIdExpr.of(
-                                EventIdVal.of("e1")),
-                        new ImmutableMarkingElement(false, true,
-                                null), BooleanLiteral.of(true), BooleanLiteral.of(true))
-                // e3 [e2.value.value]
-                .addLocalComputationEvent("elem_3", "e3", "E3", EventValueDeref.of(
-                                EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e2")))),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
-
-
-    // e1 ['a_string']
-    // e2 [e1.value]
-    public static void testSimpleDataDependency() {
-        RecursiveGraphModel model =
-                new GraphModelBuilder("graph0").addLocalComputationEvent("elem_1", "e1", "E1",
-                                StringLiteral.of("a_string"),
-                                new ImmutableMarkingElement(false, true, null),
-                                BooleanLiteral.of(true), BooleanLiteral.of(true))
-                        .addLocalComputationEvent("elem_2", "e2", "E2", EventValueDeref.of(
-                                        EventIdExpr.of(EventIdVal.of("e1"))),
-                                new ImmutableMarkingElement(false, true, null),
-                                BooleanLiteral.of(true), BooleanLiteral.of(true))
-                        .build();
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
-
     //
-
-    public static void testSimpleSpawnDummyReceivers() {
-        RecursiveGraphModel model =
-                new GraphModelBuilder("graph0")
-
-
-                        .addComputationEvent("elem_1", "locId_1", "label_1",
-                                StringLiteral.of("a_string"), new SetUnionExpr(
-                                        List.of(UserExpr.of("Prosumer", "p2"),
-                                                UserExpr.of("Prosumer", "p3"))),
-                                new ImmutableMarkingElement(false, true, null),
-                                BooleanLiteral.of(true), BooleanLiteral.of(true))
-
-
-                        .addComputationEvent("elem_1", "locId_1", "label_1",
-                                StringLiteral.of("a_string"), new SetUnionExpr(
-                                        List.of(UserExpr.of("Prosumer",
-                                                        UserParams.of(Record.ofEntries(Record.Field.of(
-                                                                "id", IntegerLiteral.of(1))))),
-                                                UserExpr.of("Prosumer", "p3"))),
-                                new ImmutableMarkingElement(false, true, null),
-                                BooleanLiteral.of(true), BooleanLiteral.of(true))
-
-                        .beginSpawn("spawn_1", "graph1", "locId_1", BooleanLiteral.of(true))
-                        .addLocalComputationEvent("elem_2", "locId_2", "label_2",
-                                BooleanLiteral.of(false),
-                                new ImmutableMarkingElement(false, true, null),
-                                BooleanLiteral.of(true), BooleanLiteral.of(true))
-                        .endSpawn()
-                        .build();
-
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
-
-
-    // e1 [?:String] (<undefined>)
-    // e2 [e1.value] ('in')
-    public static void testInputSimpleDataDependency() {
-        RecursiveGraphModel model =
-                new GraphModelBuilder("graph0").addLocalInputEvent("elem_1", "e1", "E1",
-                                new ImmutableMarkingElement(false, true, null),
-                                BooleanLiteral.of(true), BooleanLiteral.of(true))
-                        .addLocalComputationEvent("elem_2", "e2", "E2", EventValueDeref.of(
-                                        EventIdExpr.of(EventIdVal.of("e1"))),
-                                new ImmutableMarkingElement(false, true, StringVal.of("in")),
-                                BooleanLiteral.of(true), BooleanLiteral.of(true))
-                        .addControlFlowRelation("flow_1", "e1", "e2",
-                                ControlFlowRelation.Type.RESPONSE, BooleanLiteral.of(true))
-                        .addControlFlowRelation("flow_1", "e1", "e2",
-                                ControlFlowRelation.Type.CONDITION, BooleanLiteral.of(true))
-                        .build();
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
-
-    // e1 [?] (<void>)
-    // e2 [true] (false)
-    // ;
-    // e1 -->* e2
-    // e1 *--> e2
-    public static void testEmptyInput() {
-        RecursiveGraphModel model =
-                new GraphModelBuilder("graph0").addLocalInputEvent("1", "e1", "E1",
-                                new ImmutableMarkingElement(false, true, null),
-                                BooleanLiteral.of(true), BooleanLiteral.of(true))
-                        .addLocalComputationEvent("2", "e2", "E2",
-                                BooleanLiteral.of(BooleanVal.of(true)),
-                                new ImmutableMarkingElement(false, true, BooleanVal.of(false)),
-                                BooleanLiteral.of(true), BooleanLiteral.of(true))
-                        .addControlFlowRelation("3", "e1", "e2", ControlFlowRelation.Type.RESPONSE, BooleanLiteral.of(true))
-                        .addControlFlowRelation("4", "e1", "e2", ControlFlowRelation.Type.CONDITION, BooleanLiteral.of(true))
-                        .build();
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
-
-
-    // e1 [?:String] (<undefined>)
-    public static void testSimpleInputEvent() {
-        RecursiveGraphModel model =
-                new GraphModelBuilder("graph0").addLocalInputEvent("elem_1", "e1", "E1",
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println(runner);
-        readSystemIn(runner);
-
-    }
-
-    // e1 ['a_string'] (<undefined>)
-    public static void testSimpleSendReceiveP1toP2() {
-        RecursiveGraphModel model =
-                new GraphModelBuilder("graph0").addComputationEvent("elem_1", "e1", "E1",
-                        StringLiteral.of("a_string"),
-                        SetDiffExpr.of(RoleExpr.of("Prosumer"), UserExpr.of("Prosumer", "p1")),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true)).build();
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
-
-    // e1 ['a_string'] [P(1) -> P(2)]
     //
-    // e1 -->% e1
-    // e1 --> {
-    //   (e2:E2) [3] [P(2) -> P(1)]
-    //   ;
-    //   e2 -->+ e1
+    // // e1 [?:Int]
+    // // e2 [e1.value > 0 ? true : false]
+    // public static void testConditionalExprWithDataDep() {
+    //     RecursiveGraphModel model = new GraphModelBuilder()
+    //             // e1 [?:Int]
+    //             .addLocalInputEvent("event_1", "e1", EventType.of("E1"),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true))
+    //             // e2 [e1.value > 0 ? true : false]
+    //             .addLocalComputationEvent("event", "e2", EventType.of("E2"), IfThenElseExpr.of(
+    //                             IntegerCompareExpr.ofGt(EventValueDeref.of(RefExpr.of(
+    //                                             EventIdVal.of("e1"))),
+    //                                     IntLiteral.of(IntVal.of(0))),
+    //                             BoolLiteral.of(true),
+    //                             BoolLiteral.of(false)),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true)).build();
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println("== Initial State\n==");
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
     // }
-    private static void simpleSendReceiveWithSpawn() {
-        // instantiate dummy membership layer accordingly
-        DummyMembershipLayer.instance()
-                .onNeighborUp(new DummyMembershipLayer.DummyNeighbour(UserVal.of("Prosumer", "p2"),
-                        "Prosumer_p2"));
-        // build & return model
-        var model = new GraphModelBuilder("0").addComputationEvent("1", "e1", "E1",
-                        IntegerLiteral.of(2), UserExpr.of("Prosumer", "p2"),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true))
-                .addControlFlowRelation("2", "e1", "e1", ControlFlowRelation.Type.EXCLUDE, BooleanLiteral.of(true))
-                .beginSpawn("3", "4", "e1", BooleanLiteral.of(true))
-                .addReceiveEvent("5", "e2", "E2", UserExpr.of("Prosumer", "p2"),
-                        new ImmutableMarkingElement(false, true, BooleanVal.of(false)),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true))
-                .addControlFlowRelation("6", "e2", "e1", ControlFlowRelation.Type.INCLUDE, BooleanLiteral.of(true))
-                .endSpawn()
-                .build();
-
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println(runner);
-        readSystemIn(runner);
-
-    }
-
-    // (e0:readId) [?:{pId:String}] [C0(0)]
-    // %(e1:createProsumer) [?] [P(e0.value.pId)]
-    // e0 *--> e1
-    // e0 -->+ e1
-    // e1 -->% e1
-    // e1 -->> {
+    //
+    //
+    // // e1 [{kw:1, t:3}]
+    // // e2 [e1.value.kw]
+    // public static void testRecordExprWithDataDep() {
+    //     RecursiveGraphModel model = new GraphModelBuilder()
+    //             // e1 [{kw:1, t:3}]
+    //             .addLocalComputationEvent("event_1", "e1", EventType.of("E1"), RecordExpr.of(
+    //                             Record.ofEntries(Record.Field.of("kw", IntLiteral.of(1)),
+    //                                     Record.Field.of("t", IntLiteral.of(3)))),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true))
+    //             // e2 [e1.value.kw]
+    //             .addLocalComputationEvent("event", "e2", EventType.of("E2"), RecordFieldDeref.of(
+    //                             EventValueDeref.of(RefExpr.of(EventIdVal.of("e1"))), "kw"),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true)).build();
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println("== Initial State\n==");
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
+    // }
+    //
+    //
+    // // e1 ['a_string']
+    // // ;
+    // // e1 -->> {
+    // //   e2 [@trigger]
+    // //   e3 [e2.value]
+    // //   e4 [e2.value.value]
+    // // }
+    // public static void testSimpleTriggerDataDependency() {
+    //     RecursiveGraphModel model = new GraphModelBuilder()
+    //
+    //
+    //             .addLocalInputEvent("0_RxO", "cp", EventType.of("createProsumer"),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BinaryLogicOpExpr.and(BoolLiteral.of(true),
+    //                             BinaryLogicOpExpr.or(BoolLiteral.of(true), EqualsExpr.of(
+    //                                     RecordFieldDeref.of(EventValueDeref.of(RefExpr.of(
+    //                                                     EventIdVal.of("@self"))),
+    //                                             "P#cid"), IntLiteral.of(0)))), BoolLiteral.of(true))
+    //
+    //             // e1 ['a_string']
+    //             .addLocalComputationEvent("elem_1", "e1", EventType.of("E1"), StringLiteral.of("a_string"),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true)).beginSpawn("spawn_1", "graph1", "e1", BoolLiteral.of(true))
+    //             //   e2 [@trigger]
+    //             .addLocalComputationEvent("elem_2", "e2", EventType.of("E2"), RefExpr.of(
+    //                             EventIdVal.of("@trigger")),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true))
+    //             //   e3 [e2.value]
+    //             .addLocalComputationEvent("elem_3", "e3", EventType.of("E3"), EventValueDeref.of(RefExpr.of(
+    //                             EventIdVal.of("e2"))),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true))
+    //             //   e4 [e2.value.value]
+    //             .addLocalComputationEvent("elem_4", "e4", EventType.of("E4"), EventValueDeref.of(
+    //                             EventValueDeref.of(RefExpr.of(EventIdVal.of("e2")))),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true)).endSpawn().build();
+    //
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
+    // }
+    //
+    //
+    // // e1 ['a_string']
+    // // e2 [e1]
+    // // e3 [e2.value.value]
+    // public static void testSimpleNestedDataDependency() {
+    //     RecursiveGraphModel model = new GraphModelBuilder()
+    //
+    //
+    //             // e1 ['a_string']
+    //             .addLocalComputationEvent("elem_1", "e1", EventType.of("E1"), BoolLiteral.of(true),
+    //                     new ImmutableMarkingElement(false, true, BoolVal.of(false)),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true))
+    //             // e2 [e1]
+    //             .addLocalComputationEvent("elem_2", "e2", EventType.of("E2"), RefExpr.of(
+    //                             EventIdVal.of("e1")),
+    //                     new ImmutableMarkingElement(false, true,
+    //                             null), BoolLiteral.of(true), BoolLiteral.of(true))
+    //             // e3 [e2.value.value]
+    //             .addLocalComputationEvent("elem_3", "e3", EventType.of("E3"), EventValueDeref.of(
+    //                             EventValueDeref.of(RefExpr.of(EventIdVal.of("e2")))),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true)).build();
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
+    // }
+    //
+    //
+    // // e1 ['a_string']
+    // // e2 [e1.value]
+    // public static void testSimpleDataDependency() {
+    //     RecursiveGraphModel model =
+    //             new GraphModelBuilder().addLocalComputationEvent("elem_1", "e1", EventType.of("E1"),
+    //                             StringLiteral.of("a_string"),
+    //                             new ImmutableMarkingElement(false, true, null),
+    //                             BoolLiteral.of(true), BoolLiteral.of(true))
+    //                     .addLocalComputationEvent("elem_2", "e2", EventType.of("E2"), EventValueDeref.of(
+    //                                     RefExpr.of(EventIdVal.of("e1"))),
+    //                             new ImmutableMarkingElement(false, true, null),
+    //                             BoolLiteral.of(true), BoolLiteral.of(true))
+    //                     .build();
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
+    // }
+    //
+    // //
+    //
+    // public static void testSimpleSpawnDummyReceivers() {
+    //     RecursiveGraphModel model =
+    //             new GraphModelBuilder()
+    //
+    //
+    //                     .addComputationEvent("elem_1", "locId_1", EventType.of("label_1"),
+    //                             StringLiteral.of("a_string"), new SetUnionExpr(
+    //                                     List.of(RoleExpr.of("Prosumer", "p2"),
+    //                                             RoleExpr.of("Prosumer", "p3"))),
+    //                             new ImmutableMarkingElement(false, true, null),
+    //                             BoolLiteral.of(true), BoolLiteral.of(true))
+    //
+    //
+    //                     .addComputationEvent("elem_1", "locId_1", EventType.of("label_1"),
+    //                             StringLiteral.of("a_string"), new SetUnionExpr(
+    //                                     List.of(RoleExpr.of("Prosumer",
+    //                                                     Record.ofEntries(Record.Field.of(
+    //                                                             "id", IntLiteral.of(1)))),
+    //                                             RoleExpr.of("Prosumer", "p3"))),
+    //                             new ImmutableMarkingElement(false, true, null),
+    //                             BoolLiteral.of(true), BoolLiteral.of(true))
+    //
+    //                     .beginSpawn("spawn_1", "graph1", "locId_1", BoolLiteral.of(true))
+    //                     .addLocalComputationEvent("elem_2", "locId_2", EventType.of("label_2"),
+    //                             BoolLiteral.of(false),
+    //                             new ImmutableMarkingElement(false, true, null),
+    //                             BoolLiteral.of(true), BoolLiteral.of(true))
+    //                     .endSpawn()
+    //                     .build();
+    //
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
+    // }
+    //
+    //
+    // // e1 [?:String] (<undefined>)
+    // // e2 [e1.value] ('in')
+    // public static void testInputSimpleDataDependency() {
+    //     RecursiveGraphModel model =
+    //             new GraphModelBuilder().addLocalInputEvent("elem_1", "e1", EventType.of("E1"),
+    //                             new ImmutableMarkingElement(false, true, null),
+    //                             BoolLiteral.of(true), BoolLiteral.of(true))
+    //                     .addLocalComputationEvent("elem_2", "e2", EventType.of("E2"), EventValueDeref.of(
+    //                                     RefExpr.of(EventIdVal.of("e1"))),
+    //                             new ImmutableMarkingElement(false, true, StringVal.of("in")),
+    //                             BoolLiteral.of(true), BoolLiteral.of(true))
+    //                     .addControlFlowRelation("flow_1", "e1", "e2",
+    //                             ControlFlowRelation.Type.RESPONSE, BoolLiteral.of(true))
+    //                     .addControlFlowRelation("flow_1", "e1", "e2",
+    //                             ControlFlowRelation.Type.CONDITION, BoolLiteral.of(true))
+    //                     .build();
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
+    // }
+    //
+    // // e1 [?] (<void>)
+    // // e2 [true] (false)
+    // // ;
+    // // e1 -->* e2
+    // // e1 *--> e2
+    // public static void testEmptyInput() {
+    //     RecursiveGraphModel model =
+    //             new GraphModelBuilder().addLocalInputEvent("1", "e1", EventType.of("E1"),
+    //                             new ImmutableMarkingElement(false, true, null),
+    //                             BoolLiteral.of(true), BoolLiteral.of(true))
+    //                     .addLocalComputationEvent("2", "e2", EventType.of("E2"),
+    //                             BoolLiteral.of(BoolVal.of(true)),
+    //                             new ImmutableMarkingElement(false, true, BoolVal.of(false)),
+    //                             BoolLiteral.of(true), BoolLiteral.of(true))
+    //                     .addControlFlowRelation("3", "e1", "e2", ControlFlowRelation.Type.RESPONSE, BoolLiteral.of(true))
+    //                     .addControlFlowRelation("4", "e1", "e2", ControlFlowRelation.Type.CONDITION, BoolLiteral.of(true))
+    //                     .build();
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
+    // }
+    //
+    //
+    // // e1 [?:String] (<undefined>)
+    // public static void testSimpleInputEvent() {
+    //     RecursiveGraphModel model =
+    //             new GraphModelBuilder().addLocalInputEvent("elem_1", "e1", EventType.of("E1"),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true)).build();
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
     //
     // }
-    private static void energyRequest() {
-        DummyMembershipLayer.instance()
-                .onNeighborUp(new DummyMembershipLayer.DummyNeighbour(UserVal.of("Prosumer", "1"),
-                        "P(1)"));
-        DummyMembershipLayer.instance()
-                .onNeighborUp(new DummyMembershipLayer.DummyNeighbour(UserVal.of("Prosumer", "2"),
-                        "P(2)"));
-        DummyMembershipLayer.instance()
-                .onNeighborUp(new DummyMembershipLayer.DummyNeighbour(UserVal.of("Prosumer", "3"),
-                        "P(3)"));
-
-        var model = new GraphModelBuilder("0")
-                //(e0:readId) [?:{pId:String}}] [C0(1)]
-                .addLocalInputEvent("01", "e0", "readId", new ImmutableMarkingElement(false, true,
-                                null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true))
-                // (e1:createProsumer) [?] [P(e0.value.pId)]
-                .addInputEvent("02", "e1", "createProsumer", UserExpr.of("Prosumer",
-                                RecordFieldDeref.of(EventValueDeref.of(EventIdExpr.of(EventIdVal.of("e0"))),
-                                        "pId")),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true))
-                .addLocalComputationEvent("1", "e1", "E1", EventIdExpr.of(EventIdVal.of("e0")),
-                        new ImmutableMarkingElement(false, true, null),
-                        BooleanLiteral.of(true), BooleanLiteral.of(true))
-
-
-                // .addLocalComputationEvent("1", "e1", "E1",
-                //         EqualsExpr.of(EventValueDeref.of(EventIdExpr.of(EventIdVal.of("@V0",
-                //                 EventType.of("E0",
-                //                         BooleanType.singleton())))), BooleanLiteral.of(false)),
-                //         new ImmutableMarkingElement(false, true,
-                //                 BooleanVal.undefined()),
-                //         LogicalOpExpr.and(LogicalOpExpr.and(BooleanLiteral.of(true),
-                //         LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of
-                //         (EventValueDeref.of(EventIdExpr.of(EventIdVal.of("P#cid",EventType.of
-                //         ("P#cid", IntegerType.singleton())))), IntegerLiteral.of(0)))),
-                //         LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of
-                //         (EventValueDeref.of(EventIdExpr.of(EventIdVal.of("P#id",EventType.of
-                //         ("P#id", GenericStringType.singleton())))), StringLiteral.of("p1"))))
-                //         )
-
-                // e0 *--> e1
-                .addControlFlowRelation("03", "e0", "e1",
-                        // e0 -->+ e1
-                        ControlFlowRelation.Type.RESPONSE, BooleanLiteral.of(true))
-                .addControlFlowRelation("04", "e0", "e1",
-                        // e1 -->% e1
-                        ControlFlowRelation.Type.INCLUDE, BooleanLiteral.of(true))
-                .addControlFlowRelation("05", "e1", "e1", ControlFlowRelation.Type.EXCLUDE, BooleanLiteral.of(true))
-                .beginSpawn("06", "1", "e1", BooleanLiteral.of(true))
-                // .addReceiveEvent("event_elem_2", "e2", "E2", User.of
-                // ("Prosumer", "p2"),
-                //         new ImmutableMarkingElement(false, true, BooleanVal
-                //         .of(false)))
-                // .addControlFlowRelation("rel_elem_1", "e2", "e1",
-                //         ControlFlowRelation.Type.INCLUDE)
-                .endSpawn()
-                .build();
-
-        GraphRunner runner =
-                new GraphRunner(UserVal.of("CO", "1"), DummyCommunicationLayer.instance());
-        runner.init(model);
-        //
-        System.err.println(runner);
-        readSystemIn(runner);
-    }
+    //
+    // // e1 ['a_string'] (<undefined>)
+    // public static void testSimpleSendReceiveP1toP2() {
+    //     RecursiveGraphModel model =
+    //             new GraphModelBuilder().addComputationEvent("elem_1", "e1", EventType.of("E1"),
+    //                     StringLiteral.of("a_string"),
+    //                     SetDiffExpr.of(RoleExpr.of("Prosumer"), RoleExpr.of("Prosumer", "p1")),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true)).build();
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
+    // }
+    //
+    // // e1 ['a_string'] [P(1) -> P(2)]
+    // //
+    // // e1 -->% e1
+    // // e1 --> {
+    // //   (e2:E2) [3] [P(2) -> P(1)]
+    // //   ;
+    // //   e2 -->+ e1
+    // // }
+    // private static void simpleSendReceiveWithSpawn() {
+    //     // instantiate dummy membership layer accordingly
+    //     DummyMembershipLayer.instance()
+    //             .onNeighborUp(new DummyMembershipLayer.DummyNeighbour(UserVal.of("Prosumer", "p2"),
+    //                     "Prosumer_p2"));
+    //     // build & return model
+    //     var model = new GraphModelBuilder().addComputationEvent("1", "e1", EventType.of("E1"),
+    //                     IntLiteral.of(2), RoleExpr.of("Prosumer", "p2"),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true))
+    //             .addControlFlowRelation("2", "e1", "e1", ControlFlowRelation.Type.EXCLUDE, BoolLiteral.of(true))
+    //             .beginSpawn("3", "4", "e1", BoolLiteral.of(true))
+    //             .addReceiveEvent("5", "e2", EventType.of("E2"), RoleExpr.of("Prosumer", "p2"),
+    //                     new ImmutableMarkingElement(false, true, BoolVal.of(false)),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true))
+    //             .addControlFlowRelation("6", "e2", "e1", ControlFlowRelation.Type.INCLUDE, BoolLiteral.of(true))
+    //             .endSpawn()
+    //             .build();
+    //
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("Prosumer", "p1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
+    //
+    // }
+    //
+    // // (e0:readId) [?:{pId:String}] [C0(0)]
+    // // %(e1:createProsumer) [?] [P(e0.value.pId)]
+    // // e0 *--> e1
+    // // e0 -->+ e1
+    // // e1 -->% e1
+    // // e1 -->> {
+    // //
+    // // }
+    // private static void energyRequest() {
+    //     DummyMembershipLayer.instance()
+    //             .onNeighborUp(new DummyMembershipLayer.DummyNeighbour(UserVal.of("Prosumer", "1"),
+    //                     "P(1)"));
+    //     DummyMembershipLayer.instance()
+    //             .onNeighborUp(new DummyMembershipLayer.DummyNeighbour(UserVal.of("Prosumer", "2"),
+    //                     "P(2)"));
+    //     DummyMembershipLayer.instance()
+    //             .onNeighborUp(new DummyMembershipLayer.DummyNeighbour(UserVal.of("Prosumer", "3"),
+    //                     "P(3)"));
+    //
+    //     var model = new GraphModelBuilder()
+    //             //(e0:readId) [?:{pId:String}}] [C0(1)]
+    //             .addLocalInputEvent("01", "e0", EventType.of("readId"), new ImmutableMarkingElement(false, true,
+    //                             null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true))
+    //             // (e1:createProsumer) [?] [P(e0.value.pId)]
+    //             .addInputEvent("02", "e1", EventType.of("createProsumer"), RoleExpr.of("Prosumer",
+    //                             Record.ofEntries(Record.Field.of("id", RecordFieldDeref.of(EventValueDeref.of(RefExpr.of(EventIdVal.of("e0"))),
+    //                                     "pId")))),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true))
+    //             .addLocalComputationEvent("1", "e1", EventType.of("E1"), RefExpr.of(EventIdVal.of("e0")),
+    //                     new ImmutableMarkingElement(false, true, null),
+    //                     BoolLiteral.of(true), BoolLiteral.of(true))
+    //
+    //
+    //             // .addLocalComputationEvent("1", "e1", "E1",
+    //             //         EqualsExpr.of(EventValueDeref.of(EventIdExpr.of(EventIdVal.of("@V0",
+    //             //                 EventType.of("E0",
+    //             //                         BooleanType.singleton())))), BooleanLiteral.of(false)),
+    //             //         new ImmutableMarkingElement(false, true,
+    //             //                 BooleanVal.undefined()),
+    //             //         LogicalOpExpr.and(LogicalOpExpr.and(BooleanLiteral.of(true),
+    //             //         LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of
+    //             //         (EventValueDeref.of(EventIdExpr.of(EventIdVal.of("P#cid",EventType.of
+    //             //         ("P#cid", IntegerType.singleton())))), IntegerLiteral.of(0)))),
+    //             //         LogicalOpExpr.or(BooleanLiteral.of(true), EqualsExpr.of
+    //             //         (EventValueDeref.of(EventIdExpr.of(EventIdVal.of("P#id",EventType.of
+    //             //         ("P#id", GenericStringType.singleton())))), StringLiteral.of("p1"))))
+    //             //         )
+    //
+    //             // e0 *--> e1
+    //             .addControlFlowRelation("03", "e0", "e1",
+    //                     // e0 -->+ e1
+    //                     ControlFlowRelation.Type.RESPONSE, BoolLiteral.of(true))
+    //             .addControlFlowRelation("04", "e0", "e1",
+    //                     // e1 -->% e1
+    //                     ControlFlowRelation.Type.INCLUDE, BoolLiteral.of(true))
+    //             .addControlFlowRelation("05", "e1", "e1", ControlFlowRelation.Type.EXCLUDE, BoolLiteral.of(true))
+    //             .beginSpawn("06", "1", "e1", BoolLiteral.of(true))
+    //             // .addReceiveEvent("event_elem_2", "e2", "E2", User.of
+    //             // ("Prosumer", "p2"),
+    //             //         new ImmutableMarkingElement(false, true, BooleanVal
+    //             //         .of(false)))
+    //             // .addControlFlowRelation("rel_elem_1", "e2", "e1",
+    //             //         ControlFlowRelation.Type.INCLUDE)
+    //             .endSpawn()
+    //             .build();
+    //
+    //     GraphRunner runner =
+    //             new GraphRunner(UserVal.of("CO", "1"), DummyCommunicationLayer.instance());
+    //     runner.init(model);
+    //     //
+    //     System.err.println(runner);
+    //     readSystemIn(runner);
+    // }
 
 
     static void readSystemIn(GraphRunner runner) {
@@ -546,7 +545,7 @@ public class UsageTestsLocal {
         }
         // Boolean
         try {
-            return IntegerVal.of(Integer.parseInt(input));
+            return IntVal.of(Integer.parseInt(input));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Unable to parse input value");
         }
