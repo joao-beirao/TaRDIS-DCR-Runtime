@@ -1,41 +1,22 @@
 {
   "type": "object",
   "properties": {
-    "events": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/event"
-      }
+    "ty": {
+      "$ref": "#/$defs/nonEmptyString"
     },
-    "marking": {
-      "$ref": "#/$defs/marking"
-    },
-    "val": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "$ref": "#/$defs/value"
-        }
-      },
-      "required": [
-        "value"
-      ],
-      "additionalProperties": false
-    },
-    "type": {
-      "$ref": "#/$defs/type"
-    },
-    "dataExpr": {
-      "$ref": "#/$defs/dataExpr"
-    },
-    "userSet": {
-      "$ref": "#/$defs/userSetExpression"
+    "graph": {
+      "$ref": "#/$defs/graph"
     }
   },
-  "value": {
-    "$ref": "#/$defs/value"
-  },
+  "additionalProperties": false,
+  "required": [
+    "graph"
+  ],
   "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
     "value": {
       "oneOf": [
         {
@@ -110,6 +91,7 @@
               "properties": {
                 "fields": {
                   "type": "array",
+                  "minItems": 1,
                   "items": {
                     "type": "object,",
                     "properties": {
@@ -126,8 +108,7 @@
                       "value"
                     ],
                     "additionalProperties": false
-                  },
-                  "minItems": 1
+                  }
                 }
               },
               "required": [
@@ -558,11 +539,6 @@
         }
       ]
     },
-    "tester": {
-      "type": "object",
-      "properties": {
-      }
-    },
     "event": {
       "oneOf": [
         {
@@ -579,10 +555,10 @@
                 },
                 "receivers": {
                   "type": "array",
+                  "minItems": 1,
                   "items": {
                     "$ref": "#/$defs/userSetExpression"
-                  },
-                  "minItems": 1
+                  }
                 }
               },
               "required": [
@@ -607,10 +583,10 @@
                 },
                 "receivers": {
                   "type": "array",
+                  "minItems": 1,
                   "items": {
                     "$ref": "#/$defs/userSetExpression"
-                  },
-                  "minItems": 1
+                  }
                 }
               },
               "required": [
@@ -634,11 +610,16 @@
                   "$ref": "#/$defs/eventCommon"
                 },
                 "initiators": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
                     "$ref": "#/$defs/userSetExpression"
+                  }
                 }
               },
               "required": [
-                "common", "initiators"
+                "common",
+                "initiators"
               ],
               "additionalProperties": false
             }
@@ -687,33 +668,122 @@
       ],
       "additionalProperties": false
     },
-    "eventKind": {
+    "relation": {
       "oneOf": [
         {
           "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "controlFlowRelation"
+          ],
           "properties": {
-            "computation": {
-              "$ref": "#/$defs/computationExpression"
-            },
-            "receivers": {
-              "$ref": "#/$defs/userSetExpression"
+            "controlFlowRelation": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "common",
+                "targetId",
+                "relationType"
+              ],
+              "properties": {
+                "common": {
+                  "$ref": "#/$defs/relationCommon"
+                },
+                "targetId": {
+                  "$ref": "#/$defs/nonEmptyString"
+                },
+                "relationType": {
+                  "enum": [
+                    "include",
+                    "exclude",
+                    "response",
+                    "condition",
+                    "milestone"
+                  ]
+                }
+              }
             }
-          },
-          "additionalProperties": false
+          }
         },
         {
           "type": "object",
-          "properties": {
-            "initiators": {
-              "$ref": "#/$defs/userSetExpression"
-            }
-          },
           "required": [
-            "initiators"
+            "spawnRelation"
           ],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "properties": {
+            "spawnRelation": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "common",
+                "triggerId",
+                "graph"
+              ],
+              "properties": {
+                "common": {
+                  "$ref": "#/$defs/relationCommon"
+                },
+                "graph": {
+                  "$ref": "#/$defs/graph"
+                },
+                "triggerId": {
+                  "$ref": "#/$defs/nonEmptyString"
+                }
+              }
+            }
+          }
         }
       ]
+    },
+    "relationCommon": {
+      "type": "object",
+      "required": [
+        "uid",
+        "sourceId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "uid": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sourceId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "guard": {
+          "$ref": "#/$defs/computationExpression"
+        },
+        "instantiationConstraint": {
+          "$ref": "#/$defs/computationExpression"
+        }
+      }
+    },
+    "eventList": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "relationList": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/relation"
+      }
+    },
+    "graph": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "events": {
+          "$ref": "#/$defs/eventList"
+        },
+        "relations": {
+          "$ref": "#/$defs/relationList"
+        }
+      }
     }
   }
 }

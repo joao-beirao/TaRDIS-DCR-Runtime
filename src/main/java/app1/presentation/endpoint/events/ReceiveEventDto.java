@@ -1,28 +1,31 @@
 package app1.presentation.endpoint.events;
 
-import app1.presentation.endpoint.data.computation.ComputationExprDTO;
-import app1.presentation.endpoint.data.types.EventTypeDTO;
-import app1.presentation.endpoint.data.types.TypeDTO;
 import app1.presentation.endpoint.events.participants.UserSetExprDTO;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
 @JsonTypeName("receiveEvent")
 public final class ReceiveEventDto
         extends EventDTO {
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    // @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty(value = "initiators", required = true)
-    public final UserSetExprDTO initiators;
+    public final List<UserSetExprDTO> initiators;
 
 
     @JsonCreator
-    ReceiveEventDto(  @JsonProperty(value =
-                    "common", required = true) Common common,
-            @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "initiators",
-                    required = true) UserSetExprDTO initiators) {
+    public ReceiveEventDto(@JsonProperty(value = "common", required = true) Common common,
+             @JsonProperty(value = "initiators",
+                    required = true) List<UserSetExprDTO> initiators) {
         super(common);
         this.initiators = initiators;
+        // this.initiators = (initiators == null || initiators.isEmpty())
+        //         ? Collections.emptyList()
+        //         : Collections.unmodifiableList(initiators);
     }
     // @JsonCreator
     // ReceiveEventDto(@JsonProperty(value = "uid", required = true) String uid,
@@ -31,7 +34,8 @@ public final class ReceiveEventDto
     //         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "dataType",
     //                 required = true) TypeDTO dataType,
     //         @JsonProperty(value = "marking", required = true) EventDTO.MarkingDTO marking,
-    //         @JsonProperty(value = "instantiationConstraint") Optional<ComputationExprDTO> instantiationConstraint,
+    //         @JsonProperty(value = "instantiationConstraint") Optional<ComputationExprDTO>
+    //         instantiationConstraint,
     //         @JsonProperty(value = "ifcConstraint") Optional<ComputationExprDTO> ifcConstraint,
     //         @JsonProperty(value = "initiators", required = true) UserSetExprDTO initiators) {
     //     super(uid, id, eventType, dataType, marking, instantiationConstraint, ifcConstraint);

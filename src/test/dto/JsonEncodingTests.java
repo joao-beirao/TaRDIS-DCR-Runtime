@@ -1,10 +1,12 @@
 package dto;
 
+import app1.presentation.endpoint.GraphDTO;
 import app1.presentation.endpoint.data.computation.ComputationExprDTO;
 import app1.presentation.endpoint.data.types.TypeDTO;
 import app1.presentation.endpoint.data.values.ValueDTO;
 import app1.presentation.endpoint.events.EventDTO;
 import app1.presentation.endpoint.events.participants.UserSetExprDTO;
+import app1.presentation.endpoint.relations.RelationDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.junit.Test;
@@ -339,15 +341,17 @@ public class JsonEncodingTests {
                              },
                              "instantiationConstraint": { "boolLit": { "value": true } }
                            },
-                           "initiators": {
-                             "roleExpr": {
-                               "roleLabel": "P",
-                               "params": [
-                                 { "name": "p1" },
-                                 { "name": "p2", "value": { "intLit": { "value": 2 } } }
-                               ]
-                             }
-                           }
+                           "initiators": [
+                               {
+                                 "roleExpr": {
+                                   "roleLabel": "P",
+                                   "params": [
+                                     { "name": "p1" },
+                                     { "name": "p2", "value": { "intLit": { "value": 2 } } }
+                                   ]
+                                 }
+                               }
+                           ]
                          }
                     }
                     """;
@@ -356,6 +360,212 @@ public class JsonEncodingTests {
             assertEquals(objectMapper.readTree(testSrc),
                     objectMapper.readTree(serializedUserEventDTO));
         }
+    }
+
+
+    @Test
+    public void givenSomeRelation_ifDeserializeAndThenSerialize_thenSameJson()
+            throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
+        {
+            var testSrc = """
+                     {
+                      "spawnRelation": {
+                        "common": { "uid": "1", "sourceId": "e0_0_Rx" },
+                        "triggerId": "_@trigger$e0",
+                        "graph": {
+                          "events": [
+                            {
+                              "inputEvent": {
+                                "common": {
+                                  "uid": "e1_1_TxO",
+                                  "id": "e1_1_TxO",
+                                  "label": "E1",
+                                  "dataType": { "valueType": "void" },
+                                  "marking": { "isPending": false, "isIncluded": true }
+                                },
+                                "receivers": [ { "initiatorExpr": { "eventId": "e0" } } ]
+                              }
+                            }
+                          ]
+                          }
+                        }
+                      }
+                    }
+                    """;
+            RelationDTO deserializedDTO = objectMapper.readValue(testSrc, RelationDTO.class);
+            String serializedDTO = objectMapper.writeValueAsString(deserializedDTO);
+            assertEquals(objectMapper.readTree(testSrc),
+                    objectMapper.readTree(serializedDTO));
+        }
+
+    }
+
+
+    @Test
+    public void givenSomeGraph_ifDeserializeAndThenSerialize_thenSameJson()
+            throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
+        {
+            var testSrc = """
+                    {
+                    "events": [
+                      {
+                        "inputEvent": {
+                          "common": {
+                            "uid": "e0_0_Tx",
+                            "id": "e0_0_Tx",
+                            "label": "E0",
+                            "dataType": { "valueType": "void" },
+                            "marking": { "isPending": false, "isIncluded": true }
+                          },
+                          "receivers": [
+                            {
+                              "roleExpr": {
+                                "roleLabel": "P",
+                                "params": [
+                                  {
+                                    "name": "cid",
+                                    "value": {
+                                      "propDeref": {
+                                        "propBasedExpr": {
+                                          "propDeref": {
+                                            "propBasedExpr": {
+                                              "eventRef": { "value": "_@self" }
+                                            },
+                                            "prop": "params"
+                                          }
+                                        },
+                                        "prop": "cid"
+                                      }
+                                    }
+                                  },
+                                  { "name": "pid" }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "receiveEvent": {
+                          "common": {
+                            "uid": "e0_0_Rx",
+                            "id": "e0_0_Rx",
+                            "label": "E0",
+                            "dataType": { "valueType": "void" },
+                            "marking": { "isPending": false, "isIncluded": true }
+                          },
+                          "initiators": [
+                            {
+                              "roleExpr": {
+                                "roleLabel": "P",
+                                "params": [
+                                  {
+                                    "name": "cid",
+                                    "value": {
+                                      "propDeref": {
+                                        "propBasedExpr": {
+                                          "propDeref": {
+                                            "propBasedExpr": {
+                                              "eventRef": { "value": "_@self" }
+                                            },
+                                            "prop": "params"
+                                          }
+                                        },
+                                        "prop": "cid"
+                                      }
+                                    }
+                                  },
+                                  { "name": "pid" }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "relations": [
+                      {
+                        "spawnRelation": {
+                          "common": { "uid": "1", "sourceId": "e0_0_Rx" },
+                          "triggerId": "_@trigger$e0",
+                          "graph": {
+                            "events": [
+                              {
+                                "inputEvent": {
+                                  "common": {
+                                    "uid": "e1_1_TxO",
+                                    "id": "e1_1_TxO",
+                                    "label": "E1",
+                                    "dataType": { "valueType": "void" },
+                                    "marking": { "isPending": false, "isIncluded": true }
+                                  },
+                                  "receivers": [ { "initiatorExpr": { "eventId": "e0" } } ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "spawnRelation": {
+                          "common": { "uid": "1", "sourceId": "e0_0_Tx" },
+                          "triggerId": "_@trigger$e0",
+                          "graph": {
+                            "events": [
+                              {
+                                "receiveEvent": {
+                                  "common": {
+                                    "uid": "e1_1_RxO",
+                                    "id": "e1_1_RxO",
+                                    "label": "E1",
+                                    "dataType": { "valueType": "void" },
+                                    "marking": { "isPending": false, "isIncluded": true }
+                                  },
+                                  "initiators": [
+                                    {
+                                      "roleExpr": {
+                                        "roleLabel": "P",
+                                        "params": [
+                                          {
+                                            "name": "cid",
+                                            "value": {
+                                              "propDeref": {
+                                                "propBasedExpr": {
+                                                  "propDeref": {
+                                                    "propBasedExpr": {
+                                                      "eventRef": { "value": "_@trigger$e0" }
+                                                    },
+                                                    "prop": "initiator"
+                                                  }
+                                                },
+                                                "prop": "cid"
+                                              }
+                                            }
+                                          },
+                                          { "name": "pid" }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                  """;
+            GraphDTO deserializedDTO = objectMapper.readValue(testSrc, GraphDTO.class);
+            String serializedDTO = objectMapper.writeValueAsString(deserializedDTO);
+            assertEquals(objectMapper.readTree(testSrc),
+                    objectMapper.readTree(serializedDTO));
+        }
+
     }
 
 

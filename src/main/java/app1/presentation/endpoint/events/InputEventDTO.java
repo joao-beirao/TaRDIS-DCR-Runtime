@@ -26,7 +26,6 @@ public final class InputEventDTO
     }
 }
 
-
 // @JsonTypeName("inputEvent")
 // public record InputEventDTO(
 //         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "uid", required =

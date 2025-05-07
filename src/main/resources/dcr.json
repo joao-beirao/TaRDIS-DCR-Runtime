@@ -1,224 +1,151 @@
 {
-  "events": [
-
-    {
-      "computationEvent": {
-        "common": {
-          "uid": "e0_0_tx",
-          "id": "e0",
-          "label": "e0",
-          "dataType": { "valueType": "bool" },
-          "marking": {
-            "isPending": false,
-            "isIncluded": true,
-            "defaultValue": { "boolLit": { "value": true } }
+  "graph": {
+    "events": [
+      {
+        "inputEvent": {
+          "common": {
+            "uid": "e0_0_Tx",
+            "id": "e0_0_Tx",
+            "label": "E0",
+            "dataType": { "valueType": "void" },
+            "marking": { "isPending": false, "isIncluded": true }
           },
-          "ifcConstraint": { "boolLit": { "value": true } }
-        },
-        "dataExpr": { "boolLit": { "value": true } },
-        "receivers": [
-          {
-            "roleExpr": {
-              "roleLabel": "P",
-              "params": [
-                { "name": "p1" },
-                { "name": "p2", "value": { "intLit": { "value": 2 } } }
-              ]
-            }
-          }
-        ]
-      }
-    }
-  ],
-  "marking": {
-    "isPending": false,
-    "isIncluded": true,
-    "defaultValue": {
-      "intLit": {
-        "value": 3
-      }
-    }
-  },
-  "val": {
-    "value": {
-      "recordVal": {
-        "fields": [
-          {
-            "name": "p3",
-            "value": {
-              "stringLit": {
-                "value": "a_string"
-              }
-            }
-          },
-          {
-            "name": "p4",
-            "value": {
-              "recordVal": {
-                "fields": [
+          "receivers": [
+            {
+              "roleExpr": {
+                "roleLabel": "P",
+                "params": [
                   {
-                    "name": "p5",
+                    "name": "cid",
                     "value": {
-                      "recordVal": {
-                        "fields": [
-                          {
-                            "name": "p1",
-                            "value": {
-                              "boolLit": {
-                                "value": true
-                              }
-                            }
-                          },
-                          {
-                            "name": "p2",
-                            "value": {
-                              "intLit": {
-                                "value": 3
-                              }
-                            }
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "propDeref": {
+                            "propBasedExpr": {
+                              "eventRef": { "value": "_@self" }
+                            },
+                            "prop": "params"
                           }
-                        ]
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        ]
-      }
-    }
-  },
-  "type": {
-    "recordType": {
-      "fields": [
-        {
-          "name": "p3",
-          "type": {
-            "recordType": {
-              "fields": [
-                {
-                  "name": "p2",
-                  "type": {
-                    "valueType": "bool"
-                  }
-                },
-                {
-                  "name": "p1",
-                  "type": {
-                    "valueType": "string"
-                  }
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "pp4",
-          "type": {
-            "eventType": {
-              "label": "E0"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "dataExpr": {
-    "computationExpression": {
-      "record": {
-        "fields": [
-          {
-            "name": "p3",
-            "value": {
-              "boolLit": {
-                "value": true
-              }
-            }
-          },
-          {
-            "name": "p4",
-            "value": {
-              "record": {
-                "fields": [
-                  {
-                    "name": "p1",
-                    "value": {
-                      "boolLit": {
-                        "value": true
+                        },
+                        "prop": "cid"
                       }
                     }
                   },
-                  {
-                    "name": "p2",
-                    "value": {
-                      "eventRef": {
-                        "value": "E0"
-                      }
-                    }
-                  }
+                  { "name": "pid" }
                 ]
               }
             }
+          ]
+        }
+      },
+      {
+        "receiveEvent": {
+          "common": {
+            "uid": "e0_0_Rx",
+            "id": "e0_0_Rx",
+            "label": "E0",
+            "dataType": { "valueType": "void" },
+            "marking": { "isPending": false, "isIncluded": true }
           },
-          {
-            "name": "p5",
-            "value": {
-              "propDeref": {
-                "propBasedExpr": {
-                  "propDeref": {
-                    "propBasedExpr": {
-                      "eventRef": {
-                        "value": "E0"
+          "initiators": [
+            {
+              "roleExpr": {
+                "roleLabel": "P",
+                "params": [
+                  {
+                    "name": "cid",
+                    "value": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "propDeref": {
+                            "propBasedExpr": {
+                              "eventRef": { "value": "_@self" }
+                            },
+                            "prop": "params"
+                          }
+                        },
+                        "prop": "cid"
                       }
-                    },
-                    "prop": "value"
-                  }
-                },
-                "prop": "cid"
+                    }
+                  },
+                  { "name": "pid" }
+                ]
               }
             }
-          },
-          {
-            "name": "p6",
-            "value": {
-              "binaryOp": {
-                "expr1": {
-                  "intLit": {
-                    "value": 2
-                  }
-                },
-                "expr2": {
-                  "intLit": {
-                    "value": 3
-                  }
-                },
-                "op": "intAdd"
-              }
-            }
-          }
-        ]
+          ]
+        }
       }
-    }
-  },
-  "userSet": {
-    "roleExpr": {
-      "roleLabel": "P",
-      "params": [
-        {
-          "name": "p1"
-        },
-        {
-          "name": "p2",
-          "value": {
-            "intLit": {
-              "value": 2
-            }
+    ],
+    "relations": [
+      {
+        "spawnRelation": {
+          "common": { "uid": "1", "sourceId": "e0_0_Rx" },
+          "triggerId": "_@trigger$e0",
+          "graph": {
+            "events": [
+              {
+                "inputEvent": {
+                  "common": {
+                    "uid": "e1_1_TxO",
+                    "id": "e1_1_TxO",
+                    "label": "E1",
+                    "dataType": { "valueType": "void" },
+                    "marking": { "isPending": false, "isIncluded": true }
+                  },
+                  "receivers": [ { "initiatorExpr": { "eventId": "e0" } } ]
+                }
+              }
+            ]
           }
         }
-      ]
-    }
+      },
+      {
+        "spawnRelation": {
+          "common": { "uid": "1", "sourceId": "e0_0_Tx" },
+          "triggerId": "_@trigger$e0",
+          "graph": {
+            "events": [
+              {
+                "receiveEvent": {
+                  "common": {
+                    "uid": "e1_1_RxO",
+                    "id": "e1_1_RxO",
+                    "label": "E1",
+                    "dataType": { "valueType": "void" },
+                    "marking": { "isPending": false, "isIncluded": true }
+                  },
+                  "initiators": [
+                    {
+                      "roleExpr": {
+                        "roleLabel": "P",
+                        "params": [
+                          {
+                            "name": "cid",
+                            "value": {
+                              "propDeref": {
+                                "propBasedExpr": {
+                                  "propDeref": {
+                                    "propBasedExpr": {
+                                      "eventRef": { "value": "_@trigger$e0" }
+                                    },
+                                    "prop": "initiator"
+                                  }
+                                },
+                                "prop": "cid"
+                              }
+                            }
+                          },
+                          { "name": "pid" }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 }
-
-

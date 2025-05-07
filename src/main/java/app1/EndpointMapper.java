@@ -173,7 +173,9 @@ public final class EndpointMapper {
                 }
             }
             case ReceiveEventDto e -> {
-                var initiatorsExpr = toUserSetExpr(e.initiators);
+                var initiatorsExpr = SetUnionExpr.of(e.initiators.stream()
+                        .map(EndpointMapper::toUserSetExpr)
+                        .collect(Collectors.toCollection(ArrayList::new)));
                 yield builder.addReceiveEvent(uid, id, eventType, initiatorsExpr, marking,
                         (BooleanExpression) instantiationConstraint,
                         (BooleanExpression) ifcConstraint);

@@ -21,18 +21,5 @@ public record RoleExprDTO(@JsonProperty(value = "roleLabel", required = true) St
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public record ParamDTO(@JsonProperty(value = "name", required = true) String name,
                            @JsonProperty(value = "value") Optional<ComputationExprDTO> value) {
-        @NotNull
-        @Override
-        public String toString() {
-            return String.format("%s= %s", name, value.isPresent() ? value.get().toString() : "*");
-        }
     }
-
-    @NotNull
-    @Override
-    public String toString() {
-        return String.format("%s(%s)", label(),
-                params.stream().map(ParamDTO::toString).collect(Collectors.joining(", ")));
-    }
-
 }
