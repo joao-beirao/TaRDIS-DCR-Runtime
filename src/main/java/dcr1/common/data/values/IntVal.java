@@ -34,11 +34,6 @@ public final class IntVal
     }
 
     @Override
-    public String unparse() {
-        return String.format("IntegerVal(%s)", value);
-    }
-
-    @Override
     public int compareTo(IntVal other) {
         return Integer.compare(this.value, other.value);
     }

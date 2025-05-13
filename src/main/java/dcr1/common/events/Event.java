@@ -83,7 +83,7 @@ public interface Event {
      *
      * @return the local id assigned to an event at design time.
      */
-    String localId();
+    String remoteID();
 
 
     /**

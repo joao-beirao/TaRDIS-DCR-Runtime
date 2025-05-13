@@ -3,19 +3,19 @@ package app1;
 // import static pt.unl.fct.di.novasys.babel.core.GenericProtocol.logger;
 
 import app1.membership.DummyMembershipLayer;
-import dcr1.common.events.Event;
+import app1.protocols.dcr.requests.DcrReply;
+import app1.protocols.dcr.requests.DcrRequest;
+import app1.protocols.pingpong.PingPongProtocol;
 import dcr1.common.data.values.Value;
+import dcr1.common.events.Event;
 import dcr1.common.events.userset.values.UserSetVal;
 import dcr1.common.events.userset.values.UserVal;
-import dcr1.model.GraphModel;
 import dcr1.runtime.ExecutionResult;
 import dcr1.runtime.GraphRunner;
 import dcr1.runtime.communication.CommunicationLayer;
+import dcr1.runtime.communication.MembershipLayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pingpong1.PingPongProtocol;
-import pingpong1.requests.DcrReply;
-import pingpong1.requests.DcrRequest;
 import pt.unl.fct.di.novasys.babel.core.GenericProtocol;
 import pt.unl.fct.di.novasys.babel.exceptions.HandlerRegistrationException;
 import pt.unl.fct.di.novasys.network.data.Host;
@@ -28,23 +28,26 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class DCRProtocol
+public abstract class DCRProtocol1
         extends GenericProtocol
         implements CommunicationLayer {
 
-    protected static final int DEFAULT_PORT = 9000; // default port to listen on
-    protected static final Logger logger = LogManager.getLogger(DCRProtocol.class);
-    private final CLI cmdLineRunner;
-    protected GraphRunner runner;
-    protected UserVal self;
-    protected GraphModel model;
+    public static final short PROTO_ID = 51; // unique protocol id
+    public static final String PROTOCOL_NAME = "DCRApp";
 
-    public DCRProtocol(String protoName, short id) {
-        super(protoName, id);
-        this.cmdLineRunner = new CLI(this);
+    protected static final int DEFAULT_PORT = 9000; // default port to listen on
+    protected static final Logger logger = LogManager.getLogger(DCRProtocol1.class);
+
+    protected GraphRunner runner;
+
+    public DCRProtocol1(Properties props) {
+        super(PROTOCOL_NAME, PROTO_ID);
+
     }
 
     public void init(Properties properties) throws HandlerRegistrationException, IOException {
+
+        logger.info("Initializing DCRProtocol1 - registering request handlers");
         // register protocol handlers
         // --- none at this point ----
         // register request handlers
@@ -52,18 +55,26 @@ public abstract class DCRProtocol
         // register reply handler
         registerReplyHandler(DcrReply.REPLY_ID, this::onPongReply);
         // start CLI
-        cmdLineRunner.processCommands();
+        // cmdLineRunner.processCommands();
     }
 
+    // Callback for the Graph Runner
     @Override
-    public Set<UserVal> uponSendRequest(String eventId, UserSetVal receivers,
+    public Set<UserVal> uponSendRequest(UserVal requester, String eventId, UserSetVal receivers,
             Event.Marking marking,
             String uidExtension) {
-        var neighbours = DummyMembershipLayer.instance().resolveParticipants(receivers);
+        logger.info("on uponSendRequest: from" + requester);
+        var neighbours =
+                DummyMembershipLayer.instance()
+                        .resolveParticipants(receivers)
+                        .stream()
+                        .filter(n -> !n.user().equals(requester))
+                        .collect(
+                                Collectors.toSet());
         neighbours.forEach(
-                neighbour -> sendMessage(neighbour, eventId, marking, self, uidExtension));
+                neighbour -> sendMessage(neighbour, eventId, marking, requester, uidExtension));
         return neighbours.stream()
-                .map(DummyMembershipLayer.DummyNeighbour::user)
+                .map(MembershipLayer.Neighbour::user)
                 .collect(Collectors.toSet());
     }
 
@@ -76,7 +87,10 @@ public abstract class DCRProtocol
 
     // called from UI
     String onListEnabledEvents() {
-        return runner.toString();
+        return runner.lookupEnabledEvents()
+                .stream()
+                .map(Object::toString)
+                .collect(Collectors.joining("\n"));
     }
 
     // TODO maybe return something to be printed
@@ -121,7 +135,7 @@ public abstract class DCRProtocol
         try {
             runner.onReceiveEvent(eventId, marking.value(), sender, uidExtension);
             // TODO pass on something to be printed
-            cmdLineRunner.onReceiveEvent();
+            // cmdLineRunner.onReceiveEvent();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -137,17 +151,17 @@ public abstract class DCRProtocol
             onExecuteReceiveEvent(runner, dcrRequest.getEventId(), dcrRequest.getMarking(),
                     dcrRequest.getSender(), dcrRequest.getIdExtensionToken());
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("Error reading command: " + e.getMessage());
+            logger.error("Error reading command: {}", e.getMessage());
         }
     }
 
     // send a message to another Babel DCR node
-    private void sendMessage(DummyMembershipLayer.DummyNeighbour receiver, String eventId,
+    private void sendMessage(MembershipLayer.Neighbour receiver, String eventId,
             Event.Marking marking, UserVal user, String uidExtension) {
         try {
             String hostName = receiver.hostName();
             InetAddress targetAddr = InetAddress.getByName(hostName);
+            logger.info("Sending message to target {}...", targetAddr);
             Host destination = new Host(targetAddr, DEFAULT_PORT);
             // request = new DcrRequest(eventId, JSON.encode(marking), destination);
             var request = new DcrRequest(eventId, marking, destination, user, uidExtension);
@@ -155,7 +169,7 @@ public abstract class DCRProtocol
             sendRequest(request, PingPongProtocol.PROTO_ID);
             logger.info("  Message Sent.");
         } catch (Exception e1) {
-            logger.warn("Error executing event: " + e1.getMessage());
+            logger.warn("Error executing event: {}", e1.getMessage());
         }
     }
 

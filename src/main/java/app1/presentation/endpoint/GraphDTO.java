@@ -10,19 +10,16 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
-// @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
-// @JsonTypeName("graph")
-public record GraphDTO(
-        @JsonProperty(value = "events") List<EventDTO> events,
-        @JsonProperty(value = "relations") List<RelationDTO> relations) {
+public record GraphDTO(@JsonProperty(value = "events") List<EventDTO> events,
+                       @JsonProperty(value = "relations") List<RelationDTO> relations) {
     @JsonCreator
     public GraphDTO(@JsonProperty(value = "events") List<EventDTO> events,
             @JsonProperty(value = "relations") List<RelationDTO> relations) {
-        this.events = (events == null || events.isEmpty())
-                ? Collections.emptyList()
-                : Collections.unmodifiableList(events);
-        this.relations = (relations == null || relations.isEmpty())
-                ? Collections.emptyList()
-                : Collections.unmodifiableList(relations);
+        this.events = (events != null && !events.isEmpty())
+                ? Collections.unmodifiableList(events)
+                : Collections.emptyList();
+        this.relations = (relations != null && !relations.isEmpty())
+                ? Collections.unmodifiableList(relations)
+                : Collections.emptyList();
     }
 }

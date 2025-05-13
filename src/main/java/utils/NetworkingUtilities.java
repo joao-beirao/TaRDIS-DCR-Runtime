@@ -9,6 +9,7 @@ import java.util.Enumeration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+// TODO [deprecate]
 public class NetworkingUtilities {
 
     private static final Logger logger = LogManager.getLogger(NetworkingUtilities.class);

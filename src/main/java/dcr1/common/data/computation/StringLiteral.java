@@ -44,9 +44,6 @@ public class StringLiteral
     public String toString() {return value.toString();}
 
     @Override
-    public String unparse() {return String.format("StringLiteral(%s)", value.unparse());}
-
-    @Override
     public boolean isEqualTo(StringVal other) {
         return value.value().equals(other.value());
     }

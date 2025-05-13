@@ -1,7 +1,10 @@
 package dcr1.model;
 
 public interface ModelElement {
-    String getElementId();
+
+    // String choreoElementUID();
+
+    String endpointElementUID();
 
     String unparse();
 }

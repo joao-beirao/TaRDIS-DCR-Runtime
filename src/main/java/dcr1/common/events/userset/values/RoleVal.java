@@ -21,6 +21,7 @@ public record RoleVal(String role, RoleParams<PrimitiveVal> params)
         return new RoleVal(role, RoleParams.empty());
     }
 
+    // TODO make this a Record<PrimitiveVal>
     public static RoleVal of(String role, RoleParams<PrimitiveVal> params) {
         return new RoleVal(role, params);
     }
@@ -28,6 +29,6 @@ public record RoleVal(String role, RoleParams<PrimitiveVal> params)
     @NotNull
     @Override
     public String toString() {
-        return String.format("%s(*)", role);
+        return String.format("%s(%s)", role, params);
     }
 }

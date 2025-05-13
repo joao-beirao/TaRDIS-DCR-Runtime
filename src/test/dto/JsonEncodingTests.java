@@ -1,5 +1,6 @@
 package dto;
 
+import app1.presentation.endpoint.EndpointDTO;
 import app1.presentation.endpoint.GraphDTO;
 import app1.presentation.endpoint.data.computation.ComputationExprDTO;
 import app1.presentation.endpoint.data.types.TypeDTO;
@@ -410,162 +411,334 @@ public class JsonEncodingTests {
         objectMapper.registerModule(new Jdk8Module());
         {
             var testSrc = """
-                    {
-                    "events": [
                       {
-                        "inputEvent": {
-                          "common": {
-                            "uid": "e0_0_Tx",
-                            "id": "e0_0_Tx",
-                            "label": "E0",
-                            "dataType": { "valueType": "void" },
-                            "marking": { "isPending": false, "isIncluded": true }
-                          },
-                          "receivers": [
-                            {
-                              "roleExpr": {
-                                "roleLabel": "P",
-                                "params": [
-                                  {
-                                    "name": "cid",
-                                    "value": {
-                                      "propDeref": {
-                                        "propBasedExpr": {
-                                          "propDeref": {
-                                            "propBasedExpr": {
-                                              "eventRef": { "value": "_@self" }
-                                            },
-                                            "prop": "params"
-                                          }
-                                        },
-                                        "prop": "cid"
-                                      }
-                                    }
-                                  },
-                                  { "name": "pid" }
-                                ]
-                              }
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "receiveEvent": {
-                          "common": {
-                            "uid": "e0_0_Rx",
-                            "id": "e0_0_Rx",
-                            "label": "E0",
-                            "dataType": { "valueType": "void" },
-                            "marking": { "isPending": false, "isIncluded": true }
-                          },
-                          "initiators": [
-                            {
-                              "roleExpr": {
-                                "roleLabel": "P",
-                                "params": [
-                                  {
-                                    "name": "cid",
-                                    "value": {
-                                      "propDeref": {
-                                        "propBasedExpr": {
-                                          "propDeref": {
-                                            "propBasedExpr": {
-                                              "eventRef": { "value": "_@self" }
-                                            },
-                                            "prop": "params"
-                                          }
-                                        },
-                                        "prop": "cid"
-                                      }
-                                    }
-                                  },
-                                  { "name": "pid" }
-                                ]
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    ],
-                    "relations": [
-                      {
-                        "spawnRelation": {
-                          "common": { "uid": "1", "sourceId": "e0_0_Rx" },
-                          "triggerId": "_@trigger$e0",
-                          "graph": {
-                            "events": [
+                      "events": [
+                        {
+                          "inputEvent": {
+                            "common": {
+                              "uid": "e0_0_Tx",
+                              "id": "e0_0_Tx",
+                              "label": "E0",
+                              "dataType": { "valueType": "void" },
+                              "marking": { "isPending": false, "isIncluded": true }
+                            },
+                            "receivers": [
                               {
-                                "inputEvent": {
-                                  "common": {
-                                    "uid": "e1_1_TxO",
-                                    "id": "e1_1_TxO",
-                                    "label": "E1",
-                                    "dataType": { "valueType": "void" },
-                                    "marking": { "isPending": false, "isIncluded": true }
-                                  },
-                                  "receivers": [ { "initiatorExpr": { "eventId": "e0" } } ]
+                                "roleExpr": {
+                                  "roleLabel": "P",
+                                  "params": [
+                                    {
+                                      "name": "cid",
+                                      "value": {
+                                        "propDeref": {
+                                          "propBasedExpr": {
+                                            "propDeref": {
+                                              "propBasedExpr": {
+                                                "eventRef": { "value": "_@self" }
+                                              },
+                                              "prop": "params"
+                                            }
+                                          },
+                                          "prop": "cid"
+                                        }
+                                      }
+                                    },
+                                    { "name": "pid" }
+                                  ]
                                 }
                               }
                             ]
                           }
-                        }
-                      },
-                      {
-                        "spawnRelation": {
-                          "common": { "uid": "1", "sourceId": "e0_0_Tx" },
-                          "triggerId": "_@trigger$e0",
-                          "graph": {
-                            "events": [
+                        },
+                        {
+                          "receiveEvent": {
+                            "common": {
+                              "uid": "e0_0_Rx",
+                              "id": "e0_0_Rx",
+                              "label": "E0",
+                              "dataType": { "valueType": "void" },
+                              "marking": { "isPending": false, "isIncluded": true }
+                            },
+                            "initiators": [
                               {
-                                "receiveEvent": {
-                                  "common": {
-                                    "uid": "e1_1_RxO",
-                                    "id": "e1_1_RxO",
-                                    "label": "E1",
-                                    "dataType": { "valueType": "void" },
-                                    "marking": { "isPending": false, "isIncluded": true }
-                                  },
-                                  "initiators": [
+                                "roleExpr": {
+                                  "roleLabel": "P",
+                                  "params": [
                                     {
-                                      "roleExpr": {
-                                        "roleLabel": "P",
-                                        "params": [
-                                          {
-                                            "name": "cid",
-                                            "value": {
-                                              "propDeref": {
-                                                "propBasedExpr": {
-                                                  "propDeref": {
-                                                    "propBasedExpr": {
-                                                      "eventRef": { "value": "_@trigger$e0" }
-                                                    },
-                                                    "prop": "initiator"
-                                                  }
-                                                },
-                                                "prop": "cid"
-                                              }
+                                      "name": "cid",
+                                      "value": {
+                                        "propDeref": {
+                                          "propBasedExpr": {
+                                            "propDeref": {
+                                              "propBasedExpr": {
+                                                "eventRef": { "value": "_@self" }
+                                              },
+                                              "prop": "params"
                                             }
                                           },
-                                          { "name": "pid" }
-                                        ]
+                                          "prop": "cid"
+                                        }
                                       }
-                                    }
+                                    },
+                                    { "name": "pid" }
                                   ]
                                 }
                               }
                             ]
                           }
                         }
-                      }
-                    ]
-                  }
-                  """;
+                      ],
+                      "relations": [
+                        {
+                          "spawnRelation": {
+                            "common": { "uid": "1", "sourceId": "e0_0_Rx" },
+                            "triggerId": "_@trigger$e0",
+                            "graph": {
+                              "events": [
+                                {
+                                  "inputEvent": {
+                                    "common": {
+                                      "uid": "e1_1_TxO",
+                                      "id": "e1_1_TxO",
+                                      "label": "E1",
+                                      "dataType": { "valueType": "void" },
+                                      "marking": { "isPending": false, "isIncluded": true }
+                                    },
+                                    "receivers": [ { "initiatorExpr": { "eventId": "e0" } } ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        {
+                          "spawnRelation": {
+                            "common": { "uid": "1", "sourceId": "e0_0_Tx" },
+                            "triggerId": "_@trigger$e0",
+                            "graph": {
+                              "events": [
+                                {
+                                  "receiveEvent": {
+                                    "common": {
+                                      "uid": "e1_1_RxO",
+                                      "id": "e1_1_RxO",
+                                      "label": "E1",
+                                      "dataType": { "valueType": "void" },
+                                      "marking": { "isPending": false, "isIncluded": true }
+                                    },
+                                    "initiators": [
+                                      {
+                                        "roleExpr": {
+                                          "roleLabel": "P",
+                                          "params": [
+                                            {
+                                              "name": "cid",
+                                              "value": {
+                                                "propDeref": {
+                                                  "propBasedExpr": {
+                                                    "propDeref": {
+                                                      "propBasedExpr": {
+                                                        "eventRef": { "value": "_@trigger$e0" }
+                                                      },
+                                                      "prop": "initiator"
+                                                    }
+                                                  },
+                                                  "prop": "cid"
+                                                }
+                                              }
+                                            },
+                                            { "name": "pid" }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                    """;
             GraphDTO deserializedDTO = objectMapper.readValue(testSrc, GraphDTO.class);
             String serializedDTO = objectMapper.writeValueAsString(deserializedDTO);
             assertEquals(objectMapper.readTree(testSrc),
                     objectMapper.readTree(serializedDTO));
         }
+    }
 
+    @Test
+    public void givenAnEndpoint_ifDeserializeAndThenSerialize_thenSameJson()
+            throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
+        {
+            var testSrc = """
+                      {
+                        "role": {
+                          "label": "P",
+                          "params": [
+                            { "name": "cid", "type": { "valueType": "int" } },
+                            { "name": "pid", "type": { "valueType": "int" } }
+                          ]
+                        },
+                        "graph": {
+                          "events": [
+                            {
+                              "inputEvent": {
+                                "common": {
+                                  "uid": "e0_0_Tx",
+                                  "id": "e0_0_Tx",
+                                  "label": "E0",
+                                  "dataType": { "valueType": "void" },
+                                  "marking": { "isPending": false, "isIncluded": true }
+                                },
+                                "receivers": [
+                                  {
+                                    "roleExpr": {
+                                      "roleLabel": "P",
+                                      "params": [
+                                        {
+                                          "name": "cid",
+                                          "value": {
+                                            "propDeref": {
+                                              "propBasedExpr": {
+                                                "propDeref": {
+                                                  "propBasedExpr": {
+                                                    "eventRef": { "value": "_@self" }
+                                                  },
+                                                  "prop": "params"
+                                                }
+                                              },
+                                              "prop": "cid"
+                                            }
+                                          }
+                                        },
+                                        { "name": "pid" }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "receiveEvent": {
+                                "common": {
+                                  "uid": "e0_0_Rx",
+                                  "id": "e0_0_Rx",
+                                  "label": "E0",
+                                  "dataType": { "valueType": "void" },
+                                  "marking": { "isPending": false, "isIncluded": true }
+                                },
+                                "initiators": [
+                                  {
+                                    "roleExpr": {
+                                      "roleLabel": "P",
+                                      "params": [
+                                        {
+                                          "name": "cid",
+                                          "value": {
+                                            "propDeref": {
+                                              "propBasedExpr": {
+                                                "propDeref": {
+                                                  "propBasedExpr": {
+                                                    "eventRef": { "value": "_@self" }
+                                                  },
+                                                  "prop": "params"
+                                                }
+                                              },
+                                              "prop": "cid"
+                                            }
+                                          }
+                                        },
+                                        { "name": "pid" }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ],
+                          "relations": [
+                            {
+                              "spawnRelation": {
+                                "common": { "uid": "1", "sourceId": "e0_0_Rx" },
+                                "triggerId": "_@trigger$e0",
+                                "graph": {
+                                  "events": [
+                                    {
+                                      "inputEvent": {
+                                        "common": {
+                                          "uid": "e1_1_TxO",
+                                          "id": "e1_1_TxO",
+                                          "label": "E1",
+                                          "dataType": { "valueType": "void" },
+                                          "marking": { "isPending": false, "isIncluded": true }
+                                        },
+                                        "receivers": [ { "initiatorExpr": { "eventId": "e0" } } ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "spawnRelation": {
+                                "common": { "uid": "1", "sourceId": "e0_0_Tx" },
+                                "triggerId": "_@trigger$e0",
+                                "graph": {
+                                  "events": [
+                                    {
+                                      "receiveEvent": {
+                                        "common": {
+                                          "uid": "e1_1_RxO",
+                                          "id": "e1_1_RxO",
+                                          "label": "E1",
+                                          "dataType": { "valueType": "void" },
+                                          "marking": { "isPending": false, "isIncluded": true }
+                                        },
+                                        "initiators": [
+                                          {
+                                            "roleExpr": {
+                                              "roleLabel": "P",
+                                              "params": [
+                                                {
+                                                  "name": "cid",
+                                                  "value": {
+                                                    "propDeref": {
+                                                      "propBasedExpr": {
+                                                        "propDeref": {
+                                                          "propBasedExpr": {
+                                                            "eventRef": { "value": "_@trigger$e0" }
+                                                          },
+                                                          "prop": "initiator"
+                                                        }
+                                                      },
+                                                      "prop": "cid"
+                                                    }
+                                                  }
+                                                },
+                                                { "name": "pid" }
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    """;
+            EndpointDTO deserializedDTO = objectMapper.readValue(testSrc, EndpointDTO.class);
+            String serializedDTO = objectMapper.writeValueAsString(deserializedDTO);
+            assertEquals(objectMapper.readTree(testSrc),
+                    objectMapper.readTree(serializedDTO));
+        }
     }
 
 

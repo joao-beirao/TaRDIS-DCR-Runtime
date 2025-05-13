@@ -1,12 +1,13 @@
-package pingpong1;
+package app1.protocols.pingpong;
 
+
+import app1.DCRProtocol1;
 import dcr1.common.events.Event;
+
 import dcr1.common.events.userset.values.UserVal;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pingpong1.messages.PingMessage;
-import pingpong1.messages.PongMessage;
-import pingpong1.requests.DcrRequest;
 import pt.unl.fct.di.novasys.babel.core.GenericProtocol;
 import pt.unl.fct.di.novasys.babel.exceptions.HandlerRegistrationException;
 import pt.unl.fct.di.novasys.babel.generic.ProtoMessage;
@@ -14,6 +15,10 @@ import pt.unl.fct.di.novasys.channel.tcp.TCPChannel;
 import pt.unl.fct.di.novasys.channel.tcp.events.*;
 import pt.unl.fct.di.novasys.network.data.Host;
 import utils.NetworkingUtilities;
+
+import app1.protocols.pingpong.messages.*;
+import app1.protocols.dcr.requests.DcrRequest;
+
 
 import java.io.IOException;
 import java.util.Properties;
@@ -105,8 +110,8 @@ public class PingPongProtocol extends GenericProtocol {
         registerRequestHandler(DcrRequest.REQUEST_ID, this::uponReceivePingRequest);
 
         logger.info("PingPongProtocol initialized, running on "
-                        + channelProps.getProperty(TCPChannel.ADDRESS_KEY) + ":"
-                        + channelProps.getProperty(TCPChannel.PORT_KEY));
+                + channelProps.getProperty(TCPChannel.ADDRESS_KEY) + ":"
+                + channelProps.getProperty(TCPChannel.PORT_KEY));
 
         // switch (name) {
         //     case "target-A":
@@ -173,12 +178,12 @@ public class PingPongProtocol extends GenericProtocol {
      */
     public void sendPingMessage(Host destination, String message, Event.Marking marking,
             String idExtensionToken, UserVal sender) {
-      logger.debug("Sending Ping Message to {} on channel {} with message {}", destination, channelId, message);
-      sendMessage(channelId, new PingMessage(++nextPingId, message, marking, sender, idExtensionToken),
-              destination);
-      // logger.debug("Ping message sent");
-      // closeConnection(destination, channelId);
-  }
+        logger.debug("Sending Ping Message to {} on channel {} with message {}", destination, channelId, message);
+        sendMessage(channelId, new PingMessage(++nextPingId, message, marking, sender, idExtensionToken),
+                destination);
+        // logger.debug("Ping message sent");
+        // closeConnection(destination, channelId);
+    }
     // public void sendPingMessage(Host destination, String message, String marking) {
     //     logger.debug("Sending Ping Message to {} on channel {} with message {}", destination, channelId, message);
     //     sendMessage(channelId, new PingMessage(++nextPingId, message, marking), destination);
@@ -208,7 +213,7 @@ public class PingPongProtocol extends GenericProtocol {
         DcrRequest request = new DcrRequest(msg.getMessage(), msg.getMarking(), from, msg.getSender(),
                 msg.getIdExtensionToken());
         // App.PROTO_ID hardcoded just for quick-and-dirty proof of concept
-        sendRequest(request, (short) 2);
+        sendRequest(request, DCRProtocol1.PROTO_ID);
     }
 
     /**

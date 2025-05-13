@@ -1,10 +1,7 @@
 package app1.presentation.endpoint.data.values;
 
 
-import app1.presentation.endpoint.data.computation.ComputationExprDTO;
 import app1.presentation.endpoint.data.computation.IntLiteralDTO;
-import app1.presentation.endpoint.data.computation.StringLiteralDTO;
-import app1.presentation.endpoint.data.types.EventTypeDTO;
 import app1.presentation.endpoint.data.types.ValueTypeDTO;
 import app1.presentation.endpoint.events.ComputationEventDTO;
 import app1.presentation.endpoint.events.EventDTO;
@@ -33,7 +30,8 @@ public class Tester {
                         {
                               "computationEvent" : {
                                 "common" : {
-                                  "uid" : "uid",
+                                  "choreoElementUID" : "choreoElementUID",
+                                  "endpointElementUID" : "endpointElementUID",
                                   "id" : "id",
                                   "eventType" : {},
                                   "dataType" : {
@@ -54,16 +52,20 @@ public class Tester {
                     """;
             try {
 
-                EventDTO eventDTO = new ComputationEventDTO(new EventDTO.Common("uid", "id", "E0", ValueTypeDTO.STRING,
-                        new EventDTO.MarkingDTO(true, true, Optional.empty()),Optional.empty(),
-                        Optional.empty()), new IntLiteralDTO(3), Collections.emptyList());
+                EventDTO eventDTO = new ComputationEventDTO(
+                        new EventDTO.Common("choreoElementUID", "endpointElementUID", "id", "E0",
+                                ValueTypeDTO.STRING,
+                                new EventDTO.MarkingDTO(true, true, Optional.empty()),
+                                Optional.empty(), Optional.empty()), new IntLiteralDTO(3),
+                        Collections.emptyList());
 
 
                 // EventDTO deserializedEventDTO = objectMapper.readValue(testSrc, EventDTO.class);
 
 
                 String serializedUserEventDTO =
-                        objectMapper.enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(eventDTO);
+                        objectMapper.enable(SerializationFeature.INDENT_OUTPUT)
+                                .writeValueAsString(eventDTO);
 
                 System.err.println(serializedUserEventDTO);
 
@@ -324,9 +326,10 @@ public class Tester {
         //
         //     EventDTO computationEventDTO;
         //     {
-        //         var uid = "e0_0_tx";
+        //         var choreoElementUID = "e0_0_tx";
         //         var id = "e0";
-        //         computationEventDTO = new ComputationEventDTO(uid, id, intValuedMarkingDTO,
+        //         computationEventDTO = new ComputationEventDTO(choreoElementUID, id,
+        //         intValuedMarkingDTO,
         //                 null,
         //                 new BoolLiteralDTO(true), new BoolLiteralDTO(true),
         //                 computationExprDTO);

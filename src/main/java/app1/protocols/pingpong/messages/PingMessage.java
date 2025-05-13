@@ -1,4 +1,4 @@
-package pingpong1.messages;
+package app1.protocols.pingpong.messages;
 
 import dcr1.common.events.Event;
 import dcr1.common.events.userset.values.UserVal;

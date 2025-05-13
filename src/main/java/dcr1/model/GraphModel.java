@@ -1,11 +1,10 @@
 package dcr1.model;
 
-import dcr1.common.data.types.Type;
 import dcr1.common.DCRGraph;
 import dcr1.model.events.ComputationEventElement;
 import dcr1.model.events.EventElement;
-import dcr1.model.relations.IControlFlowRelationElement;
-import dcr1.model.relations.ISpawnRelationElement;
+import dcr1.model.relations.ControlFlowRelationElement;
+import dcr1.model.relations.SpawnRelationElement;
 
 public sealed interface GraphModel
     extends ModelElement, DCRGraph
@@ -19,10 +18,10 @@ public sealed interface GraphModel
   Iterable<? extends ComputationEventElement> computationEvents();
 
   @Override
-  Iterable<? extends IControlFlowRelationElement> controlFlowRelations();
+  Iterable<? extends ControlFlowRelationElement> controlFlowRelations();
 
   @Override
-  Iterable<? extends ISpawnRelationElement> spawnRelations();
+  Iterable<? extends SpawnRelationElement> spawnRelations();
 
   String unparse();
 

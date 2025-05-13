@@ -15,10 +15,6 @@ public record EventIdVal(String id)
 
     public static EventIdVal of(String id) {return new EventIdVal(id);}
 
-    // public static <T extends Type> Undefined<EventIdType> undefined(String label) {
-    //     return new Undefined<>(EventIdType.of(label));
-    // }
-
     @Override
     public boolean equals(Object obj) {
 
@@ -37,11 +33,6 @@ public record EventIdVal(String id)
     @NotNull
     @Override
     public String toString() {return id;}
-
-    @Override
-    public String unparse() {
-        return String.format("EventIdVal(%s)", id);
-    }
 
     @Override
     public EventIdType type() {

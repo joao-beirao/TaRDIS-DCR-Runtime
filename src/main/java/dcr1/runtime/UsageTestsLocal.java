@@ -36,12 +36,12 @@ public class UsageTestsLocal {
         static CommunicationLayer instance() {return singleton;}
 
         @Override
-        public Set<UserVal> uponSendRequest(String eventId, UserSetVal receivers,
-                Event.Marking value, String uidExtension) {
+        public Set<UserVal> uponSendRequest(UserVal requester, String eventId, UserSetVal receivers,
+                Event.Marking marking, String uidExtension) {
             return DummyMembershipLayer.instance()
                     .resolveParticipants(receivers)
                     .stream()
-                    .map(DummyMembershipLayer.DummyNeighbour::user)
+                    .map(DummyMembershipLayer.Neighbour::user)
                     .collect(Collectors.toSet());
         }
     }

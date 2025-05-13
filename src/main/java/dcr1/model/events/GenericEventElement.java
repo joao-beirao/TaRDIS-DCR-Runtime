@@ -1,6 +1,7 @@
 package dcr1.model.events;
 
 import dcr1.common.data.computation.BooleanExpression;
+import dcr1.common.data.computation.ComputationExpression;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 import dcr1.model.GenericElement;
 
@@ -12,6 +13,7 @@ public sealed abstract class GenericEventElement
         implements EventElement
         permits ComputationEvent, InputEvent, ReceiveEvent {
 
+    private final String choreoElementUID;
     private final String localId;
     private final String label;
     private final MarkingElement initialMarking;
@@ -20,10 +22,11 @@ public sealed abstract class GenericEventElement
     private final BooleanExpression ifcConstraint;
 
 
-    GenericEventElement(String elementId, String localId, String eventType,
+    GenericEventElement(String choreoElementUID, String endpointUID, String localId, String eventType,
             MarkingElement initialMarking, UserSetExpression passiveParticipants,
             BooleanExpression constraint, BooleanExpression ifcConstraint) {
-        super(elementId);
+        super(endpointUID);
+        this.choreoElementUID = choreoElementUID;
         this.localId = Objects.requireNonNull(localId);
         this.label = Objects.requireNonNull(eventType);
         this.initialMarking = Objects.requireNonNull(initialMarking);
@@ -33,7 +36,12 @@ public sealed abstract class GenericEventElement
     }
 
     @Override
-    public String localId() {
+    public String choreoElementUID() {
+        return choreoElementUID;
+    }
+
+    @Override
+    public String remoteID() {
         return localId;
     }
 

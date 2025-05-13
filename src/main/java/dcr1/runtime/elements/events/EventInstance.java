@@ -2,7 +2,6 @@ package dcr1.runtime.elements.events;
 
 import dcr1.common.data.computation.BooleanExpression;
 import dcr1.common.events.Event;
-import dcr1.model.ModelElement;
 import dcr1.model.events.EventElement;
 import dcr1.runtime.elements.RuntimeElement;
 
@@ -11,7 +10,9 @@ import dcr1.runtime.elements.RuntimeElement;
 // TODO [seal?]
 public interface EventInstance
         extends Event, RuntimeElement {
-    String getGlobalId();
+    String localUID();
+
+
 
     @Override
     EventElement baseElement();

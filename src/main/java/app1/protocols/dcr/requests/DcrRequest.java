@@ -1,4 +1,4 @@
-package pingpong1.requests;
+package app1.protocols.dcr.requests;
 
 import dcr1.common.events.Event;
 import dcr1.common.events.userset.values.UserVal;

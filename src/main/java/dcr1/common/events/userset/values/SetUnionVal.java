@@ -11,7 +11,7 @@ public record SetUnionVal(Collection<? extends UserSetVal> userSetVals)
         implements UserSetVal {
     public SetUnionVal(Collection<? extends UserSetVal> userSetVals) {
         Objects.requireNonNull(userSetVals);
-        if (userSetVals.size() < 2) {
+        if (userSetVals.isEmpty()) {
             throw new IllegalArgumentException(
                     "Requires at least two expressions: have " + userSetVals.size());
         }

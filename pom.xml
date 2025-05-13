@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>di.fct.unl.pt</groupId>
@@ -15,29 +15,33 @@
 
     <repositories>
         <repository>
+            <id>novasys-mvn</id>
+            <url>https://novasys.di.fct.unl.pt/packages/mvn</url>
+        </repository>
+        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
     </repositories>
     <build>
-<!--        <testSourceDirectory>target/generated-test-sources/test-annotations</testSourceDirectory>-->
+        <!--                <testSourceDirectory>target/generated-test-sources/test-annotations</testSourceDirectory>-->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>3.6.0</version>
                 <configuration>
-                    <transformers>
-                        <transformer
-                            implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>Main</mainClass>
-                            <manifestEntries>
-                                <Multi-Release>true</Multi-Release>
-                            </manifestEntries>
-                        </transformer>
-                        <transformer
-                            implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                    </transformers>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+
                 </configuration>
                 <executions>
                     <execution>
@@ -47,6 +51,17 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>Main</mainClass>
+                                    <manifestEntries>
+                                        <Multi-Release>true</Multi-Release>
+                                    </manifestEntries>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
                             <finalName>babel-backend</finalName>
                         </configuration>
                     </execution>
@@ -84,6 +99,24 @@
                 </configuration>
             </plugin>
             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <resources>
+                        <resource>
+                            <directory>src/main/resources</directory>
+                        </resource>
+                        <resource>
+                            <directory>resources</directory>
+                        </resource>
+                        <resource>
+                            <directory>web</directory>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <executions>
@@ -120,11 +153,56 @@
 
 
     <dependencies>
+        <!--                <dependency>-->
+        <!--                    <groupId>com.github.pfouto</groupId>-->
+        <!--                    <artifactId>babel-core</artifactId>-->
+        <!--                    <version>0.5.01</version>-->
+        <!--                </dependency>-->
+
         <dependency>
-            <groupId>com.github.pfouto</groupId>
+            <groupId>pt.unl.fct.di.novasys.babel</groupId>
             <artifactId>babel-core</artifactId>
-            <version>0.5.01</version>
+            <version>[1.0.5,)</version>
         </dependency>
+        <dependency>
+            <groupId>pt.unl.fct.di.novasys.babel</groupId>
+            <artifactId>babel-protocol-commons</artifactId>
+            <version>[1.0.18,)</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.unl.fct.di.novasys.babel</groupId>
+            <artifactId>babel-webservices</artifactId>
+            <version>[0.0.2,)</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.unl.fct.di.novasys.babel</groupId>
+            <artifactId>babel-protocol-epiglobalview</artifactId>
+            <version>[1.0.0,)</version>
+        </dependency>
+
+
+        <!--        <dependency>-->
+        <!--            <groupId>pt.unl.fct.di.novasys.babel</groupId>-->
+        <!--            <artifactId>nimbus-anti-entropy</artifactId>-->
+        <!--            <version>[0.0.1,)</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>pt.unl.fct.di.novasys.babel</groupId>-->
+        <!--            <artifactId>hyparview-discovery</artifactId>-->
+        <!--            <version>[0.1.16,)</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.github.javafaker</groupId>-->
+        <!--            <artifactId>javafaker</artifactId>-->
+        <!--            <version>1.0.2</version>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>pt.unl.fct.di.novasys.babel</groupId>
+            <artifactId>babel-webservices</artifactId>
+            <version>[0.0.1,)</version>
+        </dependency>
+
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -158,16 +236,16 @@
             <scope>test</scope>
         </dependency>
         <!--        &lt;!&ndash; https://mvnrepository.com/artifact/jakarta.annotation/jakarta.annotation-api &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>jakarta.annotation</groupId>-->
-<!--            <artifactId>jakarta.annotation-api</artifactId>-->
-<!--            <version>3.0.0</version>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.jetbrains/annotations &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.jetbrains</groupId>-->
-<!--            <artifactId>annotations</artifactId>-->
-<!--            <version>26.0.1</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>jakarta.annotation</groupId>-->
+        <!--            <artifactId>jakarta.annotation-api</artifactId>-->
+        <!--            <version>3.0.0</version>-->
+        <!--        </dependency>-->
+        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.jetbrains/annotations &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.jetbrains</groupId>-->
+        <!--            <artifactId>annotations</artifactId>-->
+        <!--            <version>26.0.1</version>-->
+        <!--        </dependency>-->
     </dependencies>
 </project>

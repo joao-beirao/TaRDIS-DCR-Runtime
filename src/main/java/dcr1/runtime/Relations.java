@@ -1,23 +1,20 @@
 package dcr1.runtime;
 
-import dcr1.common.data.computation.BooleanExpression;
+import dcr1.common.data.computation.ComputationExpression;
 import dcr1.model.GraphModel;
-import dcr1.model.relations.ControlFlowRelationElement;
-import dcr1.model.relations.IControlFlowRelationElement;
-import dcr1.model.relations.ISpawnRelationElement;
-import dcr1.model.relations.RelationElement;
+import dcr1.model.relations.*;
 import dcr1.runtime.elements.relations.ControlFlowRelationInstance;
 import dcr1.runtime.elements.relations.RelationInstance;
 import dcr1.runtime.elements.relations.SpawnRelationInstance;
 
 class Relations {
     static InstantiatedControlFlowRelation newControlFlowRelation(
-            IControlFlowRelationElement baseElement, GenericEventInstance source,
+            ControlFlowRelationElement baseElement, GenericEventInstance source,
             GenericEventInstance target) {
         return new InstantiatedControlFlowRelation(baseElement, source, target);
     }
 
-    static InstantiatedSpawnRelation newSpawnRelationInstance(ISpawnRelationElement baseElement,
+    static InstantiatedSpawnRelation newSpawnRelationInstance(SpawnRelationElement baseElement,
             GenericEventInstance source) {
         return new InstantiatedSpawnRelation(baseElement, source);
     }
@@ -38,13 +35,13 @@ abstract class GenericRelationInstance
     }
 
     @Override
-    public String getSourceId() {
-        return source.getGlobalId();
+    public String sourceId() {
+        return source.localUID();
     }
 
     @Override
-    public BooleanExpression getGuard() {
-        return baseElement.getGuard();
+    public ComputationExpression guard() {
+        return baseElement.guard();
     }
 
     @Override
@@ -54,7 +51,7 @@ abstract class GenericRelationInstance
 
     @Override
     public RelationElement baseElement() {
-        return null;
+        return baseElement;
     }
 }
 
@@ -62,13 +59,18 @@ class InstantiatedSpawnRelation
         extends GenericRelationInstance
         implements SpawnRelationInstance {
 
-    InstantiatedSpawnRelation(ISpawnRelationElement baseElement, GenericEventInstance source) {
+    InstantiatedSpawnRelation(SpawnRelationElement baseElement, GenericEventInstance source) {
         super(baseElement, source);
     }
 
     @Override
-    public GraphModel getSubgraph() {
-        return ((ISpawnRelationElement) baseElement()).getSubgraph();
+    public String triggerId() {
+        return ((SpawnRelationElement) baseElement()).triggerId();
+    }
+
+    @Override
+    public GraphModel subGraph() {
+        return ((SpawnRelationElement) baseElement()).subGraph();
     }
 
     // TODO [not yet implemented]
@@ -80,13 +82,8 @@ class InstantiatedSpawnRelation
     // TODO [not yet implemented]
     public String unparse(String indentation) {
         return super.toString();
-        //
-        // return String.format("%s%s -->> {\n%s%s\n}", indentation, getSourceId(),
-        //         indentation + "  ",
-        //         ((ISpawnRelationElement) getBaseElement()).getSubgraph().unparse(indentation+"  "));
     }
 }
-
 
 final class InstantiatedControlFlowRelation
         extends GenericRelationInstance
@@ -94,16 +91,15 @@ final class InstantiatedControlFlowRelation
 
     private final GenericEventInstance target;
 
-    InstantiatedControlFlowRelation(IControlFlowRelationElement baseElement,
-            GenericEventInstance source,
-            GenericEventInstance target) {
+    InstantiatedControlFlowRelation(ControlFlowRelationElement baseElement,
+            GenericEventInstance source, GenericEventInstance target) {
         super(baseElement, source);
         this.target = target;
     }
 
     @Override
-    public String getTargetId() {
-        return target.getGlobalId();
+    public String targetId() {
+        return target.localUID();
     }
 
     @Override
@@ -112,8 +108,8 @@ final class InstantiatedControlFlowRelation
     }
 
     @Override
-    public ControlFlowRelationElement.Type getRelationType() {
-        return ((IControlFlowRelationElement) baseElement()).getRelationType();
+    public ControlFlowRelationElement.Type relationType() {
+        return ((ControlFlowRelationElement) baseElement()).relationType();
     }
 
     // FIXME
@@ -125,17 +121,17 @@ final class InstantiatedControlFlowRelation
 
     //
     public String unparse(String indentation) {
-        return switch (getRelationType()) {
-            case INCLUDE -> String.format("%s%s -->+ %s", indentation, getSourceId(),
-                    getTargetId());
-            case EXCLUDE -> String.format("%s%s -->%% %s", indentation, getSourceId(),
-                    getTargetId());
-            case RESPONSE -> String.format("%s%s *--> %s", indentation, getSourceId(),
-                    getTargetId());
-            case CONDITION -> String.format("%s%s -->* %s", indentation, getSourceId(),
-                    getTargetId());
-            case MILESTONE -> String.format("%s%s --><> %s", indentation, getSourceId(),
-                    getTargetId());
+        return switch (relationType()) {
+            case INCLUDE ->
+                    String.format("%s%s -->+ %s", indentation, sourceId(), targetId());
+            case EXCLUDE ->
+                    String.format("%s%s -->%% %s", indentation, sourceId(), targetId());
+            case RESPONSE ->
+                    String.format("%s%s *--> %s", indentation, sourceId(), targetId());
+            case CONDITION ->
+                    String.format("%s%s -->* %s", indentation, sourceId(), targetId());
+            case MILESTONE ->
+                    String.format("%s%s --><> %s", indentation, sourceId(), targetId());
         };
     }
 

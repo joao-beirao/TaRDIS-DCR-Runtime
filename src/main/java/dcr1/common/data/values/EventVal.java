@@ -2,6 +2,7 @@ package dcr1.common.data.values;
 
 import dcr1.common.data.types.EventType;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
 
 
 // TODO remove type - add to Value interface a default so that a value can return the EventType
@@ -30,14 +31,10 @@ public record EventVal(Value value, EventType type)
         return value.hashCode();
     }
 
+    @NotNull
     @Override
     public String toString() {
         return String.format("%s:[value:%s]", type.typeAlias(), value);
-    }
-
-    @Override
-    public String unparse() {
-        return String.format("EventVal(%s, :%s)", type().typeAlias(), value.unparse());
     }
 
     @Override

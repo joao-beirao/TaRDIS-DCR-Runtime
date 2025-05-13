@@ -10,8 +10,6 @@ public interface ComputationExpression {
     String toString();
 
     Value eval(Environment<Value> env);
-
-    public String unparse();
 }
 
 

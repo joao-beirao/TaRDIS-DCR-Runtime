@@ -2,7 +2,6 @@ package dcr1.model.events;
 
 import dcr1.common.data.computation.BooleanExpression;
 import dcr1.common.data.computation.ComputationExpression;
-import dcr1.common.data.types.EventType;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 import dcr1.runtime.elements.events.ComputationEventInstance;
 
@@ -23,11 +22,13 @@ final class ComputationEvent
     private final ComputationExpression computationExpression;
     Function<ComputationEvent, ComputationEventInstance> builder;
 
-    ComputationEvent(String elementId, String localId, String eventType,
+    ComputationEvent(String choreoElementUID, String endpointElementUID, String localId, String eventType,
             ComputationExpression computationExpression, MarkingElement marking,
             UserSetExpression receivers, BooleanExpression instantiationConstraint,
             BooleanExpression ifcConstraint) {
-        super(elementId, localId, eventType, marking, receivers, instantiationConstraint, ifcConstraint);
+        super(choreoElementUID, endpointElementUID, localId, eventType, marking, receivers,
+                instantiationConstraint,
+                ifcConstraint);
         this.computationExpression = computationExpression;
     }
 
@@ -43,15 +44,17 @@ final class ComputationEvent
 
     @Override
     public String toString() {
-        return String.format("<%s> %s(%s: %s) [%s] (%s) [-> %s]", getElementId(),
-                this.marking().toStringPrefix(), localId(), label(), getComputationExpression(),
-                value(), receivers());
+        return String.format("<%s, %s> %s(%s: %s) [%s] (%s) [%s] (when: %s)", choreoElementUID(),
+                endpointElementUID(),
+                this.marking().toStringPrefix(), remoteID(), label(), getComputationExpression(),
+                value(), receivers().map(r -> String.format("@self -> %s", r)).orElse(
+                "Local"), instantiationConstraint());
     }
 
     @Override
     public String unparse() {
-        return String.format("ComputationEventElement<%s>[ (%s: %s) [%s] [%s] ]", getElementId(),
-                localId(), label(), getComputationExpression(), receivers());
+        return String.format("ComputationEventElement<%s>[ (%s: %s) [%s] [%s] ]", choreoElementUID(),
+                remoteID(), label(), getComputationExpression(), receivers());
     }
 }
 

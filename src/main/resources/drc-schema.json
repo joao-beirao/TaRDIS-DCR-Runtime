@@ -1,17 +1,14 @@
 {
-  "type": "object",
-  "properties": {
-    "ty": {
-      "$ref": "#/$defs/nonEmptyString"
-    },
-    "graph": {
-      "$ref": "#/$defs/graph"
-    }
+  "required": ["role", "graph"],
+  "role": {
+    "$ref": "#/$defs/roleDecl"
   },
-  "additionalProperties": false,
-  "required": [
-    "graph"
-  ],
+  "graph": {
+    "$ref": "#/$defs/graph"
+  },
+
+
+
   "$defs": {
     "nonEmptyString": {
       "type": "string",
@@ -634,17 +631,17 @@
     "eventCommon": {
       "type": "object",
       "properties": {
-        "uid": {
-          "type": "string",
-          "minLength": 1
+        "choreoElementUID": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "endpointElementUID": {
+          "$ref": "#/$defs/nonEmptyString"
         },
         "id": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/nonEmptyString"
         },
         "label": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/nonEmptyString"
         },
         "dataType": {
           "$ref": "#/$defs/type"
@@ -660,7 +657,8 @@
         }
       },
       "required": [
-        "uid",
+        "endpointElementUID",
+        "choreoElementUID",
         "id",
         "label",
         "dataType",
@@ -772,6 +770,32 @@
         "$ref": "#/$defs/relation"
       }
     },
+    "roleDecl": {
+      "type": "object",
+      "required": ["label"],
+      "properties": {
+        "label": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "params": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "type"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "type": {
+                "$ref": "#/$defs/type"
+              }
+            }
+          }
+        }
+      }
+    },
     "graph": {
       "type": "object",
       "minProperties": 1,
@@ -782,6 +806,18 @@
         },
         "relations": {
           "$ref": "#/$defs/relationList"
+        }
+      }
+    },
+    "endpoint": {
+      "type": "object",
+      "required": ["role", "graph"],
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+        },
+        "graph": {
+          "$ref": "#/$defs/graph"
         }
       }
     }

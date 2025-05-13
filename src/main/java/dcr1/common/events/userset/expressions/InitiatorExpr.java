@@ -5,6 +5,7 @@ import dcr1.common.Environment;
 import dcr1.common.data.values.Value;
 import dcr1.common.events.userset.values.UserSetVal;
 import dcr1.common.events.userset.values.UserVal;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -25,5 +26,11 @@ public record InitiatorExpr(String eventId) implements UserSetExpression {
                         "Internal " + "Error: bad environment - missing binding for event " +
                                 eventId))
                 .value();
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return String.format("@Initiator(%s)", eventId);
     }
 }

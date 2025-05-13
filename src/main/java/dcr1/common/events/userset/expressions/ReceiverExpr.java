@@ -4,6 +4,7 @@ import dcr1.common.Environment;
 import dcr1.common.data.values.Value;
 import dcr1.common.events.userset.values.UserSetVal;
 import dcr1.common.events.userset.values.UserVal;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -26,5 +27,11 @@ public record ReceiverExpr(String eventId)
                         "Internal " + "Error: bad environment - missing binding for event " +
                                 eventId))
                 .value();
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return String.format("@Receiver(%s)", eventId);
     }
 }

@@ -1,4 +1,4 @@
-package pingpong1.messages;
+package app1.protocols.pingpong.messages;
 
 import io.netty.buffer.ByteBuf;
 

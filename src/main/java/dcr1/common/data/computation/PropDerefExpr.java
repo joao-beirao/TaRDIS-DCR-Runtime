@@ -24,8 +24,10 @@ public final class PropDerefExpr
         return ((PropBasedVal) (propBasedExpr.eval(env))).fetchProp(propName);
     }
 
+
     @Override
-    public String unparse() {
-        throw new NotImplementedException("TODO");
+    public String toString() {
+        return String.format("%s.%s", propBasedExpr, propName);
     }
+
 }

@@ -45,8 +45,8 @@ public final class BinaryOpExpr implements ComputationExpression {
     }
 
     @Override
-    public String unparse() {
-        throw new NotImplementedException();
+    public String toString() {
+        return String.format("%s %s %s", left.toString(), op,  right.toString());
     }
 
     public enum OpType {
@@ -79,5 +79,5 @@ public final class BinaryOpExpr implements ComputationExpression {
             };
         }
     }
-
 }
+

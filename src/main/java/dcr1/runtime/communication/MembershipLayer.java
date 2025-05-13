@@ -8,7 +8,14 @@ public interface MembershipLayer {
     interface Neighbour {
         UserVal user();
 
+        String hostName();
+
         Host host();
+
+        default String role() {
+           return  user().role();
+        }
+
     }
 
     void onNeighborUp(Neighbour neighbourUp);

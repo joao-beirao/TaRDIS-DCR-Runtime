@@ -44,11 +44,6 @@ public final class RecordVal implements PropBasedVal {
   }
 
 
-  @Override
-  public String unparse() {
-    return String.format("RecordVal(%s)", valRecord.unparseFields(Value::unparse));
-  }
-
   // TODO store this instead(?)
   @Override
   public RecordType type() {

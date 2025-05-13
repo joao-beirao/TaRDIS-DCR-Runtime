@@ -5,19 +5,20 @@ import dcr1.common.data.values.BoolVal;
 import dcr1.common.data.values.Value;
 
 public class NegationExpr
-        implements BooleanExpression {
+        implements ComputationExpression {
 
-    public final BooleanExpression expr;
+    public final ComputationExpression expr;
 
-    private NegationExpr(BooleanExpression expr) {this.expr = expr;}
+    private NegationExpr(ComputationExpression expr) {this.expr = expr;}
 
-    public static NegationExpr of(BooleanExpression expr) {
+    public static NegationExpr of(ComputationExpression expr) {
         return new NegationExpr(expr);
     }
 
     @Override
     public BoolVal eval(Environment<Value> env) {
-        return BoolVal.of(!expr.eval(env).value());
+        return BoolVal.of(
+                !((BoolVal)expr.eval(env)).value());
     }
 
     @Override
@@ -25,8 +26,4 @@ public class NegationExpr
         return String.format("!%s", expr);
     }
 
-    @Override
-    public String unparse() {
-        return toString();
-    }
 }

@@ -1,4 +1,11 @@
 {
+  "role": {
+    "label": "P",
+    "params": [
+      { "name": "cid", "type": { "valueType": "int" } },
+      { "name": "pid", "type": { "valueType": "int" } }
+    ]
+  },
   "graph": {
     "events": [
       {

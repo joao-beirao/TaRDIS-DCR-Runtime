@@ -11,6 +11,8 @@ public sealed interface EventElement
   @Override
   MarkingElement marking();
 
+  String choreoElementUID();
+
   sealed interface MarkingElement
       extends Marking
       permits ImmutableMarkingElement {

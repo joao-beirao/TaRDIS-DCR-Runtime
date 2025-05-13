@@ -40,16 +40,8 @@ public final class BoolVal
         return value;
     }
 
-    // TODO rethink this
-
     @Override
     public BooleanType type() {return BooleanType.singleton();}
-
-    // @Override
-    // public ConstRefVal<BooleanType> refTo() {
-    //     return this == TRUE ? TRUE_REF : FALSE_REF;
-    // }
-
 
     @Override
     public int hashCode() {
@@ -68,12 +60,5 @@ public final class BoolVal
     public String toString() {
         return String.valueOf(value);
     }
-
-
-    @Override
-    public String unparse() {
-        return String.format("BooleanVal(%s)", value);
-    }
-
 
 }

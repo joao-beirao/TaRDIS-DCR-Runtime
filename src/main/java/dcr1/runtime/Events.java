@@ -1,7 +1,6 @@
 package dcr1.runtime;
 
 import dcr1.common.data.computation.ComputationExpression;
-import dcr1.common.data.types.EventType;
 import dcr1.common.data.values.Value;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 import dcr1.model.events.ComputationEventElement;
@@ -18,29 +17,29 @@ import java.io.Serializable;
 import java.util.Optional;
 
 final class Events {
-    public static ComputationInstance newLocalComputationInstance(
-            String globalId, ComputationEventElement baseElement) {
-        return new ComputationInstance(globalId, baseElement);
-    }
-
-    public static ComputationInstance newComputationInstance(String globalId,
+    public static ComputationInstance newLocalComputationInstance(String localUID, String remoteID,
             ComputationEventElement baseElement) {
-        return new ComputationInstance(globalId, baseElement);
+        return new ComputationInstance(localUID, remoteID, baseElement);
     }
 
-    public static InputInstance newLocalInputInstance(String globalId,
+    public static ComputationInstance newComputationInstance(String localUID, String remoteID,
+            ComputationEventElement baseElement) {
+        return new ComputationInstance(localUID, remoteID, baseElement);
+    }
+
+    public static InputInstance newLocalInputInstance(String localUID, String remoteID,
             InputEventElement baseElement) {
-        return InputInstance.of(globalId, baseElement);
+        return InputInstance.of(localUID, remoteID, baseElement);
     }
 
-    public static InputInstance newInputInstance(String globalId,
+    public static InputInstance newInputInstance(String localUID, String remoteID,
             InputEventElement baseElement) {
-        return InputInstance.of(globalId, baseElement);
+        return InputInstance.of(localUID, remoteID, baseElement);
     }
 
-    public static ReceiveInstance newReceiveInstance(String globalId,
+    public static ReceiveInstance newReceiveInstance(String localUID, String remoteID,
             ReceiveEventElement baseElement) {
-        return new ReceiveInstance(globalId, baseElement);
+        return new ReceiveInstance(localUID, remoteID, baseElement);
     }
 }
 
@@ -65,8 +64,8 @@ sealed abstract class GenericEventInstance
         }
 
         static MutableMarking of(Marking other) {
-            return new MutableMarking(other.hasExecuted(), other.isPending(),
-                    other.isIncluded(), other.value());
+            return new MutableMarking(other.hasExecuted(), other.isPending(), other.isIncluded(),
+                    other.value());
         }
 
         private MutableMarking(boolean hasExecuted, boolean isPending, boolean isIncluded,
@@ -93,14 +92,13 @@ sealed abstract class GenericEventInstance
         public String toString() {
             return String.format("(%b, %b, %b, %s)", hasExecuted, isPending, isIncluded, value);
         }
-
-        public String unparse() {
-            return "Marking[" + "hasExecuted=" + hasExecuted + ", isPending=" + isPending +
-                    ", isIncluded=" + isIncluded + ", value=" + value.unparse() + ']';
-        }
     }
 
-    private final String globalId;
+    // used locally/internally: uniquely identifies the event within the endpoint
+    private final String localUID;
+    // used for incoming requests to trigger events: identifies the event in a
+    // context-dependent manner (computation/input/receive)
+    private final String remoteID;
     private final EventElement baseElement;
     private final MutableMarking marking;
 
@@ -113,20 +111,21 @@ sealed abstract class GenericEventInstance
         marking.value = value;
     }
 
-    GenericEventInstance(String globalId, EventElement baseElement) {
-        this.globalId = globalId;
+    GenericEventInstance(String localUID, String remoteID, EventElement baseElement) {
+        this.localUID = localUID;
+        this.remoteID = remoteID;
         this.baseElement = baseElement;
         this.marking = MutableMarking.of(baseElement.marking());
     }
 
     @Override
-    public String getGlobalId() {
-        return globalId;
+    public String localUID() {
+        return localUID;
     }
 
     @Override
-    public String localId() {
-        return baseElement.localId();
+    public String remoteID() {
+        return remoteID;
     }
 
     @Override
@@ -171,8 +170,8 @@ final class ComputationInstance
         extends GenericEventInstance
         implements ComputationEventInstance {
 
-    ComputationInstance(String globalId, ComputationEventElement baseElement) {
-        super(globalId, baseElement);
+    ComputationInstance(String localUID, String remoteID, ComputationEventElement baseElement) {
+        super(localUID, remoteID, baseElement);
     }
 
     @Override
@@ -185,14 +184,15 @@ final class ComputationInstance
 
     @Override
     public String toString() {
-        return String.format("%s - %s(%s: %s) [%s] (%s) [ -> %s]", getGlobalId(),
-                marking().toStringPrefix(), localId(), label(),
-                getComputationExpression(), value(), receivers());
+        return String.format("[%s] %s - %s(%s : %s) [%s] (%s) [%s]", localUID(),
+                receivers().map(ignored -> "Tx").orElse("Local"), marking().toStringPrefix(),
+                remoteID(), label(), getComputationExpression(), value(),
+                receivers().map(r -> String.format("@self ->" + " %s", r)).orElse("Local"));
     }
 
     public String unparse(String indentation) {
-        return String.format("%s%s - (%s: %s) [%s] %s", indentation, getGlobalId(), localId(),
-                label(), getComputationExpression().unparse(), marking());
+        return String.format("%s%s - (%s: %s) [%s] %s", indentation, localUID(), remoteID(), label(),
+                getComputationExpression().toString(), marking());
     }
 }
 
@@ -203,12 +203,12 @@ final class InputInstance
         extends GenericEventInstance
         implements InputEventInstance {
 
-    private InputInstance(String globalId, InputEventElement baseElement) {
-        super(globalId, baseElement);
+    private InputInstance(String localUID, String remoteID, InputEventElement baseElement) {
+        super(localUID, remoteID, baseElement);
     }
 
-    static InputInstance of(String globalId, InputEventElement baseElement) {
-        return new InputInstance(globalId, baseElement);
+    static InputInstance of(String localUID, String remoteID, InputEventElement baseElement) {
+        return new InputInstance(localUID, remoteID, baseElement);
     }
 
     @Override
@@ -216,14 +216,15 @@ final class InputInstance
 
     @Override
     public String toString() {
-        return String.format("%s - %s(%s: %s) [?:%s] (%s) [ -> %s ]", getGlobalId(),
-                marking().toStringPrefix(), localId(),
-                label(), valueType(), value(), receivers());
+        return String.format("[%s] %s - %s(%s : %s) [?:%s] (%s) [%s]",
+                receivers().map(ignored -> "Tx").orElse("Local"), localUID(),
+                marking().toStringPrefix(), remoteID(), label(), valueType(), value(),
+                receivers().map(r -> String.format("@self -> %s", r)).orElse("Local"));
     }
 
     @Override
     public String unparse(String indentation) {
-        return String.format("%sInput: %s  ( %s )", indentation, getGlobalId(), value());
+        return String.format("%sInput: %s  ( %s )", indentation, localUID(), value());
     }
 }
 
@@ -235,20 +236,20 @@ final class ReceiveInstance
         implements ReceiveEventInstance {
 
 
-    ReceiveInstance(String globalId, EventElement baseElement) {
-        super(globalId, baseElement);
+    ReceiveInstance(String globalId, String localId, EventElement baseElement) {
+        super(globalId, localId, baseElement);
     }
 
     @Override
     public String toString() {
-        return String.format("%s - %s(%s: %s) [(Rx): %s] (%s) [ %s ->]", getGlobalId(),
-                marking().toStringPrefix(), localId(),
-                label(), valueType(), value(), getSenderExpr());
+        return String.format("[RX] %s - %s(%s : %s) [%s] (%s) [%s]", localUID(),
+                marking().toStringPrefix(), remoteID(), label(), valueType(), value(),
+                remoteParticipants().map(r -> String.format("%s -> @self", r)).get());
     }
 
     @Override
     String unparse(String indent) {
-        return String.format("%sReceive: %s  ( %s )", indent, getGlobalId(), value());
+        return String.format("%sReceive: %s  ( %s )", indent, localUID(), value());
     }
 
     // FIXME .get()

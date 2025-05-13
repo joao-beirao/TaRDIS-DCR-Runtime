@@ -1,8 +1,9 @@
-package pingpong1.timers;
+package app1.protocols.pingpong.timers;
 
 import pt.unl.fct.di.novasys.babel.generic.ProtoTimer;
 
-public class NextPingTimer extends ProtoTimer {
+public class NextPingTimer
+        extends ProtoTimer {
 
     public static final short TIMER_ID = 101;
 

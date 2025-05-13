@@ -1,0 +1,365 @@
+{
+  "role": {
+    "label": "P",
+    "params": [ { "name": "id", "type": { "valueType": "string" } } ]
+  },
+  "graph": {
+    "events": [
+      {
+        "inputEvent": {
+          "common": {
+            "endpointElementUID": "csm_0_TxO",
+            "choreoElementUID": "csm_0",
+            "id": "csm",
+            "label": "consume",
+            "dataType": { "valueType": "void" },
+            "marking": { "isPending": false, "isIncluded": true },
+            "instantiationConstraint": {
+              "binaryOp": {
+                "expr1": {
+                  "propDeref": {
+                    "propBasedExpr": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "eventRef": { "value": "_@self" }
+                        },
+                        "prop": "params"
+                      }
+                    },
+                    "prop": "id"
+                  }
+                },
+                "expr2": { "stringLit": { "value": "1" } },
+                "op": "equals"
+              }
+            }
+          },
+          "receivers": [
+            {
+              "roleExpr": {
+                "roleLabel": "P",
+                "params": [ { "name": "id" } ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "receiveEvent": {
+          "common": {
+            "endpointElementUID": "csm_0_RxO",
+            "choreoElementUID": "csm_0",
+            "id": "csm",
+            "label": "consume",
+            "dataType": { "valueType": "void" },
+            "marking": { "isPending": false, "isIncluded": true },
+            "instantiationConstraint": {
+              "binaryOp": {
+                "expr1": {
+                  "propDeref": {
+                    "propBasedExpr": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "eventRef": { "value": "_@self" }
+                        },
+                        "prop": "params"
+                      }
+                    },
+                    "prop": "id"
+                  }
+                },
+                "expr2": { "stringLit": { "value": "1" } },
+                "op": "notEquals"
+              }
+            }
+          },
+          "initiators": [
+            {
+              "roleExpr": {
+                "roleLabel": "P",
+                "params": [
+                  {
+                    "name": "id",
+                    "value": { "stringLit": { "value": "1" } }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "relations": [
+      {
+        "spawnRelation": {
+          "relationCommon": {
+            "endpointElementUID": "csm_0_RxO_1",
+            "sourceId": "csm_0_RxO",
+            "instantiationConstraint": {
+              "binaryOp": {
+                "expr1": {
+                  "propDeref": {
+                    "propBasedExpr": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "eventRef": { "value": "_@self" }
+                        },
+                        "prop": "params"
+                      }
+                    },
+                    "prop": "id"
+                  }
+                },
+                "expr2": { "stringLit": { "value": "1" } },
+                "op": "notEquals"
+              }
+            }
+          },
+          "triggerId": "_@trigger$csm",
+          "graph": {
+            "events": [
+              {
+                "inputEvent": {
+                  "common": {
+                    "endpointElementUID": "rpl_1_TxO",
+                    "choreoElementUID": "rpl_1",
+                    "id": "rpl",
+                    "label": "reply",
+                    "dataType": { "valueType": "void" },
+                    "marking": { "isPending": false, "isIncluded": true }
+                  },
+                  "receivers": [
+                    {
+                      "roleExpr": {
+                        "roleLabel": "P",
+                        "params": [
+                          {
+                            "name": "id",
+                            "value": { "stringLit": { "value": "1" } }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "relations": [
+              {
+                "spawnRelation": {
+                  "relationCommon": {
+                    "endpointElementUID": "rpl_1_TxO_3",
+                    "sourceId": "rpl_1_TxO"
+                  },
+                  "triggerId": "_@trigger$rpl",
+                  "graph": {
+                    "events": [
+                      {
+                        "receiveEvent": {
+                          "common": {
+                            "endpointElementUID": "nay_3_RxO",
+                            "choreoElementUID": "nay_3",
+                            "id": "nay",
+                            "label": "reject",
+                            "dataType": { "valueType": "void" },
+                            "marking": {
+                              "isPending": false,
+                              "isIncluded": true
+                            }
+                          },
+                          "initiators": [
+                            {
+                              "roleExpr": {
+                                "roleLabel": "P",
+                                "params": [
+                                  {
+                                    "name": "id",
+                                    "value": {
+                                      "stringLit": { "value": "1" }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "receiveEvent": {
+                          "common": {
+                            "endpointElementUID": "yea_2_RxO",
+                            "choreoElementUID": "yea_2",
+                            "id": "yea",
+                            "label": "accept",
+                            "dataType": { "valueType": "void" },
+                            "marking": {
+                              "isPending": false,
+                              "isIncluded": true
+                            }
+                          },
+                          "initiators": [
+                            {
+                              "roleExpr": {
+                                "roleLabel": "P",
+                                "params": [
+                                  {
+                                    "name": "id",
+                                    "value": {
+                                      "stringLit": { "value": "1" }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "spawnRelation": {
+          "relationCommon": {
+            "endpointElementUID": "csm_0_TxO_1",
+            "sourceId": "csm_0_TxO",
+            "instantiationConstraint": {
+              "binaryOp": {
+                "expr1": {
+                  "propDeref": {
+                    "propBasedExpr": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "eventRef": { "value": "_@self" }
+                        },
+                        "prop": "params"
+                      }
+                    },
+                    "prop": "id"
+                  }
+                },
+                "expr2": { "stringLit": { "value": "1" } },
+                "op": "equals"
+              }
+            }
+          },
+          "triggerId": "_@trigger$csm",
+          "graph": {
+            "events": [
+              {
+                "receiveEvent": {
+                  "common": {
+                    "endpointElementUID": "rpl_1_RxO",
+                    "choreoElementUID": "rpl_1",
+                    "id": "rpl",
+                    "label": "reply",
+                    "dataType": { "valueType": "void" },
+                    "marking": { "isPending": false, "isIncluded": true }
+                  },
+                  "initiators": [ { "receiverExpr": { "eventId": "csm" } } ]
+                }
+              }
+            ],
+            "relations": [
+              {
+                "spawnRelation": {
+                  "relationCommon": {
+                    "endpointElementUID": "rpl_1_RxO_3",
+                    "sourceId": "rpl_1_RxO"
+                  },
+                  "triggerId": "_@trigger$rpl",
+                  "graph": {
+                    "events": [
+                      {
+                        "inputEvent": {
+                          "common": {
+                            "endpointElementUID": "nay_3_TxO",
+                            "choreoElementUID": "nay_3",
+                            "id": "nay",
+                            "label": "reject",
+                            "dataType": { "valueType": "void" },
+                            "marking": {
+                              "isPending": false,
+                              "isIncluded": true
+                            }
+                          },
+                          "receivers": [
+                            { "receiverExpr": { "eventId": "csm" } }
+                          ]
+                        }
+                      },
+                      {
+                        "inputEvent": {
+                          "common": {
+                            "endpointElementUID": "yea_2_TxO",
+                            "choreoElementUID": "yea_2",
+                            "id": "yea",
+                            "label": "accept",
+                            "dataType": { "valueType": "void" },
+                            "marking": {
+                              "isPending": false,
+                              "isIncluded": true
+                            }
+                          },
+                          "receivers": [
+                            { "receiverExpr": { "eventId": "csm" } }
+                          ]
+                        }
+                      }
+                    ],
+                    "relations": [
+                      {
+                        "controlFlowRelation": {
+                          "relationCommon": {
+                            "endpointElementUID": "9",
+                            "sourceId": "nay_3_TxO"
+                          },
+                          "targetId": "nay_3_TxO",
+                          "relationType": "exclude"
+                        }
+                      },
+                      {
+                        "controlFlowRelation": {
+                          "relationCommon": {
+                            "endpointElementUID": "8",
+                            "sourceId": "nay_3_TxO"
+                          },
+                          "targetId": "yea_2_TxO",
+                          "relationType": "exclude"
+                        }
+                      },
+                      {
+                        "controlFlowRelation": {
+                          "relationCommon": {
+                            "endpointElementUID": "7",
+                            "sourceId": "yea_2_TxO"
+                          },
+                          "targetId": "nay_3_TxO",
+                          "relationType": "exclude"
+                        }
+                      },
+                      {
+                        "controlFlowRelation": {
+                          "relationCommon": {
+                            "endpointElementUID": "6",
+                            "sourceId": "yea_2_TxO"
+                          },
+                          "targetId": "yea_2_TxO",
+                          "relationType": "exclude"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

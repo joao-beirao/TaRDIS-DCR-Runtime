@@ -1,40 +1,56 @@
 package dcr1.runtime;
 
+import app1.GraphObserver;
 import dcr1.common.Environment;
-import dcr1.common.data.computation.BooleanExpression;
+import dcr1.common.Record;
+import dcr1.common.data.computation.ComputationExpression;
 import dcr1.common.data.values.BoolVal;
+import dcr1.common.data.values.RecordVal;
 import dcr1.common.data.values.Value;
+import dcr1.common.data.values.VoidVal;
+import dcr1.common.events.Event;
 import dcr1.common.events.userset.values.UserVal;
 import dcr1.model.GraphModel;
 import dcr1.model.events.ComputationEventElement;
 import dcr1.model.events.EventElement;
 import dcr1.model.events.InputEventElement;
 import dcr1.model.events.ReceiveEventElement;
-import dcr1.model.relations.IControlFlowRelationElement;
-import dcr1.model.relations.ISpawnRelationElement;
+import dcr1.model.relations.ControlFlowRelationElement;
+import dcr1.model.relations.SpawnRelationElement;
 import dcr1.runtime.communication.CommunicationLayer;
 import dcr1.runtime.elements.events.EventInstance;
 import dcr1.runtime.elements.events.LocallyInitiatedEventInstance;
 import dcr1.runtime.elements.events.RemotelyInitiatedEventInstance;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class GraphRunner {
+
+    protected static final Logger logger = LogManager.getLogger(GraphRunner.class);
 
     private enum InteractionType {
         TX, RX, NONE
     }
 
-    private record EventId(String eventId, InteractionType interactionType) {
-    }
+    // TODO [deprecate]
+    // private record EventId(String eventId, InteractionType interactionType) {
+    // }
 
-    private static final String SELF = "@self";
+    private static final String SELF = "_@self";
 
-    private final Map<EventId, EventInfo<? extends GenericEventInstance>> eventsByUuid;
+    // TODO [deprecate]
+    // private final Map<EventId, EventInfo<? extends GenericEventInstance>> eventsByUuid;
+
+    // global mapping indexed by uuid
+    private final Map<String, EventInfo<? extends GenericEventInstance>> eventsByUuid;
+
     // ==
-    // convenience mappings
+    // convenience mappings indexed by element_uid + uuid_extension (not unique across maps)
     private final Map<String, EventInfo<ComputationInstance>> computationEvents;
     private final Map<String, EventInfo<InputInstance>> inputEvents;
     private final Map<String, EventInfo<ReceiveInstance>> receiveEvents;
@@ -52,14 +68,12 @@ public final class GraphRunner {
     private final Map<EventInstance, List<ControlFlowRelationInfo>> conditions;
     private final Map<EventInstance, List<ControlFlowRelationInfo>> milestones;
     // event ids mapped to spawn models
-    // private final Map<EventInstance, List<InstantiatedSpawnRelation>> spawnRelations;
     private final Map<EventInstance, List<SpawnRelationInfo>> spawnRelations;
     // TODO [revisit] temporary setup to handle send-then-spawn
 
-    private final UserVal owner;
+    private final UserVal self;
     private final CommunicationLayer communicationLayer;
-    // TODO [revisit] not really using the model after init
-    private GraphModel graphModel;
+    private final Collection<GraphObserver> graphObservers;
 
     private static <K, V> void addToListMapping(K key, V value, Map<K, List<V>> mapping) {
         List<V> values = mapping.getOrDefault(key, new LinkedList<>());
@@ -98,9 +112,11 @@ public final class GraphRunner {
                 .setValue(newValue);
     }
 
-    public GraphRunner(UserVal owner, CommunicationLayer communicationLayer) {
-        this.owner = owner;
+
+    public GraphRunner(UserVal self, CommunicationLayer communicationLayer) {
+        this.self = self;
         this.communicationLayer = communicationLayer;
+        this.graphObservers = new LinkedList<>();
         this.eventsByUuid = new HashMap<>();
         this.computationEvents = new HashMap<>();
         this.inputEvents = new HashMap<>();
@@ -115,7 +131,9 @@ public final class GraphRunner {
     }
 
 
-    // private static User evalParams(UserSetExprElement expr, En) {}
+    public void registerGraphObserver(GraphObserver observer) {
+        this.graphObservers.add(observer);
+    }
 
 
     // TODO rename remoteParticipants env arg & rename method
@@ -157,9 +175,9 @@ public final class GraphRunner {
 
 
     public void init(GraphModel graphModel) {
-        this.graphModel = graphModel;
+        // TODO [revisit] not really using the model after init
         // TODO initialize spawn context
-        instantiateGraphElement(Objects.requireNonNull(graphModel), SpawnContext.init(this.owner),
+        instantiateGraphElement(Objects.requireNonNull(graphModel), SpawnContext.init(this.self),
                 "");
     }
 
@@ -182,8 +200,7 @@ public final class GraphRunner {
     // ..3.3 go through spawns last
     // For the sake of simplicity, we accumulate results and apply in order in the end
     // TODO [add feature] relation guards
-    private void onPropagateControlFlowConstraints(EventInfo eventInfo,
-            ExecutionResult result) {
+    private void onPropagateControlFlowConstraints(EventInfo eventInfo, ExecutionResult result) {
         // TODO later - consider accumulating effects as opposed to immediately applying them
         // List<Callable<GenericEventInstance>> stateUpdates = new LinkedList<>();
         // responses.getOrDefault(eventInfo, Collections.emptyList()).forEach(response -> {
@@ -224,18 +241,18 @@ public final class GraphRunner {
     }
 
     // for local events only
-    private static String localIdExtensionOf(String graphElementId, String idTokenExtension) {
-        System.err.println("local");
-        return String.format("%s_%s", graphElementId, idTokenExtension);
+    private static String localIdExtensionOf(String choreoElementUID, String idTokenExtension) {
+        return String.format("%s_%s", choreoElementUID, idTokenExtension);
     }
 
     // for Tx/Rx events only
     // !! only OK if User determines a unique node!! Not sure if this is what we want, probably
     // will need to add a UUID to the mix (host name or similar)
-    private static String globalIdExtensionOf(String graphElementId, String idExtensionToken,
+    private static String globalIdExtensionOf(String choreoElementUID, String idExtensionToken,
             UserVal sender, UserVal receiver) {
-        System.err.println("remote");
-        return String.format("%s_%s", localIdExtensionOf(graphElementId, idExtensionToken),
+        // return String.format("%s_%s", localIdExtensionOf(choreoElementUID, idExtensionToken),
+        //         Integer.toHexString(sender.hashCode() + receiver.hashCode()));
+        return String.format("%s_%s", idExtensionToken,
                 Integer.toHexString(sender.hashCode() + receiver.hashCode()));
     }
 
@@ -296,7 +313,7 @@ public final class GraphRunner {
         var hasExecuted = event.hasExecuted();
         event.onExecuted(newValue);
         if (!hasExecuted) {conditions.remove(event);}
-        rebindPresent(event.localId(), newValue, eventInfo.valueEnv());
+        rebindPresent(event.remoteID(), newValue, eventInfo.valueEnv());
         // rebindPresent(event.localId(), newValue.wrap(event.label()), eventInfo.valueEnv());
         result.addModifiedEvents(event);
 
@@ -315,8 +332,7 @@ public final class GraphRunner {
     private void assertAdmissibleValueType(GenericEventInstance event, Value replaceValue) {
         // check different value type for input/receive event (subtyping now accounted for)
         if (!event.value().type().equals(replaceValue.type())) {
-            System.err.printf("unexpected value %s, expecting %s%n", replaceValue,
-                    event.value());
+            System.err.printf("unexpected value %s, expecting %s%n", replaceValue, event.value());
             System.err.printf("unexpected type %s, expecting %s%n", replaceValue.type(),
                     event.value().type());
             throw new RuntimeException("Illegal value type");
@@ -326,6 +342,7 @@ public final class GraphRunner {
     // something to append to the event id, along with other identifiers - might change in the
     // future
     private static String generateIdExtensionToken() {
+        // TODO replace with UUID
         return String.valueOf(System.currentTimeMillis()) + Math.round(Math.random() * 1000);
     }
 
@@ -342,60 +359,70 @@ public final class GraphRunner {
     private void onRemotelyInitiatedEvent(RemotelyInitiatedEventInstance event, UserVal sender,
             String idExtensionToken) {
         spawnRelations.getOrDefault(event, Collections.emptyList())
-                .forEach(info -> onSpawn(event, info, sender, owner, idExtensionToken, false));
+                .forEach(info -> onSpawn(event, info, sender, self, idExtensionToken, false));
     }
 
     // ancillary call
     private void onLocallyInitiatedEvent(LocallyInitiatedEventInstance event, UserVal receiver,
             String idExtensionToken) {
-        // TODO IFC constraint
         spawnRelations.getOrDefault(event, Collections.emptyList())
-                .forEach(info -> onSpawn(event, info, owner, receiver, idExtensionToken, true));
+                .forEach(info -> onSpawn(event, info, self, receiver, idExtensionToken, true));
     }
 
     // called by either Input or Computation events
     private void onLocallyInitiatedEvent(LocallyInitiatedEventInstance event,
             EvalContext evalCtxt) {
-        // TODO IFC constraint
         var idExtensionToken = generateIdExtensionToken();
         event.receivers().ifPresentOrElse(rcvExpr -> {
             var rcvVal = rcvExpr.eval(evalCtxt.valueEnv(), evalCtxt.userEnv());
-            // System.err.println("receiver: " + rcvVal);
-            Set<UserVal> receivers = communicationLayer.uponSendRequest(event.getGlobalId(), rcvVal,
+            var receivers = communicationLayer.uponSendRequest(self, event.remoteID(), rcvVal,
                     event.marking(), idExtensionToken);
-            System.err.println("membership eval for receivers: " + receivers);
+            logger.info("locally initiated event {} has receivers {}", event, receivers);
             receivers.forEach(
                     receiver -> onLocallyInitiatedEvent(event, receiver, idExtensionToken));
         }, () -> onSpawn((GenericEventInstance) event, idExtensionToken));
     }
 
-    // local
+    // upon local-based spawn
     private void onSpawn(GenericEventInstance event, String idExtensionToken) {
         var spawns = spawnRelations.getOrDefault(event, new LinkedList<>());
         if (spawns.isEmpty()) {return;}
         spawns.forEach(info -> {
-            var subgraph = info.spawn().getSubgraph();
+            var subgraph = info.spawn().subGraph();
             var newSpawnContext = info.spawnContext().beginScope(event);
             // var subgraphCounter = fetchUpdateCounter(subgraph.getElementId());
             // var uidExtension = extensionIdOf(subgraph.getElementId(), subgraphCounter, owner);
-            var idExtension = localIdExtensionOf(subgraph.getElementId(), idExtensionToken);
+            var idExtension = localIdExtensionOf(subgraph.endpointElementUID(), idExtensionToken);
             instantiateGraphElement(subgraph, newSpawnContext, idExtension);
         });
     }
 
+    // upon interaction-based spawn
     private void onSpawn(EventInstance event, SpawnRelationInfo info, UserVal sender,
-            UserVal receiver,
-            String idExtensionToken, boolean locallyInitiated) {
+            UserVal receiver, String idExtensionToken, boolean locallyInitiated) {
+        logger.info("on spawn {} for receiver {}", event, receiver);
         var remoteUser = locallyInitiated ? receiver : sender;
-        var subgraph = info.spawn().getSubgraph();
-        var newSpawnContext = info.spawnContext().beginScope(event, remoteUser);
+        var subgraph = info.spawn().subGraph();
+        var newSpawnContext =
+                info.spawnContext().beginScope(info.spawn().triggerId(), event, remoteUser);
         var localIdExtension =
-                globalIdExtensionOf(subgraph.getElementId(), idExtensionToken, sender, receiver);
+                globalIdExtensionOf(subgraph.endpointElementUID(), idExtensionToken, sender,
+                        receiver);
         instantiateGraphElement(subgraph, newSpawnContext, localIdExtension);
     }
 
 
     // ====== Entry points ======
+
+    public List<Event> lookupEnabledEvents() {
+        return eventsByUuid.values()
+                .stream()
+                .map(EventInfo::event)
+                .filter(this::isEnabled)
+                .filter(e -> !(e instanceof ReceiveInstance))
+                .collect(Collectors.toList());
+    }
+
 
     // TODO [revisit] is an UndeclaredIdentifierException acceptable here?
     // TODO [revisit] validate args? (public method)
@@ -404,8 +431,8 @@ public final class GraphRunner {
         var info = computationEvents.get(eventId);
         assertNonNullEnabledEvent(info);
         var event = info.event();
-        Value recomputedValue = event.getComputationExpression().eval(info.evalContext()
-                .valueEnv());
+        Value recomputedValue =
+                event.getComputationExpression().eval(info.evalContext().valueEnv());
         ExecutionResult executionResult = new ExecutionResult();
         // TODO [tmp] IFC evaluation duplicated and unfriendly - extract method and return proper
         //  result
@@ -449,7 +476,7 @@ public final class GraphRunner {
         var event = info.event();
         // var voidInput = Undefined.ofVoid();
         // assertAdmissibleValueType(info.event(), voidInput);
-        Value voidInput = null;
+        Value voidInput = VoidVal.instance();
         assertAdmissibleValueType(info.event(), voidInput);
         ExecutionResult executionResult = new ExecutionResult();
         // TODO [tmp] IFC evaluation duplicated and unfriendly - extract method and return proper
@@ -499,7 +526,7 @@ public final class GraphRunner {
     // TODO [revisit] exception catching - spawns should also go through this
     // TODO [revise] the motivation for collecting state updates
     // TODO [revise]
-    // instantiate a (sub)graph model element
+    // instantiate a (sub)graph model element - uidExtension expected to be empty for top-level
     private void instantiateGraphElement(GraphModel graph, SpawnContext spawnContext,
             String uidExtension) {
         List<Consumer<GraphRunner>> updates = new LinkedList<>();
@@ -517,63 +544,61 @@ public final class GraphRunner {
         updateState(updates);
     }
 
-    private InstantiatedSpawnRelation newSpawnRelationInstanceOf(ISpawnRelationElement baseElement,
+    private InstantiatedSpawnRelation newSpawnRelationInstanceOf(SpawnRelationElement baseElement,
             SpawnContext spawnContext) {
         // TODO [revise] handle lookup exception uniformly (this could only result of an
         //  implementation error - not something to throw and handle externally
         GenericEventInstance source =
-                lookupPresent(spawnContext.alphaRenamings, baseElement.getSourceId());
+                lookupPresent(spawnContext.alphaRenamings, baseElement.sourceId());
         return Relations.newSpawnRelationInstance(baseElement, source);
     }
 
-    private void instantiateSpawnRelation(ISpawnRelationElement baseElement,
+    private void instantiateSpawnRelation(SpawnRelationElement baseElement,
             SpawnContext spawnContext) {
         if (!canInstantiate(baseElement.instantiationConstraint(), spawnContext.evalEnv)) {
-            System.err.println("Unable to instantiate " + baseElement.getElementId());
+            logger.info("Dropping relation instance {}",
+                    baseElement.endpointElementUID());
+            return;
         }
-        else {
-            InstantiatedSpawnRelation instance =
-                    newSpawnRelationInstanceOf(baseElement, spawnContext);
-            List<SpawnRelationInfo> spawnRelations =
-                    this.spawnRelations.getOrDefault(instance.getSource(), new LinkedList<>());
-            spawnRelations.add(new SpawnRelationInfo(instance, spawnContext));
-            this.spawnRelations.putIfAbsent(instance.getSource(), spawnRelations);
-        }
+        InstantiatedSpawnRelation instance = newSpawnRelationInstanceOf(baseElement, spawnContext);
+        List<SpawnRelationInfo> spawnRelations =
+                this.spawnRelations.getOrDefault(instance.getSource(), new LinkedList<>());
+        spawnRelations.add(new SpawnRelationInfo(instance, spawnContext));
+        this.spawnRelations.putIfAbsent(instance.getSource(), spawnRelations);
     }
 
     private InstantiatedControlFlowRelation newControlFlowRelationInstanceOf(
-            IControlFlowRelationElement baseElement, SpawnContext spawnContext) {
+            ControlFlowRelationElement baseElement, SpawnContext spawnContext) {
         // TODO [revise] exception throwing - throwing here signals an implementation error -
         //  should probably funnel this into an InternalErrorException for similar methods
         GenericEventInstance source =
-                spawnContext.alphaRenamings.lookup(baseElement.getSourceId()).orElseThrow().value();
+                spawnContext.alphaRenamings.lookup(baseElement.sourceId()).orElseThrow().value();
         GenericEventInstance target =
-                spawnContext.alphaRenamings.lookup(baseElement.getTargetId()).orElseThrow().value();
+                spawnContext.alphaRenamings.lookup(baseElement.targetId()).orElseThrow().value();
         return Relations.newControlFlowRelation(baseElement, source, target);
     }
 
-    private void instantiateControlFlowRelationElement(IControlFlowRelationElement baseElement,
+    private void instantiateControlFlowRelationElement(ControlFlowRelationElement baseElement,
             SpawnContext spawnContext) {
         if (!canInstantiate(baseElement.instantiationConstraint(), spawnContext.evalEnv)) {
-            System.err.println("Unable to instantiate " + baseElement.getElementId());
+            logger.info("Dropping relation instance: {}", baseElement.endpointElementUID());
+            return;
         }
-        else {
-            InstantiatedControlFlowRelation instance =
-                    newControlFlowRelationInstanceOf(baseElement, spawnContext);
-            ControlFlowRelationInfo value =
-                    new ControlFlowRelationInfo(instance, spawnContext.evalEnv);
-            addToListMapping(instance.getSource(), value, controlFlowRelations);
-            switch (instance.getRelationType()) {
-                case INCLUDE -> addToListMapping(instance.getSource(), value, includes);
-                case EXCLUDE -> addToListMapping(instance.getSource(), value, excludes);
-                case RESPONSE -> addToListMapping(instance.getSource(), value, responses);
-                case CONDITION -> addToListMapping(instance.getTarget(), value, conditions);
-                case MILESTONE -> addToListMapping(instance.getTarget(), value, milestones);
-            }
+        InstantiatedControlFlowRelation instance =
+                newControlFlowRelationInstanceOf(baseElement, spawnContext);
+        ControlFlowRelationInfo value = new ControlFlowRelationInfo(instance, spawnContext.evalEnv);
+        addToListMapping(instance.getSource(), value, controlFlowRelations);
+        switch (instance.relationType()) {
+            case INCLUDE -> addToListMapping(instance.getSource(), value, includes);
+            case EXCLUDE -> addToListMapping(instance.getSource(), value, excludes);
+            case RESPONSE -> addToListMapping(instance.getSource(), value, responses);
+            case CONDITION -> addToListMapping(instance.getTarget(), value, conditions);
+            case MILESTONE -> addToListMapping(instance.getTarget(), value, milestones);
         }
+
     }
 
-    private boolean canInstantiate(BooleanExpression constraint, Environment<Value> evalEnv) {
+    private boolean canInstantiate(ComputationExpression constraint, Environment<Value> evalEnv) {
         return constraint.eval(evalEnv).equals(BoolVal.of(true));
     }
 
@@ -582,63 +607,67 @@ public final class GraphRunner {
     private void instantiateEventElement(EventElement baseElement, String idExtension,
             SpawnContext spawnContext) {
         if (!canInstantiate(baseElement.instantiationConstraint(), spawnContext.evalEnv)) {
-            System.err.println("Unable to instantiate " + baseElement.getElementId());
+            logger.info("Dropping event instance {}", baseElement.endpointElementUID());
             return;
         }
-        else {System.err.println("Instantiating " + baseElement.getElementId());}
-        String uuid = newEventUuidOf(baseElement.localId(), idExtension);
+        Function<String, String> renamer = (name) -> newEventUuidOf(name, idExtension);
+        // generate uuid extension
+        // String uuid = renamer.apply(baseElement.elementId());
+        String localUID = newEventUuidOf(baseElement.endpointElementUID(), idExtension);
+        String remoteID = newEventUuidOf(baseElement.choreoElementUID(), idExtension);
+
+        logger.info("Creating with uuid {}, local_uuid {}", localUID, remoteID);
         GenericEventInstance instance;
-        EventInfo eventInfo;
+        EventInfo<?> eventInfo;
         switch (baseElement) {
             case ComputationEventElement elem -> {
-                instance = Events.newComputationInstance(uuid, elem);
+                instance = Events.newComputationInstance(localUID, remoteID, elem);
                 EventInfo<ComputationInstance> info =
                         new EventInfo<>((ComputationInstance) instance,
                                 new EvalContext(spawnContext.evalEnv,
                                         spawnContext.triggerCounterparts));
                 // TODO refactor
-                if (((ComputationInstance) instance).receivers().isEmpty()) {
-                    eventsByUuid.put(new EventId(uuid, InteractionType.NONE), info);
-                }
-                else {
-                    eventsByUuid.put(new EventId(uuid, InteractionType.TX), info);
-                }
-                computationEvents.put(instance.getGlobalId(), info);
+                eventsByUuid.put(instance.localUID(), info);
+                // if (((ComputationInstance) instance).receivers().isEmpty()) {
+                //     eventsByUuid.put(new EventId(uuid, InteractionType.NONE), info);
+                // }
+                // else {
+                //     eventsByUuid.put(new EventId(uuid, InteractionType.TX), info);
+                // }
+                computationEvents.put(instance.remoteID(), info);
                 eventInfo = info;
             }
             case InputEventElement elem -> {
-                instance = Events.newInputInstance(uuid, elem);
-                EventInfo<InputInstance> info =
-                        new EventInfo<>((InputInstance) instance,
-                                new EvalContext(spawnContext.evalEnv,
-                                        spawnContext.triggerCounterparts));
-                if (((InputInstance) instance).receivers().isEmpty()) {
-                    eventsByUuid.put(new EventId(uuid, InteractionType.NONE), info);
-                }
-                else {
-                    eventsByUuid.put(new EventId(uuid, InteractionType.TX), info);
-                }
-                inputEvents.put(instance.getGlobalId(), info);
+                instance = Events.newInputInstance(localUID, remoteID, elem);
+                EventInfo<InputInstance> info = new EventInfo<>((InputInstance) instance,
+                        new EvalContext(spawnContext.evalEnv, spawnContext.triggerCounterparts));
+                eventsByUuid.put(instance.localUID(), info);
+                // if (((InputInstance) instance).receivers().isEmpty()) {
+                //     eventsByUuid.put(new EventId(uuid, InteractionType.NONE), info);
+                // }
+                // else {
+                //     eventsByUuid.put(new EventId(uuid, InteractionType.TX), info);
+                // }
+                inputEvents.put(instance.remoteID(), info);
                 eventInfo = info;
             }
             case ReceiveEventElement elem -> {
-                instance = Events.newReceiveInstance(uuid, elem);
-                EventInfo<ReceiveInstance> info =
-                        new EventInfo<>((ReceiveInstance) instance,
-                                new EvalContext(spawnContext.evalEnv,
-                                        spawnContext.triggerCounterparts));
-                eventsByUuid.put(new EventId(uuid, InteractionType.RX), info);
-                receiveEvents.put(instance.getGlobalId(), info);
+                instance = Events.newReceiveInstance(localUID, remoteID, elem);
+                EventInfo<ReceiveInstance> info = new EventInfo<>((ReceiveInstance) instance,
+                        new EvalContext(spawnContext.evalEnv, spawnContext.triggerCounterparts));
+                eventsByUuid.put(instance.localUID(), info);
+                // eventsByUuid.put(new EventId(uuid, InteractionType.RX), info);
+                receiveEvents.put(instance.remoteID(), info);
                 eventInfo = info;
             }
         }
         Value instanceValue = instance.marking().value();
 
         // TODO use bindIfAbsent above
-        eventInfo.valueEnv()
-                .bindIfAbsent(instance.localId(), instanceValue);
-        // .wrap(baseElement.label()));
-        spawnContext.alphaRenamings.bindIfAbsent(baseElement.localId(), instance);
+        eventInfo.valueEnv().bindIfAbsent(instance.remoteID(), instanceValue);
+        // for computation expressions
+        logger.info("Creating event {}", baseElement.endpointElementUID());
+        spawnContext.alphaRenamings.bindIfAbsent(baseElement.endpointElementUID(), instance);
     }
 
 
@@ -679,8 +708,8 @@ public final class GraphRunner {
             builder.append(System.lineSeparator()).append(";");
             spawnRelations.values()
                     .forEach(list -> list.stream()
-                            .map(info -> "\n" + info.spawn.baseElement().getSourceId() +
-                                    " -->> " + info.spawn.getSubgraph())
+                            .map(info -> "\n" + info.spawn.baseElement().sourceId() + " -->> " +
+                                    info.spawn.subGraph())
                             .forEach(builder::append));
         }
         return builder.toString();
@@ -733,7 +762,8 @@ public final class GraphRunner {
         // }
 
         static SpawnContext init(UserVal self) {
-            var selfVal = self.getParamsAsRecordVal();
+            var selfVal = RecordVal.of(
+                    Record.ofEntries(Record.Field.of("params", self.getParamsAsRecordVal())));
             Environment<Value> evalEnv = Environment.empty();
             // @self must always be available for evaluation of constraints
             evalEnv.bindIfAbsent(SELF, selfVal);
@@ -743,13 +773,14 @@ public final class GraphRunner {
         // TODO [revise]
         // TODO [revisit] alphaRenamings.beginScope() - why?
         // when the triggering event involves communication
-        SpawnContext beginScope(EventInstance triggerEvent, UserVal triggerCounterpart) {
-            var newEvalEnv = evalEnv.beginScope("@trigger",
-                    triggerEvent.value());
+        SpawnContext beginScope(String triggerId, EventInstance triggerEvent,
+                UserVal triggerCounterpart) {
+            var newEvalEnv = evalEnv.beginScope(triggerId, triggerEvent.value());
             // .wrap(triggerEvent.label()));
             var newAlphaRenamings = alphaRenamings.beginScope();
             var newTriggerCounterparts =
-                    triggerCounterparts.beginScope(triggerEvent.localId(), triggerCounterpart);
+                    triggerCounterparts.beginScope(triggerEvent.baseElement().remoteID(),
+                            triggerCounterpart);
             // TODO defensive copy triggerVal - immutable snapshot
             return new SpawnContext(newEvalEnv, newAlphaRenamings, newTriggerCounterparts);
         }
@@ -759,8 +790,7 @@ public final class GraphRunner {
         SpawnContext beginScope(EventInstance triggerEvent) {
             // TODO [rethink]] do we need to triggerCounterparts.beginScope()?
             // TODO defensive copy triggerVal - immutable snapshot
-            var newEvalEnv = evalEnv.beginScope("@trigger",
-                    triggerEvent.value());
+            var newEvalEnv = evalEnv.beginScope("@trigger", triggerEvent.value());
             // .wrap(triggerEvent.label()));
             return new SpawnContext(newEvalEnv, alphaRenamings.beginScope(), triggerCounterparts);
         }
@@ -774,7 +804,7 @@ public final class GraphRunner {
             return relation.getSource();
         }
 
-        BooleanExpression guard() {return relation.getGuard();}
+        ComputationExpression guard() {return relation.guard();}
 
         GenericEventInstance target() {
             return relation.getTarget();
@@ -783,8 +813,7 @@ public final class GraphRunner {
 
     private record EvalContext(Environment<Value> valueEnv, Environment<UserVal> userEnv) {}
 
-    private record EventInfo<E extends GenericEventInstance>(E event,
-                                                             EvalContext evalContext) {
+    private record EventInfo<E extends GenericEventInstance>(E event, EvalContext evalContext) {
         Environment<Value> valueEnv() {return evalContext().valueEnv;}
 
         Environment<UserVal> userEnv() {return evalContext().userEnv;}

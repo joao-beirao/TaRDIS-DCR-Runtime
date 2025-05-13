@@ -37,11 +37,6 @@ public final class StringVal
         return StringType.singleton();
     }
 
-    @Override
-    public String unparse() {
-        return String.format("StringVal('%s')", value);
-    }
-
     // TODO have a compare with StringLiteral and base it on value()
     @Override
     public int compareTo(StringVal other) {return this.value.compareToIgnoreCase(other.value);}

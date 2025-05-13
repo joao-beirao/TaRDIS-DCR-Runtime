@@ -1,7 +1,7 @@
 package dcr1.model.events;
 
 import dcr1.common.data.computation.BooleanExpression;
-import dcr1.common.data.types.EventType;
+import dcr1.common.data.computation.ComputationExpression;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 
 public sealed interface ReceiveEventElement
@@ -15,11 +15,11 @@ final class ReceiveEvent
         extends GenericEventElement
         implements ReceiveEventElement {
 
-    ReceiveEvent(String elementId, String localId, String eventType,
-            UserSetExpression senders, MarkingElement marking,
-            BooleanExpression instantiationConstraint,
-            BooleanExpression ifcConstraint) {
-        super(elementId, localId, eventType, marking, senders, instantiationConstraint, ifcConstraint);
+    ReceiveEvent(String choreoElementUID, String endpointElementUID, String localId,
+            String eventType, UserSetExpression senders, MarkingElement marking,
+            BooleanExpression instantiationConstraint, BooleanExpression ifcConstraint) {
+        super(choreoElementUID, endpointElementUID, localId, eventType, marking, senders,
+                instantiationConstraint, ifcConstraint);
     }
 
     // FIXME [.get()]
@@ -31,14 +31,17 @@ final class ReceiveEvent
 
     @Override
     public String toString() {
-        return String.format("<%s> %s(%s: %s) [%s] (%s) [%s -> ] ", getElementId(),
-                this.marking().toStringPrefix(), localId(), label(), valueType(), value(),
-                this.getSenderExpr());
+        return String.format("<%s, %s> %s(%s: %s) [%s] (%s) [%s] (when: %s)", choreoElementUID(),
+                endpointElementUID(), this.marking().toStringPrefix(), remoteID(), label(),
+                valueType(), value(),
+                this.remoteParticipants().map(r -> String.format("%s -> @self", r)).get(),
+                instantiationConstraint());
     }
 
     @Override
     public String unparse() {
-        return String.format("ReceiveEventElement<%s>[ (%s: %s) [%s] [%s] ]", getElementId(),
-                localId(), label(), valueType(), this.getSenderExpr());
+        return String.format("ReceiveEventElement<%s>[ (%s: %s) [%s] [%s] ]", choreoElementUID(),
+                remoteID(), label(), valueType(),
+                this.remoteParticipants().map(r -> String.format("%s -> @self", r)).get());
     }
 }

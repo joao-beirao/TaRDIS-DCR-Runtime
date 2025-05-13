@@ -1,12 +1,13 @@
 package pingpong;
 
-import pingpong.messages.PingMessage;
-import pingpong.messages.PongMessage;
-import pingpong.requests.DcrRequest;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import dcr.EventMarking;
+import pingpong.messages.PingMessage;
+import pingpong.messages.PongMessage;
+import pingpong.requests.DcrRequest;
 import pt.unl.fct.di.novasys.babel.core.GenericProtocol;
 import pt.unl.fct.di.novasys.babel.exceptions.HandlerRegistrationException;
 import pt.unl.fct.di.novasys.babel.generic.ProtoMessage;
@@ -132,6 +133,7 @@ public class PingPongProtocol extends GenericProtocol {
     }
 
     private void uponReceivePingRequest(DcrRequest dcrRequest, short sourceProtocol) {
+        System.err.println("!!!HERE");
         logger.info("Received dcr request to ping {} with message {}",
                 dcrRequest.getDestination(), dcrRequest.getEventId());
         openConnection(dcrRequest.getDestination(), channelId);
@@ -144,7 +146,7 @@ public class PingPongProtocol extends GenericProtocol {
     /**
      * Handle when an open connection operation succeeded
      * Start the periodic timer to send Ping pingpong.messages
-     * 
+     *
      * @param event   OutConnectionUp event
      * @param channel Channel ID
      */
@@ -155,7 +157,7 @@ public class PingPongProtocol extends GenericProtocol {
     /**
      * Handle when an open connection operation has failed
      * Print error message and exit
-     * 
+     *
      * @param event   OutConnectionFailed event
      * @param channel Channel ID
      */
@@ -166,7 +168,7 @@ public class PingPongProtocol extends GenericProtocol {
 
     /**
      * Send Ping message to Host destination with the given string message
-     * 
+     *
      * @param destination Host destination
      * @param message     String message
      */
@@ -186,7 +188,7 @@ public class PingPongProtocol extends GenericProtocol {
     /**
      * Handle a newly received Ping Message
      * Reply to the Source Host with a Pong Message
-     * 
+     *
      * @param msg         PingMessage
      * @param from        Source Host
      * @param sourceProto Source protocol ID
@@ -203,7 +205,7 @@ public class PingPongProtocol extends GenericProtocol {
     /**
      * Handle a newly received Pong Message
      * Print received pingId and message
-     * 
+     *
      * @param msg         PongMessage
      * @param from        Source Host
      * @param sourceProto Source protocol ID
@@ -218,7 +220,7 @@ public class PingPongProtocol extends GenericProtocol {
      * Handle the case when a message fails to be (confirmed to be) delivered to the
      * destination
      * Print the error
-     * 
+     *
      * @param msg       the message that failed delivery
      * @param host      the destination host
      * @param destProto the destination protocol ID
@@ -232,7 +234,7 @@ public class PingPongProtocol extends GenericProtocol {
     /**
      * Handle the case when someone opened a connection to this node
      * Print the event
-     * 
+     *
      * @param event   the event containing the connection information
      * @param channel the channel ID (from which channel the event was received)
      */
@@ -243,7 +245,7 @@ public class PingPongProtocol extends GenericProtocol {
     /**
      * Handle the case when someone closed a connection to this node
      * Print the event
-     * 
+     *
      * @param event   the event containing the connection information
      * @param channel the channel ID (from which channel the event was received)
      */
@@ -254,7 +256,7 @@ public class PingPongProtocol extends GenericProtocol {
     /**
      * Handle the case when a connection to a remote node went down or was closed
      * Print the event
-     * 
+     *
      * @param event   the event containing the connection information
      * @param channel the channel ID (from which channel the event was received)
      */

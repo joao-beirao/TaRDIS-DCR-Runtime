@@ -47,10 +47,6 @@ public class RecordFieldDeref
         return recordExpr.toString() + "." + fieldName;
     }
 
-    @Override
-    public String unparse() {
-        return String.format("RecordFieldDeref(%s, %s)", recordExpr.unparse(), fieldName);
-    }
 
     // TODO [discard tests - or move to Unit Testing]
     public static void main(String[] args) {

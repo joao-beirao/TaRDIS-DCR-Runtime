@@ -32,11 +32,6 @@ public final class IntLiteral
     }
 
     @Override
-    public String unparse() {
-        return String.format("ASTNumber(%s)", value.unparse());
-    }
-
-    @Override
     public String toString() {return value.toString();}
 
     @Override

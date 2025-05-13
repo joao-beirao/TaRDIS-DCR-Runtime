@@ -14,7 +14,7 @@ import java.util.StringTokenizer;
 
 public final class CLI {
     private static final Logger logger = LogManager.getLogger(CLI.class);
-    private final DCRProtocol dcrProtocol;
+    private final DCRProtocol1 dcrProtocol1;
 
     private static void onHelpCmd() {
         System.out.println("\nHelp");
@@ -44,17 +44,27 @@ public final class CLI {
         System.out.println("---");
     }
 
-    CLI(DCRProtocol dcrProtocol) {
-        this.dcrProtocol = dcrProtocol;
+
+    // ==============================
+    // == Entry points / callbacks
+    // ==============================
+    CLI(DCRProtocol1 dcrProtocol1) {
+        this.dcrProtocol1 = dcrProtocol1;
     }
 
-    void processCommands() {
-        readSystemIn();
+    void init() {
+        // readSystemIn();
+        new Thread(this::readSystemIn).start();
     }
 
     void onReceiveEvent() {
         // TODO [print something]
     }
+
+
+    // ==============================
+    // == Internals
+    // ==============================
 
     private void readSystemIn() {
         Scanner in = new Scanner(System.in);
@@ -87,18 +97,18 @@ public final class CLI {
                 CLI.onHelpCmd();
                 break;
             case "list": {
-                var graph = dcrProtocol.onListEnabledEvents();
+                var graph = dcrProtocol1.onListEnabledEvents();
                 onShowEnabledEvents(graph);
             }
             break;
             case "debug": {
-                var graph = dcrProtocol.onDisplayGraph();
+                var graph = dcrProtocol1.onDisplayGraph();
                 onShowGraph(graph);
             }
             break;
             case "!": {
                 var eventId = tokenizer.nextToken();
-                dcrProtocol.onExecuteComputationEvent(eventId);
+                dcrProtocol1.onExecuteComputationEvent(eventId);
             }
             break;
             case "?": {
@@ -116,10 +126,10 @@ public final class CLI {
                         return;
                     }
                     var inputValue = parseInputVal(inputString);
-                    dcrProtocol.onExecuteInputEvent(eventId, inputValue);
+                    dcrProtocol1.onExecuteInputEvent(eventId, inputValue);
                 }
                 else {
-                    dcrProtocol.onExecuteInputEvent(eventId);
+                    dcrProtocol1.onExecuteInputEvent(eventId);
                 }
                 // var inputString = tokenizer.nextToken();
                 // var inputValue = parseInputVal(inputString);

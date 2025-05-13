@@ -8,8 +8,7 @@ import dcr1.model.events.ComputationEventElement;
 import dcr1.model.events.EventElement;
 import dcr1.model.events.InputEventElement;
 import dcr1.model.events.ReceiveEventElement;
-import dcr1.model.relations.IControlFlowRelationElement;
-import dcr1.model.relations.ISpawnRelationElement;
+import dcr1.model.relations.ControlFlowRelationElement;
 import dcr1.model.relations.SpawnRelationElement;
 
 import java.util.*;
@@ -23,10 +22,10 @@ public final class RecursiveGraphModel
 
     // TODO [revisit] possibly discard computationEvents
     private final Map<String, ComputationEventElement> computationEvents;
-    private final Set<IControlFlowRelationElement> controlFlowRelations;
+    private final Set<ControlFlowRelationElement> controlFlowRelations;
 
     // TODO should eventually be a list of relations per event
-    private final List<ISpawnRelationElement> spawnRelations;
+    private final List<SpawnRelationElement> spawnRelations;
 
     RecursiveGraphModel(String elementId) {
         super(elementId);
@@ -49,7 +48,7 @@ public final class RecursiveGraphModel
     }
 
     @Override
-    public Iterable<IControlFlowRelationElement> controlFlowRelations() {
+    public Iterable<ControlFlowRelationElement> controlFlowRelations() {
         return controlFlowRelations;
     }
 
@@ -65,7 +64,7 @@ public final class RecursiveGraphModel
     }
 
     @Override
-    public Iterable<ISpawnRelationElement> spawnRelations() {
+    public Iterable<SpawnRelationElement> spawnRelations() {
         return spawnRelations;
     }
 
@@ -75,20 +74,20 @@ public final class RecursiveGraphModel
     // Type type, EventMarking marking
     void addComputationEvent(ComputationEventElement event) {
         // TODO uncomment
-        eventsByLocalId.putIfAbsent(event.localId(), event);
-        computationEvents.putIfAbsent(event.localId(), event);
+        eventsByLocalId.putIfAbsent(event.endpointElementUID(), event);
+        computationEvents.putIfAbsent(event.remoteID(), event);
     }
 
     void addInputEvent(InputEventElement event) {
-        eventsByLocalId.putIfAbsent(event.localId(), event);
+        eventsByLocalId.putIfAbsent(event.endpointElementUID(), event);
     }
 
     void addReceiveEvent(ReceiveEventElement event) {
-        eventsByLocalId.putIfAbsent(event.localId(), event);
+        eventsByLocalId.putIfAbsent(event.endpointElementUID(), event);
     }
 
 
-    void addControlFlowRelation(IControlFlowRelationElement relationElement) {
+    void addControlFlowRelation(ControlFlowRelationElement relationElement) {
         // TODO
         controlFlowRelations.add(relationElement);
     }
@@ -114,7 +113,7 @@ public final class RecursiveGraphModel
         builder.append(System.lineSeparator())
                 .append(indent)
                 .append("(<")
-                .append(graph.getElementId())
+                .append(graph.endpointElementUID())
                 .append(">)");
         graph.eventsByLocalId.values()
                 .forEach(event -> builder.append(System.lineSeparator())
@@ -124,9 +123,9 @@ public final class RecursiveGraphModel
             builder.append(System.lineSeparator()).append(indent).append(";");
         }
         graph.spawnRelations.forEach(spawn -> {
-            builder.append(beginSpawn(indent, spawn.getSourceId()));
+            builder.append(beginSpawn(indent, spawn.sourceId()));
             builder.append(
-                    tester((RecursiveGraphModel) spawn.getSubgraph(), indent + "  ", stringifier));
+                    tester((RecursiveGraphModel) spawn.subGraph(), indent + "  ", stringifier));
             builder.append(endSpawn(indent));
         });
         return builder.toString();

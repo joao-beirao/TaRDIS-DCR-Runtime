@@ -27,8 +27,10 @@ public sealed abstract class EventDTO
     }
 
     public record Common(
-            @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "uid", required =
-                    true) String uid,
+            @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "choreoElementUID",
+                    required = true) String choreoElementUID,
+            @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "endpointElementUID"
+                    , required = true) String endpointElementUID,
             @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "id", required =
                     true) String id,
             @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "label", required =

@@ -38,12 +38,9 @@ public final class RecordExpr
     @Override
     public String toString() {return exprRecord.toString();}
 
-    @Override
-    public String unparse() {
-        return String.format("RecordExpr( %s )",
-                exprRecord.unparseFields(ComputationExpression::unparse));
-    }
 
+
+    // TODO remove
     // Usage Example
     public static void main(String[] args) {
 
@@ -74,10 +71,9 @@ public final class RecordExpr
         System.err.println(flatExpr);
         System.err.println(nestedExpr);
         System.err.println();
-        System.err.println(flatExpr.unparse());
-        System.err.println(nestedExpr.unparse());
+
         System.err.println();
         System.err.println(recordFromBuilder);
-        System.err.println(RecordExpr.of(recordFromBuilder).unparse());
+
     }
 }

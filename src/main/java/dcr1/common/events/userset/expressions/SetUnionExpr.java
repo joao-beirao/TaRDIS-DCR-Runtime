@@ -5,20 +5,21 @@ import dcr1.common.Environment;
 import dcr1.common.data.values.Value;
 import dcr1.common.events.userset.values.SetUnionVal;
 import dcr1.common.events.userset.values.UserVal;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-// TODO [sanitize args]
-
+// TODO [clarify] thinking of this as a generic catch all to represent a set of users from any
+//  given role, which should filter out duplicates on eval
 public record SetUnionExpr(Collection<? extends UserSetExpression> userSetExprs)
         implements UserSetExpression {
     public SetUnionExpr(Collection<? extends UserSetExpression> userSetExprs) {
         Objects.requireNonNull(userSetExprs);
-        if (userSetExprs.size() < 2) {
-            throw new IllegalArgumentException(
-                    "Requires at least two expressions: have " + userSetExprs.size());
+        if (userSetExprs.isEmpty()) {
+            throw new IllegalArgumentException("Empty UnionSet expression not allowed");
         }
         if (userSetExprs.stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("List argument contains null entries - not allowed");
@@ -30,9 +31,16 @@ public record SetUnionExpr(Collection<? extends UserSetExpression> userSetExprs)
         return new SetUnionExpr(userSetExprs);
     }
 
+    // TODO - filter out duplicates
     @Override
     public SetUnionVal eval(Environment<Value> valueEnv, Environment<UserVal> userEnv) {
         return SetUnionVal.of(
                 userSetExprs.stream().map(expr -> expr.eval(valueEnv, userEnv)).toList());
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return userSetExprs.stream().map(UserSetExpression::toString).collect(Collectors.joining(","));
     }
 }

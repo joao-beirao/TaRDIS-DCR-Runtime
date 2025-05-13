@@ -7,7 +7,7 @@ import dcr1.common.Environment;
 import java.util.Objects;
 
 public final class BoolLiteral
-        implements BooleanExpression {
+        implements ComputationExpression {
     public static final BoolLiteral TRUE = new BoolLiteral(BoolVal.of(true));
     public static final BoolLiteral FALSE = new BoolLiteral(BoolVal.of(false));
     private final BoolVal value;
@@ -31,10 +31,5 @@ public final class BoolLiteral
 
     @Override
     public String toString() {return value.toString();}
-
-    @Override
-    public String unparse() {
-        return String.format("ASTBoolean(%s)", value.unparse());
-    }
 
 }

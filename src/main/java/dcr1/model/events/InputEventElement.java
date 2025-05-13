@@ -1,7 +1,7 @@
 package dcr1.model.events;
 
 import dcr1.common.data.computation.BooleanExpression;
-import dcr1.common.data.types.EventType;
+import dcr1.common.data.computation.ComputationExpression;
 import dcr1.common.events.userset.expressions.UserSetExpression;
 
 import java.util.Optional;
@@ -18,10 +18,12 @@ public sealed interface InputEventElement
 final class InputEvent
         extends GenericEventElement
         implements InputEventElement {
-    InputEvent(String elementId, String localId, String eventType,
+    InputEvent(String choreoElementUID, String endpointElementUID, String localId, String eventType,
             MarkingElement marking, UserSetExpression receivers, BooleanExpression instantiationConstraint,
             BooleanExpression ifcConstraint) {
-        super(elementId, localId, eventType, marking, receivers, instantiationConstraint, ifcConstraint);
+        super(choreoElementUID, endpointElementUID, localId, eventType, marking, receivers,
+                instantiationConstraint,
+                ifcConstraint);
     }
 
     @Override
@@ -31,16 +33,23 @@ final class InputEvent
 
     @Override
     public String toString() {
-        return String.format("<%s> %s(%s: %s) [?:%s] (%s) [%s] ", getElementId(),
+        return String.format("<%s, %s> %s(%s: %s) [?:%s] (%s) [%s] (when: %s)", choreoElementUID(),
+                endpointElementUID(),
                 this.marking().toStringPrefix(),
-                localId(), label(), valueType(), value(), receivers());
+                remoteID(), label(), valueType(), value(), receivers().map(r -> String.format(
+                        "@self" +
+                        " " +
+                        "-> %s", r)).orElse(
+                        "Local"), instantiationConstraint());
     }
 
     // FIXME '?:' only when type expr not empty; '?' otherwise
     @Override
     public String unparse() {
-        return String.format("InputEventElement<%s>[ (%s: %s) [?:%s] [%s] ]", getElementId(),
-                localId(), label(), valueType(), receivers());
+        return String.format("InputEventElement<%s>[ (%s: %s) [?:%s] [%s] ]", choreoElementUID(),
+                remoteID(), label(), valueType(),
+                receivers().map(r -> String.format("@self -> %s", r)).orElse(
+                        "Local"));
     }
 }
 

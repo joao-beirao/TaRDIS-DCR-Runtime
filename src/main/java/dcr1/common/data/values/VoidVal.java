@@ -9,10 +9,16 @@ public final class VoidVal
         implements Value {
     @Serial
     private static final long serialVersionUID = -5587609113242528555L;
+    private static final VoidVal INSTANCE = new VoidVal();
+
+
+    private VoidVal() {}
+
+    public static VoidVal instance() {return INSTANCE;}
 
     @Override
-    public String unparse() {
-        return "<Void>";
+    public String toString() {
+        return "void";
     }
 
     @Override

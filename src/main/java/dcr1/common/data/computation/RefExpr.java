@@ -3,7 +3,9 @@ package dcr1.common.data.computation;
 import dcr1.common.Environment;
 import dcr1.common.data.values.EventIdVal;
 import dcr1.common.data.values.EventVal;
+import dcr1.common.data.values.PropBasedVal;
 import dcr1.common.data.values.Value;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -27,10 +29,10 @@ public record RefExpr(EventIdVal eventIdLiteral)
 
     @Override
     // public Value<? extends ConstRefType<EventType<T>>> eval(Environment<Value<? extends Type>> env)
-    public EventVal eval(Environment<Value> env) {
+    public PropBasedVal eval(Environment<Value> env) {
         // note: attempt to catch wrong type of value as soon they are retrieved from the
         // environment
-        return (EventVal) env.lookup(eventIdLiteral.id())
+        return (PropBasedVal) env.lookup(eventIdLiteral.id())
                 .map(Environment.Binding::value)
                 .orElseThrow(() -> new IllegalStateException(
                         "Internal Error: Environment was expected to contain a binding for " +
@@ -58,13 +60,10 @@ public record RefExpr(EventIdVal eventIdLiteral)
         //                 lookupResult);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return eventIdLiteral.id();
     }
 
-    @Override
-    public String unparse() {
-        return String.format("EventIdLiteral(%s)", eventIdLiteral.unparse());
-    }
 }

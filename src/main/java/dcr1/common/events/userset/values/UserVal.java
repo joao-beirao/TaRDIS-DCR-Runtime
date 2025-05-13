@@ -16,17 +16,17 @@ import java.util.Objects;
 // TODO [sanitize args]
 // TODO remove Serializable - have a DTO on the DRCProtocol instead
 
-public record UserVal(String role, RoleParams<Value> params)
+public record UserVal(String role, Record<Value> params)
         implements UserSetVal, Serializable {
 
-    public static UserVal of(String role, RoleParams<Value> params) {
+    public static UserVal of(String role, Record<Value> params) {
         return new UserVal(role, params);
     }
 
     // deprecating...
     public static UserVal of(String role, String id) {
-        return new UserVal(role, RoleParams.of(Record.ofEntries(Record.Field.of("id",
-                StringVal.of(Objects.requireNonNull(id))))));
+        return new UserVal(role, Record.ofEntries(Record.Field.of("id",
+                StringVal.of(Objects.requireNonNull(id)))));
     }
 
     public UserVal {
@@ -49,7 +49,7 @@ public record UserVal(String role, RoleParams<Value> params)
     // TODO revise - quick patch
     public RecordVal getParamsAsRecordVal() {
         Record.Builder<Value> builder = Record.builder();
-        for (var param : params.params().fields()) {
+        for (var param : params.fields()) {
             builder.addFieldWithParams(param.name(), param.value());
         }
         return RecordVal.of(builder.build());
@@ -58,7 +58,7 @@ public record UserVal(String role, RoleParams<Value> params)
 
     public RoleExpr toRoleExpr() {
         var recordBuilder = new Record.Builder<ComputationExpression>();
-        for (var param : params.params().fields()) {
+        for (var param : params.fields()) {
             var expr = switch (param.value()) {
                 case BoolVal bool -> BoolLiteral.of(bool);
                 case IntVal integer -> IntLiteral.of(integer);

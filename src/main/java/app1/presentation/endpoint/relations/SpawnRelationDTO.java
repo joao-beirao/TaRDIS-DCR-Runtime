@@ -7,7 +7,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeName("spawnRelation")
 public record SpawnRelationDTO(
-        @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "common", required =
+        @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "relationCommon",
+                required =
                 true) Common common,
         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "triggerId", required
                 = true) String triggerId,

@@ -32,8 +32,8 @@ public final class ComputationEventDTO
     }
 
     // public ComputationEventDTO(
-    //         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "uid", required =
-    //                 true) String uid,
+    //         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "choreoElementUID", required =
+    //                 true) String choreoElementUID,
     //         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "id", required =
     //                 true) String id,
     //         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "eventType",
@@ -49,7 +49,7 @@ public final class ComputationEventDTO
     //         @JsonProperty(value = "ifcConstraint") Optional<ComputationExprDTO> ifcConstraint,
     //         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "receivers")
     //         List<UserSetExprDTO> receivers) {
-    //     super(uid, id, eventType, dataType, marking, instantiationConstraint, ifcConstraint);
+    //     super(choreoElementUID, id, eventType, dataType, marking, instantiationConstraint, ifcConstraint);
     //     this.dataExpr = dataExpr;
     //     this.receivers = (receivers == null || receivers.isEmpty())
     //             ? Collections.emptyList()

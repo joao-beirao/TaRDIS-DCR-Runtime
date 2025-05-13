@@ -28,8 +28,8 @@ public final class InputEventDTO
 
 // @JsonTypeName("inputEvent")
 // public record InputEventDTO(
-//         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "uid", required =
-//         true) String uid,
+//         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "choreoElementUID", required =
+//         true) String choreoElementUID,
 //         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "id", required =
 //         true) String id,
 //         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "eventType",
@@ -47,8 +47,8 @@ public final class InputEventDTO
 //
 //     @JsonCreator
 //     public InputEventDTO(
-//             @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "uid", required =
-//                     true) String uid,
+//             @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "choreoElementUID", required =
+//                     true) String choreoElementUID,
 //             @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "id", required =
 //                     true) String id,
 //             @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "eventType",
@@ -63,7 +63,7 @@ public final class InputEventDTO
 //             @JsonProperty(value = "ifcConstraint") Optional<ComputationExprDTO> ifcConstraint,
 //             @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "receivers")
 //             List<UserSetExprDTO> receivers) {
-//         this.uid = uid;
+//         this.choreoElementUID = choreoElementUID;
 //         this.id = id;
 //         this.marking = marking;
 //         this.dataExpr = dataExpr;

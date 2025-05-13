@@ -125,18 +125,18 @@ final class GraphState
   }
 
   void addComputationEvent(ComputationEventInstance event) {
-    eventsById.put(event.getGlobalId(), event);
-    computationEvents.put(event.getGlobalId(), event);
+    eventsById.put(event.localUID(), event);
+    computationEvents.put(event.localUID(), event);
   }
 
   void addInputEvent(InputEventInstance event) {
-    eventsById.put(event.getGlobalId(), event);
+    eventsById.put(event.localUID(), event);
     // TODO [implement for real]
     // throw new RuntimeException("TODO add to input events");
   }
 
   void addReceiveEvent(ReceiveEventInstance event) {
-    eventsById.put(event.getGlobalId(), event);
+    eventsById.put(event.localUID(), event);
     throw new RuntimeException("TODO add to receive events");
   }
 
@@ -150,9 +150,9 @@ final class GraphState
   }
 
   void addControlFlowRelation(ControlFlowRelationInstance relation) {
-    EventInstance src = eventsById.get(relation.getSourceId());
-    EventInstance tgt = eventsById.get(relation.getTargetId());
-    switch (relation.getRelationType()) {
+    EventInstance src = eventsById.get(relation.sourceId());
+    EventInstance tgt = eventsById.get(relation.targetId());
+    switch (relation.relationType()) {
       case INCLUDE -> addControlFlowRelation(src, tgt, includes);
       case EXCLUDE -> addControlFlowRelation(src, tgt, excludes);
       case RESPONSE -> addControlFlowRelation(src, tgt, responses);

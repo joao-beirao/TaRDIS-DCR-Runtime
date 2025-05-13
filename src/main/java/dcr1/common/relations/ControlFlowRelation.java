@@ -22,7 +22,7 @@ public interface ControlFlowRelation
     }
 
 
-    String getTargetId();
+    String targetId();
 
-    Type getRelationType();
+    Type relationType();
 }

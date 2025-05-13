@@ -1,4 +1,4 @@
-package pingpong1.requests;
+package app1.protocols.dcr.requests;
 
 import pt.unl.fct.di.novasys.babel.generic.ProtoReply;
 import pt.unl.fct.di.novasys.network.data.Host;

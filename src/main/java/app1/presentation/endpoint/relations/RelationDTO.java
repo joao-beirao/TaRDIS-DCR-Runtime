@@ -1,7 +1,6 @@
 package app1.presentation.endpoint.relations;
 
 import app1.presentation.endpoint.data.computation.ComputationExprDTO;
-import app1.presentation.endpoint.events.EventDTO;
 import com.fasterxml.jackson.annotation.*;
 
 import java.util.Optional;
@@ -14,8 +13,8 @@ public sealed interface RelationDTO
         permits ControlFlowRelationDTO, SpawnRelationDTO {
 
     record Common(
-            @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "uid", required =
-                    true) String uid,
+            @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "endpointElementUID"
+                    , required = true) String endpointElementUID,
             @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "sourceId",
                     required = true) String sourceId,
             @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "guard") Optional<ComputationExprDTO> guard,

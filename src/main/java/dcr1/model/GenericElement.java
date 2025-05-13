@@ -2,16 +2,23 @@ package dcr1.model;
 
 public abstract class GenericElement
     implements ModelElement {
-  private final String elementId;
+  // private final String choreoElementUID;
+  private final String endpointElementUID;
 
   // TODO seal
 
-  public GenericElement(String elementId) {
-    this.elementId = elementId;
+  // public GenericElement(String choreoElementUID, String endpointElementUID) {
+  public GenericElement(String endpointElementUID) {
+    // this.choreoElementUID = choreoElementUID;
+      this.endpointElementUID = endpointElementUID;
   }
 
   @Override
-  public String getElementId() {
-    return elementId;
+  public String endpointElementUID() {
+    return endpointElementUID;
   }
+
+  // public String choreoElementUID() {
+  //   return choreoElementUID;
+  // }
 }

@@ -16,7 +16,7 @@ public final class UndefinedVal<T extends Type>
     @Serial
     private static final long serialVersionUID = -1588707935989188517L;
     private static final UndefinedVal<VoidType> VOID = new UndefinedVal<>(VoidType.singleton());
-    private static final String TO_STRING_VAL = "<undefined>";
+    private static final String TO_STRING_VAL = "<undefined value>";
 
     //  TODO [revise] any workaround to avoid storing typeInstance? thinking no
     private final T typeInstance;
@@ -39,11 +39,6 @@ public final class UndefinedVal<T extends Type>
     }
 
     @Override
-    public String unparse() {
-        return "";
-    }
-
-    @Override
     public int hashCode() {
         return typeInstance.hashCode();
     }
@@ -56,11 +51,6 @@ public final class UndefinedVal<T extends Type>
         return typeInstance.equals(((UndefinedVal<?>) obj).typeInstance);
     }
 
-    // @Override
-    // public String toString() {return TO_STRING_VAL;}
-
-    // @Override
-    // public String unparse() {
-    //     return String.format("UnitVal<%s>", typeInstance);
-    // }
+    @Override
+    public String toString() {return TO_STRING_VAL;}
 }

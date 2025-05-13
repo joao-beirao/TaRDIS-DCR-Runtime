@@ -5,7 +5,6 @@ import dcr1.common.Record;
 import dcr1.common.data.computation.ComputationExpression;
 import dcr1.common.data.computation.StringLiteral;
 import dcr1.common.data.values.PrimitiveVal;
-import dcr1.common.data.values.StringVal;
 import dcr1.common.data.values.Value;
 import dcr1.common.events.userset.RoleParams;
 import dcr1.common.events.userset.values.RoleVal;
@@ -13,6 +12,7 @@ import dcr1.common.events.userset.values.UserSetVal;
 import dcr1.common.events.userset.values.UserVal;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 // TODO [sanitize args]
 
@@ -48,8 +48,16 @@ public final class RoleExpr
         var evalParams = Record.<PrimitiveVal>builder();
         params.fields()
                 .stream()
-                .map(field -> Record.Field.of(field.name(), (PrimitiveVal)field.value().eval(valueEnv)))
+                .map(field -> Record.Field.of(field.name(),
+                        (PrimitiveVal) field.value().eval(valueEnv)))
                 .forEach(evalParams::addField);
         return RoleVal.of(role, RoleParams.of(evalParams.build()));
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s(%s)", role,
+                params.stream().map(p -> String.format("%s=%s", p.name(), p.value())).collect(
+                        Collectors.joining(", ")));
     }
 }
