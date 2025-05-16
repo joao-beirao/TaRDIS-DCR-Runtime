@@ -50,6 +50,7 @@ public class DCRGraphREST
     @Produces(MediaType.TEXT_PLAIN)
     public Response endpointProcess( ) {
         logger.info("\n\n\nEndpoint process requested");
+
        return Response.status(Response.Status.OK).entity("all good").type(MediaType.TEXT_PLAIN).build();
     }
 

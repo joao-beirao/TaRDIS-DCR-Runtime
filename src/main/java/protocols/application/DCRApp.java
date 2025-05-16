@@ -140,7 +140,7 @@ public final class DCRApp
         // triggerNotification(new NeighborUp(self));
 
 
-        // subscribeNotification(NeighborUp.NOTIFICATION_ID, this::uponNeighborUpNotification);
+        subscribeNotification(NeighborUp.NOTIFICATION_ID, this::uponNeighborUpNotification);
         // registerRequestHandler();
 
 
