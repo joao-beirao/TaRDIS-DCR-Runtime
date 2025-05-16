@@ -1,13 +1,13 @@
 package dto;
 
-import app1.presentation.endpoint.EndpointDTO;
-import app1.presentation.endpoint.GraphDTO;
-import app1.presentation.endpoint.data.computation.ComputationExprDTO;
-import app1.presentation.endpoint.data.types.TypeDTO;
-import app1.presentation.endpoint.data.values.ValueDTO;
-import app1.presentation.endpoint.events.EventDTO;
-import app1.presentation.endpoint.events.participants.UserSetExprDTO;
-import app1.presentation.endpoint.relations.RelationDTO;
+import app.presentation.endpoint.EndpointDTO;
+import app.presentation.endpoint.GraphDTO;
+import app.presentation.endpoint.data.computation.ComputationExprDTO;
+import app.presentation.endpoint.data.types.TypeDTO;
+import app.presentation.endpoint.data.values.ValueDTO;
+import app.presentation.endpoint.events.EventDTO;
+import app.presentation.endpoint.events.participants.UserSetExprDTO;
+import app.presentation.endpoint.relations.RelationDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.junit.Test;

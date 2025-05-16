@@ -1,8 +1,6 @@
 package rest;
 
-import app1.protocols.application.App;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -51,7 +49,6 @@ public class DCRGraphREST
     @Path("/")
     @Produces(MediaType.TEXT_PLAIN)
     public Response endpointProcess( ) {
-        System.err.println("\n\n\nEndpoint process requested");
         logger.info("\n\n\nEndpoint process requested");
        return Response.status(Response.Status.OK).entity("all good").type(MediaType.TEXT_PLAIN).build();
     }

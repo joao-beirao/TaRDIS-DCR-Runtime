@@ -12,7 +12,7 @@
             "choreoElementUID": "csm_0",
             "id": "csm",
             "label": "consume",
-            "dataType": { "valueType": "void" },
+            "dataType": { "valueType": "string" },
             "marking": { "isPending": false, "isIncluded": true },
             "instantiationConstraint": {
               "binaryOp": {
@@ -38,7 +38,12 @@
             {
               "roleExpr": {
                 "roleLabel": "P",
-                "params": [ { "name": "id" } ]
+                "params": [
+                  {
+                    "name": "id",
+                    "value": { "stringLit": { "value": "2" } }
+                  }
+                ]
               }
             }
           ]
@@ -51,7 +56,7 @@
             "choreoElementUID": "csm_0",
             "id": "csm",
             "label": "consume",
-            "dataType": { "valueType": "void" },
+            "dataType": { "valueType": "string" },
             "marking": { "isPending": false, "isIncluded": true },
             "instantiationConstraint": {
               "binaryOp": {
@@ -68,8 +73,8 @@
                     "prop": "id"
                   }
                 },
-                "expr2": { "stringLit": { "value": "1" } },
-                "op": "notEquals"
+                "expr2": { "stringLit": { "value": "2" } },
+                "op": "equals"
               }
             }
           },
@@ -110,8 +115,8 @@
                     "prop": "id"
                   }
                 },
-                "expr2": { "stringLit": { "value": "1" } },
-                "op": "notEquals"
+                "expr2": { "stringLit": { "value": "2" } },
+                "op": "equals"
               }
             }
           },
@@ -121,26 +126,14 @@
               {
                 "inputEvent": {
                   "common": {
-                    "endpointElementUID": "rpl_1_TxO",
-                    "choreoElementUID": "rpl_1",
-                    "id": "rpl",
+                    "endpointElementUID": "rply_1_TxO",
+                    "choreoElementUID": "rply_1",
+                    "id": "rply",
                     "label": "reply",
                     "dataType": { "valueType": "void" },
                     "marking": { "isPending": false, "isIncluded": true }
                   },
-                  "receivers": [
-                    {
-                      "roleExpr": {
-                        "roleLabel": "P",
-                        "params": [
-                          {
-                            "name": "id",
-                            "value": { "stringLit": { "value": "1" } }
-                          }
-                        ]
-                      }
-                    }
-                  ]
+                  "receivers": [ { "initiatorExpr": { "eventId": "csm" } } ]
                 }
               }
             ],
@@ -148,10 +141,10 @@
               {
                 "spawnRelation": {
                   "relationCommon": {
-                    "endpointElementUID": "rpl_1_TxO_3",
-                    "sourceId": "rpl_1_TxO"
+                    "endpointElementUID": "rply_1_TxO_3",
+                    "sourceId": "rply_1_TxO"
                   },
-                  "triggerId": "_@trigger$rpl",
+                  "triggerId": "_@trigger$rply",
                   "graph": {
                     "events": [
                       {
@@ -168,19 +161,7 @@
                             }
                           },
                           "initiators": [
-                            {
-                              "roleExpr": {
-                                "roleLabel": "P",
-                                "params": [
-                                  {
-                                    "name": "id",
-                                    "value": {
-                                      "stringLit": { "value": "1" }
-                                    }
-                                  }
-                                ]
-                              }
-                            }
+                            { "initiatorExpr": { "eventId": "csm" } }
                           ]
                         }
                       },
@@ -198,19 +179,7 @@
                             }
                           },
                           "initiators": [
-                            {
-                              "roleExpr": {
-                                "roleLabel": "P",
-                                "params": [
-                                  {
-                                    "name": "id",
-                                    "value": {
-                                      "stringLit": { "value": "1" }
-                                    }
-                                  }
-                                ]
-                              }
-                            }
+                            { "initiatorExpr": { "eventId": "csm" } }
                           ]
                         }
                       }
@@ -253,9 +222,9 @@
               {
                 "receiveEvent": {
                   "common": {
-                    "endpointElementUID": "rpl_1_RxO",
-                    "choreoElementUID": "rpl_1",
-                    "id": "rpl",
+                    "endpointElementUID": "rply_1_RxO",
+                    "choreoElementUID": "rply_1",
+                    "id": "rply",
                     "label": "reply",
                     "dataType": { "valueType": "void" },
                     "marking": { "isPending": false, "isIncluded": true }
@@ -268,10 +237,10 @@
               {
                 "spawnRelation": {
                   "relationCommon": {
-                    "endpointElementUID": "rpl_1_RxO_3",
-                    "sourceId": "rpl_1_RxO"
+                    "endpointElementUID": "rply_1_RxO_3",
+                    "sourceId": "rply_1_RxO"
                   },
-                  "triggerId": "_@trigger$rpl",
+                  "triggerId": "_@trigger$rply",
                   "graph": {
                     "events": [
                       {
