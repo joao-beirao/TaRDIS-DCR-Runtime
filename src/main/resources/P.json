@@ -29,21 +29,17 @@
                     "prop": "id"
                   }
                 },
-                "expr2": { "stringLit": { "value": "1" } },
+                "expr2": { "stringLit": { "value": "2" } },
                 "op": "equals"
               }
-            }
+            },
+            "ifcConstraint": { "boolLit": { "value": true } }
           },
           "receivers": [
             {
               "roleExpr": {
                 "roleLabel": "P",
-                "params": [
-                  {
-                    "name": "id",
-                    "value": { "stringLit": { "value": "2" } }
-                  }
-                ]
+                "params": [ { "name": "id" } ]
               }
             }
           ]
@@ -74,7 +70,7 @@
                   }
                 },
                 "expr2": { "stringLit": { "value": "2" } },
-                "op": "equals"
+                "op": "notEquals"
               }
             }
           },
@@ -85,7 +81,7 @@
                 "params": [
                   {
                     "name": "id",
-                    "value": { "stringLit": { "value": "1" } }
+                    "value": { "stringLit": { "value": "2" } }
                   }
                 ]
               }
@@ -116,7 +112,7 @@
                   }
                 },
                 "expr2": { "stringLit": { "value": "2" } },
-                "op": "equals"
+                "op": "notEquals"
               }
             }
           },
@@ -131,7 +127,8 @@
                     "id": "rply",
                     "label": "reply",
                     "dataType": { "valueType": "void" },
-                    "marking": { "isPending": false, "isIncluded": true }
+                    "marking": { "isPending": false, "isIncluded": true },
+                    "ifcConstraint": { "boolLit": { "value": true } }
                   },
                   "receivers": [ { "initiatorExpr": { "eventId": "csm" } } ]
                 }
@@ -211,7 +208,7 @@
                     "prop": "id"
                   }
                 },
-                "expr2": { "stringLit": { "value": "1" } },
+                "expr2": { "stringLit": { "value": "2" } },
                 "op": "equals"
               }
             }
@@ -254,6 +251,38 @@
                             "marking": {
                               "isPending": false,
                               "isIncluded": true
+                            },
+                            "ifcConstraint": {
+                              "binaryOp": {
+                                "expr1": {
+                                  "binaryOp": {
+                                    "expr1": {
+                                      "binaryOp": {
+                                        "expr1": {
+                                          "propDeref": {
+                                            "propBasedExpr": {
+                                              "eventRef": {
+                                                "value": "_@trigger$csm"
+                                              }
+                                            },
+                                            "prop": "value"
+                                          }
+                                        },
+                                        "expr2": {
+                                          "stringLit": { "value": "1" }
+                                        },
+                                        "op": "equals"
+                                      }
+                                    },
+                                    "expr2": {
+                                      "boolLit": { "value": false }
+                                    },
+                                    "op": "or"
+                                  }
+                                },
+                                "expr2": { "boolLit": { "value": true } },
+                                "op": "and"
+                              }
                             }
                           },
                           "receivers": [
@@ -272,6 +301,38 @@
                             "marking": {
                               "isPending": false,
                               "isIncluded": true
+                            },
+                            "ifcConstraint": {
+                              "binaryOp": {
+                                "expr1": {
+                                  "binaryOp": {
+                                    "expr1": {
+                                      "binaryOp": {
+                                        "expr1": {
+                                          "propDeref": {
+                                            "propBasedExpr": {
+                                              "eventRef": {
+                                                "value": "_@trigger$csm"
+                                              }
+                                            },
+                                            "prop": "value"
+                                          }
+                                        },
+                                        "expr2": {
+                                          "stringLit": { "value": "1" }
+                                        },
+                                        "op": "equals"
+                                      }
+                                    },
+                                    "expr2": {
+                                      "boolLit": { "value": false }
+                                    },
+                                    "op": "or"
+                                  }
+                                },
+                                "expr2": { "boolLit": { "value": true } },
+                                "op": "and"
+                              }
                             }
                           },
                           "receivers": [

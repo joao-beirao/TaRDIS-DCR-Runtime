@@ -13,21 +13,13 @@ public final class BoolVal
 
     @Serial
     private static final long serialVersionUID = 3976540914858038158L;
-    private static final BoolVal TRUE = new BoolVal(true);
-    private static final BoolVal FALSE = new BoolVal(false);
+    public static final BoolVal TRUE = new BoolVal(true);
+    public static final BoolVal FALSE = new BoolVal(false);
     private final boolean value;
-
-    // private static final Undefined<BooleanType> UNDEFINED = new Undefined<>(BooleanType.singleton());
-    // private static final ConstRefVal<BooleanType> TRUE_REF = ConstRefVal.of(TRUE);
-    // private static final ConstRefVal<BooleanType> FALSE_REF = ConstRefVal.of(FALSE);
 
     public static BoolVal of(boolean value) {
         return value ? TRUE : FALSE;
     }
-
-    // public static Undefined<BooleanType> undefined() {
-    //     return UNDEFINED;
-    // }
 
     private BoolVal(boolean value) {this.value = value;}
 

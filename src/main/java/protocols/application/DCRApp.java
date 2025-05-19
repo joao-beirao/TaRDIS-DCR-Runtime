@@ -18,10 +18,11 @@ import dcr.common.events.Event;
 import dcr.common.events.userset.values.UserSetVal;
 import dcr.common.events.userset.values.UserVal;
 import dcr.model.GraphModel;
-import dcr.runtime.ExecutionResult;
 import dcr.runtime.GraphRunner;
 import dcr.runtime.communication.CommunicationLayer;
 import dcr.runtime.communication.MembershipLayer;
+import dcr.runtime.monitoring.GraphObserver;
+import dcr.runtime.monitoring.StateUpdate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import protocols.application.requests.AppRequest;
@@ -39,10 +40,9 @@ import pt.unl.fct.di.novasys.network.data.Host;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // docker run example
@@ -53,6 +53,11 @@ import java.util.stream.Collectors;
 public final class DCRApp
         extends GenericWebServiceProtocol
         implements GraphObserver, CommunicationLayer {
+
+    @Override
+    public void onUpdate(List<StateUpdate> update) {
+        logger.info("Observed state update: {}", update);
+    }
 
     private static final class LazyHolder {
         static final DCRApp INSTANCE = new DCRApp();
@@ -72,6 +77,7 @@ public final class DCRApp
 
     public static DCRApp getInstance() {
         return LazyHolder.INSTANCE;
+        // return new DCRApp();
     }
 
     // attempt to fetch and decode json-encoded endpoint resource
@@ -100,8 +106,8 @@ public final class DCRApp
                 .collect(Collectors.toMap(Record.Field::name, Record.Field::value))));
     }
 
-    private static Record.Field<Value> fetchSelfParamField(Properties props,
-            String key, Type type) {
+    private static Record.Field<Value> fetchSelfParamField(Properties props, String key,
+            Type type) {
         var prop = props.getProperty(key);
         return Record.Field.of(key, switch (type) {
             case BooleanType ignored -> BoolVal.of(Boolean.parseBoolean(prop));
@@ -138,8 +144,6 @@ public final class DCRApp
         registerRequestHandler(BroadcastRequest.REQUEST_ID, this::uponBroadCastRequest);
         subscribeNotification(BroadcastDelivery.NOTIFICATION_ID, this::uponBroadcastDelivery);
         // triggerNotification(new NeighborUp(self));
-
-
         subscribeNotification(NeighborUp.NOTIFICATION_ID, this::uponNeighborUpNotification);
         // registerRequestHandler();
 
@@ -244,21 +248,22 @@ public final class DCRApp
     // Callback for the Graph Runner
     @Override
     public Set<UserVal> uponSendRequest(UserVal requester, String eventId, UserSetVal receivers,
-            Event.Marking marking,
-            String uidExtension) {
-        logger.info("on uponSendRequest: from" + requester);
-        var neighbours =
-                DummyMembershipLayer.instance()
-                        .resolveParticipants(receivers)
-                        .stream()
-                        .filter(n -> !n.user().equals(requester))
-                        .collect(
-                                Collectors.toSet());
-        neighbours.forEach(
-                neighbour -> sendMessage(neighbour, eventId, marking, requester, uidExtension));
-        return neighbours.stream()
-                .map(MembershipLayer.Neighbour::user)
+            Event.Marking marking, String uidExtension) {
+        // logger.info("on uponSendRequest: from{}", requester);
+        var neighbours = DummyMembershipLayer.instance()
+                .resolveParticipants(receivers)
+                .stream()
+                .filter(n -> !n.user().equals(requester))
                 .collect(Collectors.toSet());
+        var reachable = new HashSet<MembershipLayer.Neighbour>();
+        neighbours.forEach(neighbour -> {
+            if (deliverMessage(neighbour, eventId, marking, requester, uidExtension)) {
+                reachable.add(neighbour);
+            }
+        });
+        // return neighbours.stream().map(MembershipLayer.Neighbour::user).collect(Collectors
+        // .toSet());
+        return reachable.stream().map(MembershipLayer.Neighbour::user).collect(Collectors.toSet());
     }
 
 
@@ -270,7 +275,7 @@ public final class DCRApp
 
     // called from UI
     String onListEnabledEvents() {
-        return runner.lookupEnabledEvents()
+        return runner.enabledEvents()
                 .stream()
                 .map(Object::toString)
                 .collect(Collectors.joining("\n"));
@@ -279,20 +284,18 @@ public final class DCRApp
     // TODO maybe return something to be printed
     // called from UI
     void onExecuteComputationEvent(String eventId) {
-        logger.info("Executing ComputationAction '{}'...", eventId);
+        logger.info("Executing Computation event '{}'", eventId);
         try {
-            ExecutionResult result = runner.executeComputationEvent(eventId);
-            logger.info("ComputationAction executed. Event marking updated to {}",
-                    result.getMarking());
+            runner.executeComputationEvent(eventId);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            logger.error("Error executing Computation Event '{}': {}", eventId, e.getMessage());
             e.printStackTrace();
         }
     }
 
     // called from UI
     void onExecuteInputEvent(String eventId, Value inputValue) {
-        logger.info("Executing input action '{}' with input value {}", eventId, inputValue);
+        logger.info("Executing Input event '{}' with input value {}", eventId, inputValue);
         try {
             runner.executeInputEvent(eventId, inputValue);
         } catch (Exception e) {
@@ -302,57 +305,56 @@ public final class DCRApp
     }
 
     void onExecuteInputEvent(String eventId) {
-        logger.info("Executing empty input action '{}'", eventId);
+        logger.info("Executing (void) Input event '{}'", eventId);
         try {
             runner.executeInputEvent(eventId);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            logger.error("Error executing Input Event '{}': {}", eventId, e.getMessage());
             e.printStackTrace();
         }
     }
 
     // called from Babel's internal network after a remote event has been executed
-    private void onExecuteReceiveEvent(GraphRunner runner, String eventId,
-            Event.Marking marking, UserVal sender, String uidExtension) {
-        logger.info("Executing receive operation '{}': received {}", eventId, marking);
+    private void onExecuteReceiveEvent(GraphRunner runner, String eventId, Event.Marking marking,
+            UserVal sender, String uidExtension) {
+        logger.info("Executing Receive event '{}': received {}", eventId, marking);
         try {
             runner.onReceiveEvent(eventId, marking.value(), sender, uidExtension);
             // TODO pass on something to be printed
             // cmdLineRunner.onReceiveEvent();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+            logger.error("Error executing Receive Event '{}': {}", eventId, e.getMessage());
             e.printStackTrace();
-            System.err.println(e.getMessage());
         }
     }
 
-    // registered handler for incoming DcrRequests - at this point, this can only be a request to
+    // (inner-process) DCR Protocol request to enact a Tx/RX
+    private boolean deliverMessage(MembershipLayer.Neighbour receiver, String eventId,
+            Event.Marking marking, UserVal user, String uidExtension) {
+        try {
+            String hostName = receiver.hostName();
+            InetAddress targetAddr = InetAddress.getByName(hostName);
+            Host destination = new Host(targetAddr, DEFAULT_PORT);
+            var request = new AppRequest(eventId, marking, destination, user, uidExtension);
+            sendRequest(request, DistributedDCRProtocol.PROTO_ID);
+            return true;
+        } catch (UnknownHostException e) {
+            logger.warn("Unable to deliver message: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /* =======================
+     * DCR Protocol handlers
+     * ======================= */
+
+    // handle incoming (inner-process) DCRProtocol request (Tx/Rx)
     private void uponReceiveDcrRequest(AppRequest appRequest, short sourceProtocol) {
-        logger.info("@App: DCR Request received - execute Rx event {} with marking {}",
-                appRequest.getEventId(), appRequest.getMarking());
         try {
             onExecuteReceiveEvent(runner, appRequest.getEventId(), appRequest.getMarking(),
                     appRequest.getSender(), appRequest.getIdExtensionToken());
         } catch (Exception e) {
             logger.error("Error reading command: {}", e.getMessage());
-        }
-    }
-
-
-    // send a message to another Babel DCR node
-    private void sendMessage(MembershipLayer.Neighbour receiver, String eventId,
-            Event.Marking marking, UserVal user, String uidExtension) {
-        try {
-            String hostName = receiver.hostName();
-            InetAddress targetAddr = InetAddress.getByName(hostName);
-            logger.info("Sending message to target {}...", targetAddr);
-            Host destination = new Host(targetAddr, DEFAULT_PORT);
-            var request = new AppRequest(eventId, marking, destination, user, uidExtension);
-            logger.info("Sending message to receiver {}...", receiver);
-            sendRequest(request, DistributedDCRProtocol.PROTO_ID);
-            logger.info("  Message Sent.");
-        } catch (Exception e1) {
-            logger.warn("Error executing event: {}", e1.getMessage());
         }
     }
 

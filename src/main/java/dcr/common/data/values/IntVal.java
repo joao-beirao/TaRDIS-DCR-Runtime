@@ -15,12 +15,8 @@ public final class IntVal
         implements PrimitiveVal, Comparable<IntVal> {
     @Serial
     private static final long serialVersionUID = -6289916328707077719L;
-    // private static final Undefined<IntegerType> UNDEFINED = new Undefined<>(IntegerType
-    // .singleton());
 
     private final int value;
-
-    // public static Undefined<IntegerType> undefined() {return UNDEFINED;}
 
     public static IntVal of(int value) {return new IntVal(value);}
 

@@ -5,7 +5,10 @@ import dcr.model.ModelElement;
 
 public sealed interface EventElement
     extends Event, ModelElement
-    permits GenericEventElement, ComputationEventElement, InputEventElement, ReceiveEventElement {
+        permits ComputationEventElement,
+                GenericEventElement,
+                InputEventElement,
+                ReceiveEventElement {
 
   @Override
   MarkingElement marking();

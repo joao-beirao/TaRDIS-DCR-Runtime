@@ -15,15 +15,15 @@ public final class UndefinedVal<T extends Type>
 
     @Serial
     private static final long serialVersionUID = -1588707935989188517L;
-    private static final UndefinedVal<VoidType> VOID = new UndefinedVal<>(VoidType.singleton());
+    // private static final UndefinedVal<VoidType> VOID = new UndefinedVal<>(VoidType.singleton());
     private static final String TO_STRING_VAL = "<undefined value>";
 
     //  TODO [revise] any workaround to avoid storing typeInstance? thinking no
     private final T typeInstance;
 
-    public static UndefinedVal<VoidType> ofVoid() {
-        return VOID;
-    }
+    // public static UndefinedVal<VoidType> ofVoid() {
+    //     return VOID;
+    // }
 
     public static <T extends Type> UndefinedVal<T> of(T typeInstance) {
         return new UndefinedVal<>(typeInstance);

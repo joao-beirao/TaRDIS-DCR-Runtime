@@ -10,14 +10,6 @@ import org.jetbrains.annotations.NotNull;
 public record EventVal(Value value, EventType type)
         implements PropBasedVal {
 
-    // TODO 1. replace *EventType<T> type*  with *String label*
-    // TODO 2. implement type() returning value.toEventType(this.label)
-
-
-    public static EventVal of(Value value, EventType type) {
-        return new EventVal(value, type);
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {return true;}
@@ -29,12 +21,6 @@ public record EventVal(Value value, EventType type)
     @Override
     public int hashCode() {
         return value.hashCode();
-    }
-
-    @NotNull
-    @Override
-    public String toString() {
-        return String.format("%s:[value:%s]", type.typeAlias(), value);
     }
 
     @Override

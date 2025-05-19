@@ -102,7 +102,7 @@ public final class EndpointMapper {
             case BoolLiteralDTO expr -> BoolLiteral.of(expr.value());
             case IntLiteralDTO expr -> IntLiteral.of(expr.value());
             case StringLiteralDTO expr -> StringLiteral.of(expr.value());
-            case RefExprDTO expr -> RefExpr.of(expr.value());
+            case RefExprDTO expr -> new RefExpr(expr.value());
             case RecordExprDTO expr -> RecordExpr.of(Record.ofEntries(expr.fields()
                     .stream()
                     .collect(Collectors.toMap(RecordExprDTO.FieldDTO::name,

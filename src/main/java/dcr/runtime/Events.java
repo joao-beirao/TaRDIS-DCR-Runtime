@@ -3,10 +3,7 @@ package dcr.runtime;
 import dcr.common.data.computation.ComputationExpression;
 import dcr.common.data.values.Value;
 import dcr.common.events.userset.expressions.UserSetExpression;
-import dcr.model.events.ComputationEventElement;
-import dcr.model.events.EventElement;
-import dcr.model.events.InputEventElement;
-import dcr.model.events.ReceiveEventElement;
+import dcr.model.events.*;
 import dcr.runtime.elements.events.ComputationEventInstance;
 import dcr.runtime.elements.events.EventInstance;
 import dcr.runtime.elements.events.InputEventInstance;
@@ -17,20 +14,22 @@ import java.io.Serializable;
 import java.util.Optional;
 
 final class Events {
-    public static ComputationInstance newLocalComputationInstance(String localUID, String remoteID,
-            ComputationEventElement baseElement) {
-        return new ComputationInstance(localUID, remoteID, baseElement);
-    }
+    // TODO [deprecate]
+    // public static ComputationInstance newLocalComputationInstance(String localUID, String remoteID,
+    //         ComputationEventElement baseElement) {
+    //     return new ComputationInstance(localUID, remoteID, baseElement);
+    // }
 
     public static ComputationInstance newComputationInstance(String localUID, String remoteID,
             ComputationEventElement baseElement) {
         return new ComputationInstance(localUID, remoteID, baseElement);
     }
 
-    public static InputInstance newLocalInputInstance(String localUID, String remoteID,
-            InputEventElement baseElement) {
-        return InputInstance.of(localUID, remoteID, baseElement);
-    }
+    // TODO [deprecate]
+    // public static InputInstance newLocalInputInstance(String localUID, String remoteID,
+    //         InputEventElement baseElement) {
+    //     return InputInstance.of(localUID, remoteID, baseElement);
+    // }
 
     public static InputInstance newInputInstance(String localUID, String remoteID,
             InputEventElement baseElement) {
@@ -41,11 +40,17 @@ final class Events {
             ReceiveEventElement baseElement) {
         return new ReceiveInstance(localUID, remoteID, baseElement);
     }
+
+    public static GenericEventInstance newInstance(String localUID, String remoteID, EventElement baseElement) {
+        return switch (baseElement) {
+            case ComputationEventElement e -> newComputationInstance(localUID, remoteID, e);
+            case InputEventElement e -> newInputInstance(localUID, remoteID, e);
+            case ReceiveEventElement e -> newReceiveInstance(localUID, remoteID, e);
+        };
+    }
 }
 
-/**
- * @param
- */
+
 sealed abstract class GenericEventInstance
         implements EventInstance
         permits ComputationInstance, InputInstance, ReceiveInstance {

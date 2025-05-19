@@ -25,29 +25,6 @@ public class ExecutionResult {
         this.newRelations = new HashSet<>();
     }
 
-    public ExecutionResult(Set<String> receivers, Event.Marking value) {
-        this.receivers = receivers;
-        this.marking = value;
-        this.diff = new HashSet<>();
-        this.newRelations = new HashSet<>();
-    }
-
-    void addReceiverExpr(UserSetVal receiversExpr) {
-        this.receiversExpr = receiversExpr;
-    }
-
-    Optional<UserSetVal> getReceiversExpr() {
-        return Optional.ofNullable(receiversExpr);
-    }
-
-    void addReceiver(String receiver) {
-        this.receivers.add(receiver);
-    }
-
-    void addAllReceivers(Set<String> receivers) {
-        this.receivers.addAll(receivers);
-    }
-
     void addModifiedEvents(EventInstance event) {
         diff.add(event);
     }
@@ -60,14 +37,4 @@ public class ExecutionResult {
         return this.marking;
     }
 
-    public Iterable<String> getReceivers() {
-        return this.receivers;
-    }
-
-
-    public void addReceivers(UserSetVal receivers) {
-        Map<String, List<String>> includeList;
-        Map<String, List<String>> excludeList;
-
-    }
 }

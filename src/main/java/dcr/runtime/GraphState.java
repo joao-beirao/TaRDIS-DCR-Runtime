@@ -10,6 +10,7 @@ import dcr.runtime.elements.relations.SpawnRelationInstance;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// TODO [deprecate?]
 final class GraphState
         implements GraphInstance {
 

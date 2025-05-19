@@ -7,6 +7,6 @@ import java.io.Serializable;
 // TODO [?] consider @Overriding equals across values?
 public sealed interface Value
         extends Serializable
-        permits EventIdVal, PrimitiveVal, PropBasedVal, UndefinedVal, VoidVal {
+        permits PrimitiveVal, PropBasedVal, UndefinedVal, VoidVal {
     Type type();
 }

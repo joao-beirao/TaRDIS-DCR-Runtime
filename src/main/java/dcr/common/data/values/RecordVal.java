@@ -24,14 +24,13 @@ public final class RecordVal implements PropBasedVal {
 
   @Serial
   private static final long serialVersionUID = -1287514074906057952L;
-  // private static final Undefined<RecordType> UNDEFINED = new Undefined<>(RecordType.empty());
   private final Record<Value> valRecord;
 
   // public static Undefined<RecordType> undefined() {return UNDEFINED;}
 
   // public static Undefined<RecordType> undefined(RecordType typeRecord) {return Undefined.of(typeRecord);}
 
-  private RecordVal(Record<Value> valRecord) {
+  public RecordVal(Record<Value> valRecord) {
     this.valRecord = valRecord;
   }
 

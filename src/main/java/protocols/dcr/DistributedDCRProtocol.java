@@ -47,7 +47,7 @@ public class DistributedDCRProtocol
 
     public void init(Properties props) throws IOException, HandlerRegistrationException {
 
-        String name = props.getProperty("target-name");
+        // String name = props.getProperty("target-name");
 
         // switch (name) {
         //     case "target-A":
