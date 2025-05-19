@@ -29,7 +29,7 @@ public class DCRGraphREST
 
     public enum DCREndpoints
             implements EndpointPath {
-        ENDPOINT_PROCESS("endpoint");
+        ENDPOINT_PROCESS("dcr");
 
         private final String endpointPath;
 

@@ -7,12 +7,9 @@
     "$ref": "#/$defs/graph"
   },
 
-
-
   "$defs": {
     "nonEmptyString": {
-      "type": "string",
-      "minLength": 1
+      "$ref": "#/$defs/nonEmptyString"
     },
     "value": {
       "oneOf": [
@@ -65,8 +62,7 @@
               "type": "object",
               "properties": {
                 "value": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/nonEmptyString"
                 }
               },
               "required": [
@@ -93,8 +89,7 @@
                     "type": "object,",
                     "properties": {
                       "name": {
-                        "type": "string",
-                        "minLength": 1
+                        "$ref": "#/$defs/nonEmptyString"
                       },
                       "value": {
                         "$ref": "#/$defs/value"
@@ -152,8 +147,7 @@
                     "type": "object",
                     "properties": {
                       "name": {
-                        "type": "string",
-                        "minLength": 1
+                        "$ref": "#/$defs/nonEmptyString"
                       },
                       "type": {
                         "$ref": "#/$defs/type"
@@ -186,8 +180,7 @@
               "type": "object",
               "properties": {
                 "label": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/nonEmptyString"
                 }
               },
               "required": [
@@ -273,8 +266,7 @@
               "type": "object",
               "properties": {
                 "value": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/nonEmptyString"
                 }
               },
               "required": [
@@ -295,8 +287,7 @@
               "type": "object",
               "properties": {
                 "value": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/nonEmptyString"
                 }
               },
               "required": [
@@ -322,8 +313,7 @@
                     "type": "object",
                     "properties": {
                       "name": {
-                        "type": "string",
-                        "minLength": 1
+                        "$ref": "#/$defs/nonEmptyString"
                       },
                       "value": {
                         "$ref": "#/$defs/computationExpression"
@@ -359,8 +349,7 @@
                   "$ref": "#/$defs/computationExpression"
                 },
                 "prop": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/nonEmptyString"
                 }
               },
               "required": [
@@ -427,8 +416,7 @@
               "type": "object",
               "properties": {
                 "roleLabel": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/nonEmptyString"
                 },
                 "params": {
                   "type": "array",
@@ -436,8 +424,7 @@
                     "type": "object",
                     "properties": {
                       "name": {
-                        "type": "string",
-                        "minLength": 1
+                        "$ref": "#/$defs/nonEmptyString"
                       },
                       "value": {
                         "$ref": "#/$defs/computationExpression"
@@ -469,8 +456,7 @@
               "type": "object",
               "properties": {
                 "eventId": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/nonEmptyString"
                 }
               },
               "required": [
@@ -491,8 +477,7 @@
               "type": "object",
               "properties": {
                 "eventId": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/nonEmptyString"
                 }
               },
               "required": [
@@ -679,12 +664,12 @@
               "type": "object",
               "additionalProperties": false,
               "required": [
-                "common",
+                "relationCommon",
                 "targetId",
                 "relationType"
               ],
               "properties": {
-                "common": {
+                "relationCommon": {
                   "$ref": "#/$defs/relationCommon"
                 },
                 "targetId": {

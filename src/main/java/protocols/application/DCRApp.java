@@ -80,24 +80,27 @@ public final class DCRApp
         // return new DCRApp();
     }
 
+
+
     // attempt to fetch and decode json-encoded endpoint resource
-    private static Endpoint loadEndpoint(Properties properties) {
-        try (InputStream in = DCRApp.class.getResourceAsStream(
-                String.format("/%s", properties.getProperty(CLI_ROLE_ARG)))) {
-            assert in != null;
-            var jsonEncodedEndpoint = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new Jdk8Module());
-            var deserializedEndpoint =
-                    objectMapper.readValue(jsonEncodedEndpoint, EndpointDTO.class);
-            return EndpointMapper.mapEndpoint(deserializedEndpoint);
-        } catch (Exception e) {
-            logger.error(e);
-            throw new InternalError(
-                    String.format("Failed to load endpoint resource: %s\n%s", CLI_ROLE_ARG,
-                            e.getMessage()));
-        }
-    }
+    // private static Endpoint loadEndpoint(Properties properties) {
+    //     try (InputStream in = DCRApp.class.getResourceAsStream(
+    //             String.format("%s", properties.getProperty(CLI_ROLE_ARG)))) {
+    //         logger.info("Loading endpoint {}", String.format("%s", properties.getProperty(CLI_ROLE_ARG)));
+    //         assert in != null;
+    //         var jsonEncodedEndpoint = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+    //         ObjectMapper objectMapper = new ObjectMapper();
+    //         objectMapper.registerModule(new Jdk8Module());
+    //         var deserializedEndpoint =
+    //                 objectMapper.readValue(jsonEncodedEndpoint, EndpointDTO.class);
+    //         return EndpointMapper.mapEndpoint(deserializedEndpoint);
+    //     } catch (Exception e) {
+    //         logger.error(e);
+    //         throw new InternalError(
+    //                 String.format("Failed to load endpoint resource: %s\n%s", CLI_ROLE_ARG,
+    //                         e.getMessage()));
+    //     }
+    // }
 
     private static UserVal instantiateSelf(Properties props, Endpoint.Role roleDecl) {
         return UserVal.of(roleDecl.roleName(), Record.ofEntries(roleDecl.params()
@@ -150,7 +153,7 @@ public final class DCRApp
 
         // observation: Bootstrap is currently supported by CLI params:
         // - a 'role' param is required, and determines the role this endpoint should enact - based
-        // on this param, the json-encoded endpoint resource is loaded and used to instantiate,
+        // on the role, the json-encoded endpoint resource is loaded and used to instantiate,
         // both the DCR Model and the Role for the active participant;
         // - similarly, CLI params are used to inject the runtime parameter values for the
         // role (when applicable), and are expected to follow the parameter names declared by the
@@ -158,39 +161,28 @@ public final class DCRApp
         logger.info("role property: {}", properties.getProperty(CLI_ROLE_ARG));
 
         try (InputStream in = DCRApp.class.getResourceAsStream(
-                String.format("/%s", properties.getProperty(CLI_ROLE_ARG)))) {
+                String.format("%s.json", properties.getProperty(CLI_ROLE_ARG)))) {
             assert in != null;
 
-            // the user behind this endpoint's
+            // the user associated with this endpoint
             UserVal self;
-            // the projection this endpoint will run
+            // the behaviour this endpoint will enact
             GraphModel graphModel;
             {
                 // load the information required to deploy this endpoint
                 var jsonEncodedEndpoint = new String(in.readAllBytes(), StandardCharsets.UTF_8);
                 var endpoint = decodeEndpoint(jsonEncodedEndpoint);
                 // inject runtime parameters into self
-                var roleDecl = endpoint.role();
                 self = instantiateSelf(properties, endpoint.role());
                 graphModel = endpoint.graphModel();
             }
-
-            // TODO remove debug
-            System.err.println(graphModel);
-
-            // aggregates CLI-based functionality and callbacks (replaceable with GUI)
+            // aggregates CLI-based functionality and callbacks (replaceable with GUI/REST/...)
             CLI cmdLineRunner = new CLI(this);
-
-            // boilerplate
+            // setup graph runner
             runner = new GraphRunner(self, this);
             runner.init(graphModel);
             runner.registerGraphObserver(this);
-
-
-            // TODO remove debug
-            System.err.println(runner);
-
-            // kickstart interaction
+            // start CLI-based interaction
             cmdLineRunner.init();
         } catch (Exception e) {
             e.printStackTrace();

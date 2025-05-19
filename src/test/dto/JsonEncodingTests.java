@@ -258,7 +258,8 @@ public class JsonEncodingTests {
                     {
                          "computationEvent": {
                            "common": {
-                             "uid": "e0_0_tx",
+                             "choreoElementUID": "e0_0_tx",
+                             "endpointElementUID": "e0_0_tx",
                              "id": "e0",
                              "label": "e0",
                              "dataType": { "valueType": "bool" },
@@ -294,7 +295,8 @@ public class JsonEncodingTests {
                     {
                        "inputEvent": {
                          "common": {
-                           "uid": "e0_0_tx",
+                           "choreoElementUID": "e0_0_tx",
+                           "endpointElementUID": "e0_0_tx",
                            "id": "e0",
                            "label": "e0",
                            "dataType": { "valueType": "bool" },
@@ -331,7 +333,8 @@ public class JsonEncodingTests {
                      {
                          "receiveEvent": {
                            "common": {
-                             "uid": "e0_0_tx",
+                             "choreoElementUID": "e0_0_tx",
+                             "endpointElementUID": "e0_0_tx",
                              "id": "e0",
                              "label": "e0",
                              "dataType": { "valueType": "bool" },
@@ -365,22 +368,22 @@ public class JsonEncodingTests {
 
 
     @Test
-    public void givenSomeRelation_ifDeserializeAndThenSerialize_thenSameJson()
-            throws Exception {
+    public void givenSomeRelation_ifDeserializeAndThenSerialize_thenSameJson() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new Jdk8Module());
         {
             var testSrc = """
                      {
                       "spawnRelation": {
-                        "common": { "uid": "1", "sourceId": "e0_0_Rx" },
+                        "relationCommon": { "endpointElementUID": "1", "sourceId": "e0_0_Rx" },
                         "triggerId": "_@trigger$e0",
                         "graph": {
                           "events": [
                             {
                               "inputEvent": {
                                 "common": {
-                                  "uid": "e1_1_TxO",
+                                  "choreoElementUID": "e0_0_tx",
+                                  "endpointElementUID": "e0_0_tx",
                                   "id": "e1_1_TxO",
                                   "label": "E1",
                                   "dataType": { "valueType": "void" },
@@ -397,16 +400,14 @@ public class JsonEncodingTests {
                     """;
             RelationDTO deserializedDTO = objectMapper.readValue(testSrc, RelationDTO.class);
             String serializedDTO = objectMapper.writeValueAsString(deserializedDTO);
-            assertEquals(objectMapper.readTree(testSrc),
-                    objectMapper.readTree(serializedDTO));
+            assertEquals(objectMapper.readTree(testSrc), objectMapper.readTree(serializedDTO));
         }
 
     }
 
 
     @Test
-    public void givenSomeGraph_ifDeserializeAndThenSerialize_thenSameJson()
-            throws Exception {
+    public void givenSomeGraph_ifDeserializeAndThenSerialize_thenSameJson() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new Jdk8Module());
         {
@@ -416,7 +417,8 @@ public class JsonEncodingTests {
                         {
                           "inputEvent": {
                             "common": {
-                              "uid": "e0_0_Tx",
+                              "choreoElementUID": "e0_0_Tx",
+                              "endpointElementUID": "e0_0_Tx",
                               "id": "e0_0_Tx",
                               "label": "E0",
                               "dataType": { "valueType": "void" },
@@ -453,7 +455,8 @@ public class JsonEncodingTests {
                         {
                           "receiveEvent": {
                             "common": {
-                              "uid": "e0_0_Rx",
+                            "choreoElementUID": "e0_0_Rx",
+                            "endpointElementUID": "e0_0_Rx",
                               "id": "e0_0_Rx",
                               "label": "E0",
                               "dataType": { "valueType": "void" },
@@ -491,14 +494,15 @@ public class JsonEncodingTests {
                       "relations": [
                         {
                           "spawnRelation": {
-                            "common": { "uid": "1", "sourceId": "e0_0_Rx" },
+                            "relationCommon": { "endpointElementUID": "1", "sourceId": "e0_0_Rx" },
                             "triggerId": "_@trigger$e0",
                             "graph": {
                               "events": [
                                 {
                                   "inputEvent": {
                                     "common": {
-                                      "uid": "e1_1_TxO",
+                                    "choreoElementUID": "e1_1_TxO",
+                                    "endpointElementUID": "e1_1_TxO",
                                       "id": "e1_1_TxO",
                                       "label": "E1",
                                       "dataType": { "valueType": "void" },
@@ -513,14 +517,15 @@ public class JsonEncodingTests {
                         },
                         {
                           "spawnRelation": {
-                            "common": { "uid": "1", "sourceId": "e0_0_Tx" },
+                            "relationCommon": { "endpointElementUID": "1", "sourceId": "e0_0_Tx" },
                             "triggerId": "_@trigger$e0",
                             "graph": {
                               "events": [
                                 {
                                   "receiveEvent": {
                                     "common": {
-                                      "uid": "e1_1_RxO",
+                                    "choreoElementUID": "e1_1_RxO",
+                                    "endpointElementUID": "e1_1_RxO",
                                       "id": "e1_1_RxO",
                                       "label": "E1",
                                       "dataType": { "valueType": "void" },
@@ -563,14 +568,12 @@ public class JsonEncodingTests {
                     """;
             GraphDTO deserializedDTO = objectMapper.readValue(testSrc, GraphDTO.class);
             String serializedDTO = objectMapper.writeValueAsString(deserializedDTO);
-            assertEquals(objectMapper.readTree(testSrc),
-                    objectMapper.readTree(serializedDTO));
+            assertEquals(objectMapper.readTree(testSrc), objectMapper.readTree(serializedDTO));
         }
     }
 
     @Test
-    public void givenAnEndpoint_ifDeserializeAndThenSerialize_thenSameJson()
-            throws Exception {
+    public void givenAnEndpoint_ifDeserializeAndThenSerialize_thenSameJson() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new Jdk8Module());
         {
@@ -588,7 +591,8 @@ public class JsonEncodingTests {
                             {
                               "inputEvent": {
                                 "common": {
-                                  "uid": "e0_0_Tx",
+                                  "choreoElementUID": "e0_0_Tx",
+                                  "endpointElementUID": "e0_0_Tx",
                                   "id": "e0_0_Tx",
                                   "label": "E0",
                                   "dataType": { "valueType": "void" },
@@ -625,7 +629,8 @@ public class JsonEncodingTests {
                             {
                               "receiveEvent": {
                                 "common": {
-                                  "uid": "e0_0_Rx",
+                                  "choreoElementUID": "e0_0_Rx",
+                                  "endpointElementUID": "e0_0_Rx",
                                   "id": "e0_0_Rx",
                                   "label": "E0",
                                   "dataType": { "valueType": "void" },
@@ -663,14 +668,15 @@ public class JsonEncodingTests {
                           "relations": [
                             {
                               "spawnRelation": {
-                                "common": { "uid": "1", "sourceId": "e0_0_Rx" },
+                                "relationCommon": { "endpointElementUID": "1", "sourceId": "e0_0_Rx" },
                                 "triggerId": "_@trigger$e0",
                                 "graph": {
                                   "events": [
                                     {
                                       "inputEvent": {
                                         "common": {
-                                          "uid": "e1_1_TxO",
+                                          "choreoElementUID": "e1_1_TxO",
+                                          "endpointElementUID": "e1_1_TxO",
                                           "id": "e1_1_TxO",
                                           "label": "E1",
                                           "dataType": { "valueType": "void" },
@@ -685,14 +691,15 @@ public class JsonEncodingTests {
                             },
                             {
                               "spawnRelation": {
-                                "common": { "uid": "1", "sourceId": "e0_0_Tx" },
+                                "relationCommon": { "endpointElementUID": "1", "sourceId": "e0_0_Tx" },
                                 "triggerId": "_@trigger$e0",
                                 "graph": {
                                   "events": [
                                     {
                                       "receiveEvent": {
                                         "common": {
-                                          "uid": "e1_1_RxO",
+                                          "choreoElementUID": "e1_1_RxO",
+                                          "endpointElementUID": "e1_1_RxO",
                                           "id": "e1_1_RxO",
                                           "label": "E1",
                                           "dataType": { "valueType": "void" },
@@ -736,8 +743,7 @@ public class JsonEncodingTests {
                     """;
             EndpointDTO deserializedDTO = objectMapper.readValue(testSrc, EndpointDTO.class);
             String serializedDTO = objectMapper.writeValueAsString(deserializedDTO);
-            assertEquals(objectMapper.readTree(testSrc),
-                    objectMapper.readTree(serializedDTO));
+            assertEquals(objectMapper.readTree(testSrc), objectMapper.readTree(serializedDTO));
         }
     }
 
