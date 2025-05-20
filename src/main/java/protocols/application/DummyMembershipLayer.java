@@ -36,14 +36,15 @@ public final class DummyMembershipLayer
 
     static {
         // USE CASE EDP V1
-        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
-                Record.ofEntries(Record.Field.of("id", StringVal.of("1")))), "P_1"));
-        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
-                Record.ofEntries(Record.Field.of("id", StringVal.of("2")))), "P_2"));
-        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
-                Record.ofEntries(Record.Field.of("id", StringVal.of("3")))), "P_3"));
-        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
-                Record.ofEntries(Record.Field.of("id", StringVal.of("4")))), "P_4"));
+        // singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+        //         Record.ofEntries(Record.Field.of("id", StringVal.of("1")))), "P_1"));
+        // singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+        //         Record.ofEntries(Record.Field.of("id", StringVal.of("2")))), "P_2"));
+        // singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+        //         Record.ofEntries(Record.Field.of("id", StringVal.of("3")))), "P_3"));
+        // singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+        //         Record.ofEntries(Record.Field.of("id", StringVal.of("4")))), "P_4"));
+
 
 
         // docker run --network tardis-babel-backend-net --rm -h P_1_1 --name P_1_1 -it dcr-babel interface=eth0 role='CO.json' cid=1
@@ -57,31 +58,36 @@ public final class DummyMembershipLayer
         //
         // docker run --network tardis-babel-backend-net --rm -p 8080:8080 -h P_4_1 --name P_4_1
         // -it dcr-babel interface=eth0 role='P.json' id='4' cid=1
-        // USE CASE goal
+
+
+        // // USE CASE EDP V3
         // EC 1
-        // singleton.onNeighborUp(new DummyNeighbour(
-        //         UserVal.of("CO", Record.ofEntries(Record.Field.of("cid", IntVal.of(1)))), "P_1_1"));
-        // singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
-        //         Record.ofEntries(Record.Field.of("id", StringVal.of("1")),
-        //                 Record.Field.of("cid", IntVal.of(1)))), "P_1_1"));
-        // singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
-        //         Record.ofEntries(Record.Field.of("id", StringVal.of("2")),
-        //                 Record.Field.of("cid", IntVal.of(1)))), "P_2_1"));
-        // singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
-        //         Record.ofEntries(Record.Field.of("id", StringVal.of("4")),
-        //                 Record.Field.of("cid", IntVal.of(1)))), "P_4_1"));
-        // // EC 2
-        // singleton.onNeighborUp(new DummyNeighbour(
-        //         UserVal.of("CO", Record.ofEntries(Record.Field.of("cid", IntVal.of(2)))), "P_1_2"));
-        // singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
-        //         Record.ofEntries(Record.Field.of("id", StringVal.of("1")),
-        //                 Record.Field.of("cid", IntVal.of(2)))), "P_1_2"));
-        // singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
-        //         Record.ofEntries(Record.Field.of("id", StringVal.of("2")),
-        //                 Record.Field.of("cid", IntVal.of(2)))), "P_2_2"));
-        // singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
-        //         Record.ofEntries(Record.Field.of("id", StringVal.of("3")),
-        //                 Record.Field.of("cid", IntVal.of(2)))), "P_3_2"));
+        singleton.onNeighborUp(new DummyNeighbour(
+                UserVal.of("CO", Record.ofEntries(Record.Field.of("cid", IntVal.of(1)))), "CO_1"));
+        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+                Record.ofEntries(Record.Field.of("id", StringVal.of("1")),
+                        Record.Field.of("cid", IntVal.of(1)))), "P_1_1"));
+        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+                Record.ofEntries(Record.Field.of("id", StringVal.of("2")),
+                        Record.Field.of("cid", IntVal.of(1)))), "P_2_1"));
+        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+                Record.ofEntries(Record.Field.of("id", StringVal.of("3")),
+                        Record.Field.of("cid", IntVal.of(1)))), "P_3_1"));
+        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+                Record.ofEntries(Record.Field.of("id", StringVal.of("4")),
+                        Record.Field.of("cid", IntVal.of(1)))), "P_4_1"));
+        // EC 2
+        singleton.onNeighborUp(new DummyNeighbour(
+                UserVal.of("CO", Record.ofEntries(Record.Field.of("cid", IntVal.of(2)))), "CO_2"));
+        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+                Record.ofEntries(Record.Field.of("id", StringVal.of("1")),
+                        Record.Field.of("cid", IntVal.of(2)))), "P_1_2"));
+        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+                Record.ofEntries(Record.Field.of("id", StringVal.of("2")),
+                        Record.Field.of("cid", IntVal.of(2)))), "P_2_2"));
+        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+                Record.ofEntries(Record.Field.of("id", StringVal.of("3")),
+                        Record.Field.of("cid", IntVal.of(2)))), "P_3_2"));
     }
 
     private final Map<UserVal, Neighbour> neighbourMapping;
@@ -132,16 +138,10 @@ public final class DummyMembershipLayer
 
     @Override
     public void onNeighborUp(Neighbour neighbourUp) {
-        System.err.println("called Neighbour onNeighborUp");
         if (neighbourMapping.putIfAbsent(neighbourUp.user(), neighbourUp) == null) {
             putIfAbsent(neighboursByRole, neighbourUp.role(), neighbourUp);
         }
     }
-
-    // @Override
-    // public void onNeighborUp(Neighbour neighbourUp) {
-    //
-    // }
 
     @Override
     public void onNeighborDown(Neighbour neighbourDown) {
@@ -159,21 +159,16 @@ public final class DummyMembershipLayer
         Set<Neighbour> evalResult = new HashSet<>();
         switch (receivers) {
             case UserVal user -> {
-                // System.err.println("mapping: " + neighbourMapping);
                 for (var key : neighbourMapping.keySet())
-                    //     System.err.printf("key: %s, hashcode: %d%n", key, key.hashCode());
-                    // System.err.printf("userval: %s, hashcode: %d%n: ", user, user.hashCode());
                     Optional.ofNullable(neighbourMapping.get(user)).ifPresent(evalResult::add);
             }
             // TODO subsequent filter according to params
             case RoleVal role -> {
-                System.err.println("membership: ");
                 neighboursByRole.forEach(
                         (key, value) -> value.forEach(n -> System.err.println(n.user())));
 
                 System.err.println();
                 var candidates = neighboursByRole.getOrDefault(role.role(), Collections.emptySet());
-                System.err.println("candidates for role: ");
                 candidates.forEach(candidate -> System.err.println(candidate.user()));
                 System.err.println();
                 for (var param : role.params().params()) {
@@ -184,20 +179,13 @@ public final class DummyMembershipLayer
                                             .fetchProp(param.name())))
                             .collect(Collectors.toSet());
                 }
-                System.err.println("candidates after filtering: ");
                 candidates.forEach(candidate -> System.err.println(candidate.user()));
-                System.err.println();
-                System.err.println("on role eval: " + role);
                 evalResult.addAll(candidates);
-                // evalResult.addAll(
-                //         neighboursByRole.getOrDefault(role.role(), Collections.emptySet()));
             }
             case SetDiffVal setDiff -> {
                 var positiveSet = new HashSet<>(resolveParticipants(setDiff.positiveSet()));
                 var negativeSet = new HashSet<>(resolveParticipants(setDiff.negativeSet()));
                 positiveSet.removeAll(negativeSet);
-                // System.err.println(
-                //         "positive set in evalUserSetExpr:DummyMembership Layer: " + positiveSet);
                 evalResult.addAll(positiveSet);
             }
             case SetUnionVal unionSet -> unionSet.userSetVals()

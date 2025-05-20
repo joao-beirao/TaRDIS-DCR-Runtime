@@ -5,6 +5,7 @@ import dcr.common.Environment;
 import dcr.common.data.values.Value;
 import dcr.common.events.userset.values.SetUnionVal;
 import dcr.common.events.userset.values.UserVal;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -33,7 +34,7 @@ public record SetUnionExpr(Collection<? extends UserSetExpression> userSetExprs)
 
     // TODO - filter out duplicates
     @Override
-    public SetUnionVal eval(Environment<Value> valueEnv, Environment<UserVal> userEnv) {
+    public SetUnionVal eval(Environment<Value> valueEnv, Environment<Pair<UserVal, UserVal>> userEnv) {
         return SetUnionVal.of(
                 userSetExprs.stream().map(expr -> expr.eval(valueEnv, userEnv)).toList());
     }

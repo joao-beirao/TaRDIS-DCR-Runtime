@@ -17,6 +17,7 @@ import dcr.runtime.elements.events.RemotelyInitiatedEventInstance;
 import dcr.runtime.monitoring.EventUpdate;
 import dcr.runtime.monitoring.GraphObserver;
 import dcr.runtime.monitoring.StateUpdate;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -372,10 +373,10 @@ public final class GraphRunner {
     private void onSpawn(EventInstance event, SpawnRelationInfo info, UserVal sender,
             UserVal receiver, String idExtensionToken, boolean locallyInitiated,
             List<StateUpdate> updates) {
-        var remoteUser = locallyInitiated ? receiver : sender;
+        // var remoteUser = locallyInitiated ? receiver : sender;
         var subgraph = info.spawn().subGraph();
         var newSpawnContext = info.spawnContext()
-                .beginScope(info.spawn().triggerId(), event, self, remoteUser, locallyInitiated);
+                .beginScope(info.spawn().triggerId(), event, sender, receiver, locallyInitiated);
         var localIdExtension = globalIdExtensionOf(idExtensionToken, sender, receiver);
         instantiateGraphElement(subgraph, newSpawnContext, localIdExtension, updates);
     }
@@ -575,7 +576,7 @@ public final class GraphRunner {
      *         event (when applicable), and eval env
      */
     record SpawnContext(Environment<Value> evalEnv, Environment<GenericEventInstance> renamingEnv,
-                        Environment<UserVal> triggerCounterparts) {
+                        Environment<Pair<UserVal, UserVal>> triggerCounterparts) {
         // cumulative register keeping track of actual sender/receiver of each interaction
         // triggering a spawn (either Tx or Rx) - enables resolving of Receiver(e1)
         // and Sender(e1) type of expressions - empty for top-level events
@@ -605,16 +606,18 @@ public final class GraphRunner {
         }
 
         // upon Tx/Rx trigger event
-        SpawnContext beginScope(String triggerId, EventInstance triggerEvent, UserVal self,
-                UserVal remoteParticipant, boolean isLocallyInitiated) {
-            var triggerVal = isLocallyInitiated
-                    ? encodeTriggerVal(triggerEvent.value(), self, remoteParticipant)
-                    : encodeTriggerVal(triggerEvent.value(), remoteParticipant, self);
+        SpawnContext beginScope(String triggerId, EventInstance triggerEvent, UserVal sender,
+                UserVal receiver, boolean isLocallyInitiated) {
+
+            var triggerVal = encodeTriggerVal(triggerEvent.value(), sender, receiver);
+            // var triggerVal = isLocallyInitiated
+            //         ? encodeTriggerVal(triggerEvent.value(), self, remoteParticipant)
+            //         : encodeTriggerVal(triggerEvent.value(), remoteParticipant, self);
             var newEvalEnv = evalEnv.beginScope(triggerId, triggerVal);
             var newAlphaRenamings = renamingEnv.beginScope();
             var newTriggerCounterparts =
                     triggerCounterparts.beginScope(triggerEvent.baseElement().remoteID(),
-                            remoteParticipant);
+                            Pair.of(sender, receiver));
             // TODO defensive copy triggerVal - immutable snapshot
             return new SpawnContext(newEvalEnv, newAlphaRenamings, newTriggerCounterparts);
         }
@@ -642,7 +645,7 @@ public final class GraphRunner {
     }
 
     // context for evaluation of computation- and user-expressions
-    private record EvalContext(Environment<Value> valueEnv, Environment<UserVal> userEnv) {}
+    private record EvalContext(Environment<Value> valueEnv, Environment<Pair<UserVal, UserVal>> userEnv) {}
 
 
     // encloses event

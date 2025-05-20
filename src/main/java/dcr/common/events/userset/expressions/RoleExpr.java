@@ -10,6 +10,7 @@ import dcr.common.events.userset.RoleParams;
 import dcr.common.events.userset.values.RoleVal;
 import dcr.common.events.userset.values.UserSetVal;
 import dcr.common.events.userset.values.UserVal;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ public final class RoleExpr
 
 
     @Override
-    public UserSetVal eval(Environment<Value> valueEnv, Environment<UserVal> userEnv) {
+    public UserSetVal eval(Environment<Value> valueEnv, Environment<Pair<UserVal, UserVal>> userEnv) {
         var evalParams = Record.<PrimitiveVal>builder();
         params.fields()
                 .stream()

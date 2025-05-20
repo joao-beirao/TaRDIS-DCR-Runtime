@@ -80,28 +80,6 @@ public final class DCRApp
         // return new DCRApp();
     }
 
-
-
-    // attempt to fetch and decode json-encoded endpoint resource
-    // private static Endpoint loadEndpoint(Properties properties) {
-    //     try (InputStream in = DCRApp.class.getResourceAsStream(
-    //             String.format("%s", properties.getProperty(CLI_ROLE_ARG)))) {
-    //         logger.info("Loading endpoint {}", String.format("%s", properties.getProperty(CLI_ROLE_ARG)));
-    //         assert in != null;
-    //         var jsonEncodedEndpoint = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-    //         ObjectMapper objectMapper = new ObjectMapper();
-    //         objectMapper.registerModule(new Jdk8Module());
-    //         var deserializedEndpoint =
-    //                 objectMapper.readValue(jsonEncodedEndpoint, EndpointDTO.class);
-    //         return EndpointMapper.mapEndpoint(deserializedEndpoint);
-    //     } catch (Exception e) {
-    //         logger.error(e);
-    //         throw new InternalError(
-    //                 String.format("Failed to load endpoint resource: %s\n%s", CLI_ROLE_ARG,
-    //                         e.getMessage()));
-    //     }
-    // }
-
     private static UserVal instantiateSelf(Properties props, Endpoint.Role roleDecl) {
         return UserVal.of(roleDecl.roleName(), Record.ofEntries(roleDecl.params()
                 .stream()
