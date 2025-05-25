@@ -31,9 +31,6 @@ public final class GraphRunner {
 
     private static final String SELF = "_@self";
 
-    // TODO [deprecate]
-    // private final Map<EventId, EventInfo<? extends GenericEventInstance>> eventsByUuid;
-
     // global mapping indexed by uuid
     private final Map<String, EventInfo<? extends GenericEventInstance>> eventsByUuid;
 
@@ -57,8 +54,8 @@ public final class GraphRunner {
     private final Map<EventInstance, List<ControlFlowRelationInfo>> milestones;
     // event ids mapped to spawn models
     private final Map<EventInstance, List<SpawnRelationInfo>> spawnRelations;
-    // TODO [revisit] temporary setup to handle send-then-spawn
 
+    // whoami
     private final UserVal self;
     private final CommunicationLayer communicationLayer;
     private final Collection<GraphObserver> graphObservers;
@@ -288,6 +285,11 @@ public final class GraphRunner {
     }
 
 
+    // unique tokens for spawn-based event-id generation (for locally-initiated events)
+    private static String generateIdExtensionToken() {
+        return UUID.randomUUID().toString();
+    }
+
     // TODO [revisit] updateEnv exception should reflect an implementation error: bug, not a feature
     // TODO [revisit] removal of conditions upon first execute
     private void locallyUpdateOnEventExecution(EventInfo<?> eventInfo, Value newValue,
@@ -320,10 +322,6 @@ public final class GraphRunner {
         }
     }
 
-    // unique tokens for spawn-based event-id generation (for locally-initiated events)
-    private static String generateIdExtensionToken() {
-        return UUID.randomUUID().toString();
-    }
 
 
     // called by Receive events
@@ -541,34 +539,34 @@ public final class GraphRunner {
     }
 
     // TODO [deprecate]
-    public String unparse(String indent) {
-        Objects.requireNonNull(indent);
-        StringBuilder builder = new StringBuilder();
-        builder.append("   == Runtime Graph State ==\n");
-        Consumer<Map<EventInstance, List<ControlFlowRelationInfo>>> ctrlFlowRelUnparser =
-                infoVals -> {
-                    infoVals.values()
-                            .stream()
-                            .map(values -> values.stream()
-                                    .map(info -> info.relation.unparse(indent))
-                                    .collect(Collectors.joining("\n")))
-                            .forEach(builder::append);
-                };
-        Consumer<Map<EventInstance, List<SpawnRelationInfo>>> spawnRelUnparser = infoVals -> {
-            infoVals.values()
-                    .forEach(list -> list.stream()
-                            .map(info -> info.spawn.unparse(indent) + "\n")
-                            .forEach(builder::append));
-        };
-        eventsByUuid.values()
-                .stream()
-                .map(ctxt -> ctxt.event.unparse(indent) + "\n")
-                .forEach(builder::append);
-        ctrlFlowRelUnparser.accept(conditions);
-        ctrlFlowRelUnparser.accept(responses);
-        spawnRelUnparser.accept(spawnRelations);
-        return builder.toString();
-    }
+    // public String unparse(String indent) {
+    //     Objects.requireNonNull(indent);
+    //     StringBuilder builder = new StringBuilder();
+    //     builder.append("   == Runtime Graph State ==\n");
+    //     Consumer<Map<EventInstance, List<ControlFlowRelationInfo>>> ctrlFlowRelUnparser =
+    //             infoVals -> {
+    //                 infoVals.values()
+    //                         .stream()
+    //                         .map(values -> values.stream()
+    //                                 .map(info -> info.relation.unparse(indent))
+    //                                 .collect(Collectors.joining("\n")))
+    //                         .forEach(builder::append);
+    //             };
+    //     Consumer<Map<EventInstance, List<SpawnRelationInfo>>> spawnRelUnparser = infoVals -> {
+    //         infoVals.values()
+    //                 .forEach(list -> list.stream()
+    //                         .map(info -> info.spawn.unparse(indent) + "\n")
+    //                         .forEach(builder::append));
+    //     };
+    //     eventsByUuid.values()
+    //             .stream()
+    //             .map(ctxt -> ctxt.event.unparse(indent) + "\n")
+    //             .forEach(builder::append);
+    //     ctrlFlowRelUnparser.accept(conditions);
+    //     ctrlFlowRelUnparser.accept(responses);
+    //     spawnRelUnparser.accept(spawnRelations);
+    //     return builder.toString();
+    // }
 
     /**
      * @param evalEnv

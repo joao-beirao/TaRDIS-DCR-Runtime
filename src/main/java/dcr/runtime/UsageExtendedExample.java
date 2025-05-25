@@ -126,7 +126,7 @@ public class UsageExtendedExample {
                 }
                 String event = tokenizer.nextToken();
                 runner.executeComputationEvent(event);
-                System.err.println(runner.unparse(""));
+                // System.err.println(runner.unparse(""));
 
             } catch (Exception e) {
                 // TODO: Handle event exception in here

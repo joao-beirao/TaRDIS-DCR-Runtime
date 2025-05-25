@@ -105,13 +105,13 @@ public class DistributedDCRProtocol
 
         // register protocol handlers
         // register message handlers
-        registerMessageHandler(channelId, OnTxMessage.MSG_ID, this::uponReceivePingMessage, this::uponMessageFailed);
+        registerMessageHandler(channelId, OnTxMessage.MSG_ID, this::uponReceivedDcrMessage, this::uponMessageFailed);
         registerMessageHandler(channelId, PongMessage.MSG_ID, this::uponReceivePongMessage, this::uponMessageFailed);
 
         // register request handlers
         registerRequestHandler(AppRequest.REQUEST_ID, this::uponReceivePingRequest);
 
-        logger.info("PingPongProtocol initialized, running on "
+        logger.info("DcrProtocol initialized, running on "
                 + channelProps.getProperty(TCPChannel.ADDRESS_KEY) + ":"
                 + channelProps.getProperty(TCPChannel.PORT_KEY));
 
@@ -144,7 +144,7 @@ public class DistributedDCRProtocol
         openConnection(appRequest.getDestination(), channelId);
         // send a ping message to target
         //sendPingMessage(dcrRequest.getDestination(), dcrRequest.getEventId(), dcrRequest.getMarking());
-        sendPingMessage(appRequest.getDestination(), appRequest.getEventId(),
+        sendDcrMessage(appRequest.getDestination(), appRequest.getEventId(),
                 appRequest.getMarking(), appRequest.getIdExtensionToken(), appRequest.getSender());
         // closeConnection(dcrRequest.getDestination(), channelId);
     }
@@ -178,9 +178,10 @@ public class DistributedDCRProtocol
      * @param destination Host destination
      * @param message     String message
      */
-    public void sendPingMessage(Host destination, String message, Event.Marking marking,
+    public void sendDcrMessage(Host destination, String message, Event.Marking marking,
             String idExtensionToken, UserVal sender) {
-        logger.debug("Sending Ping Message to {} on channel {} with message {}", destination, channelId, message);
+        logger.debug("Sending DCR Message to {} on channel {} with message {}", destination,
+                channelId, message);
         sendMessage(channelId, new OnTxMessage(++nextPingId, message, marking, sender, idExtensionToken),
                 destination);
         // logger.debug("Ping message sent");
@@ -203,8 +204,9 @@ public class DistributedDCRProtocol
      * @param channelId   Source channel ID (from which channel was the message was
      *                    received)
      */
-    public void uponReceivePingMessage(OnTxMessage msg, Host from, short sourceProto, int channelId) {
-        logger.info("Received PingMessage with id: {} from {}; message: {}; idExtensionToken: {};" +
+    public void uponReceivedDcrMessage(OnTxMessage msg, Host from, short sourceProto, int channelId) {
+        logger.info("Received DCR message with id: {} from {}; message: {}; " +
+                        "idExtensionToken: {};" +
                         " sender: {}",
                 msg.getPingId(),
                 from.toString(),
@@ -244,7 +246,8 @@ public class DistributedDCRProtocol
      * @param channelId the channel ID (from which channel was the message was sent)
      */
     private void uponMessageFailed(ProtoMessage msg, Host host, short destProto, Throwable error, int channelId) {
-        logger.warn("Failed message: {} to host: {} with error: {}", msg, host, error.getMessage());
+        logger.warn("Unable to deliver DCR message: {} to host: {} with error: {}", msg, host,
+                error.getMessage());
     }
 
     /**

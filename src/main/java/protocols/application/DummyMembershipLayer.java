@@ -6,6 +6,7 @@ import dcr.common.data.values.StringVal;
 import dcr.common.events.userset.values.*;
 import dcr.runtime.communication.MembershipLayer;
 import org.apache.commons.lang3.NotImplementedException;
+import pt.unl.fct.di.novasys.babel.protocols.membership.VersionedPeer;
 import pt.unl.fct.di.novasys.network.data.Host;
 
 import java.util.*;
@@ -47,20 +48,9 @@ public final class DummyMembershipLayer
 
 
 
-        // docker run --network tardis-babel-backend-net --rm -h P_1_1 --name P_1_1 -it dcr-babel interface=eth0 role='CO.json' cid=1
-        //
-        // docker run --network tardis-babel-backend-net --rm -p 8080:8080 -h P_1_1 --name P_1_1 -it dcr-babel interface=eth0 role='P.json' id='1' cid="1"
-        //
-        // docker run --network tardis-babel-backend-net --rm -p 8080:8080 -h P_2_1 --name P_2_1 -it dcr-babel interface=eth0 role='P.json' id='2' cid=1
-        //
-        // docker run --network tardis-babel-backend-net --rm -p 8080:8080 -h P_2_1 --name P_2_1
-        // -it dcr-babel interface=eth0 role='P.json' id='3' cid=1
-        //
-        // docker run --network tardis-babel-backend-net --rm -p 8080:8080 -h P_4_1 --name P_4_1
-        // -it dcr-babel interface=eth0 role='P.json' id='4' cid=1
 
 
-        // // USE CASE EDP V3
+        // USE CASE EDP V3
         // EC 1
         singleton.onNeighborUp(new DummyNeighbour(
                 UserVal.of("CO", Record.ofEntries(Record.Field.of("cid", IntVal.of(1)))), "CO_1"));
@@ -88,6 +78,9 @@ public final class DummyMembershipLayer
         singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
                 Record.ofEntries(Record.Field.of("id", StringVal.of("3")),
                         Record.Field.of("cid", IntVal.of(2)))), "P_3_2"));
+        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+                Record.ofEntries(Record.Field.of("id", StringVal.of("4")),
+                        Record.Field.of("cid", IntVal.of(2)))), "P_4_2"));
     }
 
     private final Map<UserVal, Neighbour> neighbourMapping;
@@ -155,7 +148,6 @@ public final class DummyMembershipLayer
     }
 
     public Set<Neighbour> resolveParticipants(UserSetVal receivers) {
-        System.err.println(receivers);
         Set<Neighbour> evalResult = new HashSet<>();
         switch (receivers) {
             case UserVal user -> {
@@ -164,13 +156,11 @@ public final class DummyMembershipLayer
             }
             // TODO subsequent filter according to params
             case RoleVal role -> {
-                neighboursByRole.forEach(
-                        (key, value) -> value.forEach(n -> System.err.println(n.user())));
-
-                System.err.println();
+                // neighboursByRole.forEach(
+                //         (key, value) -> value.forEach(n -> System.err.println(n.user())));
                 var candidates = neighboursByRole.getOrDefault(role.role(), Collections.emptySet());
-                candidates.forEach(candidate -> System.err.println(candidate.user()));
-                System.err.println();
+                // candidates.forEach(candidate -> System.err.println(candidate.user()));
+                // System.err.println();
                 for (var param : role.params().params()) {
                     candidates = candidates.stream()
                             .filter(u -> param.value()
@@ -191,7 +181,7 @@ public final class DummyMembershipLayer
             case SetUnionVal unionSet -> unionSet.userSetVals()
                     .forEach(expr -> evalResult.addAll(resolveParticipants(expr)));
         }
-        System.err.println("eval result on membership: " + evalResult);
+        // System.err.println("eval result on membership: " + evalResult);
         return evalResult;
     }
 
