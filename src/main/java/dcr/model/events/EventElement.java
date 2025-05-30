@@ -13,6 +13,8 @@ public sealed interface EventElement
   @Override
   MarkingElement marking();
 
+  default String localId() {return remoteID();}
+
   String choreoElementUID();
 
   sealed interface MarkingElement

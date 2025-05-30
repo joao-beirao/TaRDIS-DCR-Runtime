@@ -9,7 +9,7 @@ import dcr.common.data.computation.ComputationExpression;
  */
 public interface ComputationEvent
         extends LocallyInitiatedEvent {
-    ComputationExpression getComputationExpression();
+    ComputationExpression computationExpression();
 }
 
 

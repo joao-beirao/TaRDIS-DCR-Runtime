@@ -26,6 +26,8 @@ public final class RecordExpr
         return new RecordExpr(Objects.requireNonNull(recordExpr));
     }
 
+    public Record<ComputationExpression> fields() {return  exprRecord;}
+
     @Override
     public PropBasedVal eval(Environment<Value> env) {
         Record.Builder<Value> builder = new Record.Builder<>();

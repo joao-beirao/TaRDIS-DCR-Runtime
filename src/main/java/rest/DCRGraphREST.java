@@ -29,7 +29,7 @@ public class DCRGraphREST
 
     public enum DCREndpoints
             implements EndpointPath {
-        ENDPOINT_PROCESS("dcr");
+        ENDPOINT_PROCESS("endpoint_process");
 
         private final String endpointPath;
 
@@ -37,45 +37,43 @@ public class DCRGraphREST
 
         @Override
         public String getPath() {return endpointPath;}
-
     }
 
     public DCRGraphREST() {
         super();
     }
 
-
+    // dummy
     @GET
     @Path("/")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response endpointProcess( ) {
+    public Response endpointProcess() {
         logger.info("\n\n\nEndpoint process requested");
 
-       return Response.status(Response.Status.OK).entity("all good").type(MediaType.TEXT_PLAIN).build();
+        return Response.status(Response.Status.OK)
+                .entity("all good")
+                .type(MediaType.TEXT_PLAIN)
+                .build();
     }
 
     @GET
     @Path("/endpoint")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public void endpointProcess(@Suspended final AsyncResponse ar) {
-        logger.info("Endpoint process requested");
         this.sendRequest(WebServiceOperation.READ, DCREndpoints.ENDPOINT_PROCESS, ar);
-        logger.info("Endpoint process forwarded");
     }
 
-
     @Override
-    public void triggerResponse(String opUID, GenericWebAPIResponse responseVal) {
+    public void triggerResponse(String opUID, GenericWebAPIResponse genericResponse) {
         PendingResponse pendingResponse = super.removePendingResponse(opUID);
         var restEndpoint = (DCREndpoints) pendingResponse.getRestEnpoint();
         var ar = pendingResponse.getAr();
-        Response response = null;
         switch (restEndpoint) {
             case ENDPOINT_PROCESS:
-                if (responseVal == null) {
+                if (genericResponse == null) {
                     sendStatusResponse(ar, Response.Status.INTERNAL_SERVER_ERROR, ERROR_MESSAGE);
                 }
-                else {sendResponse(ar, Response.Status.OK, responseVal);}
+                else {sendResponse(ar, Response.Status.OK, genericResponse);}
         }
     }
 

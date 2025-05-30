@@ -24,6 +24,8 @@ public final class BoolLiteral
         this.value = value;
     }
 
+    public boolean value() {return value.value();}
+
     @Override
     public BoolVal eval(Environment<Value> env) {
         return value;
@@ -31,5 +33,4 @@ public final class BoolLiteral
 
     @Override
     public String toString() {return value.toString();}
-
 }

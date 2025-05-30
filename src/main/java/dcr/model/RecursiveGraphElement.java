@@ -4,19 +4,21 @@ package dcr.model;
 import dcr.common.Environment;
 import dcr.common.events.InputEvent;
 import dcr.common.events.ReceiveEvent;
+import dcr.common.relations.Relation;
 import dcr.model.events.ComputationEventElement;
 import dcr.model.events.EventElement;
 import dcr.model.events.InputEventElement;
 import dcr.model.events.ReceiveEventElement;
 import dcr.model.relations.ControlFlowRelationElement;
+import dcr.model.relations.RelationElement;
 import dcr.model.relations.SpawnRelationElement;
 
 import java.util.*;
 import java.util.function.Function;
 
-public final class RecursiveGraphModel
+public final class RecursiveGraphElement
         extends GenericElement
-        implements GraphModel {
+        implements GraphElement {
 
     private final Map<String, EventElement> eventsByLocalId;
 
@@ -27,7 +29,7 @@ public final class RecursiveGraphModel
     // TODO should eventually be a list of relations per event
     private final List<SpawnRelationElement> spawnRelations;
 
-    RecursiveGraphModel(String elementId) {
+    RecursiveGraphElement(String elementId) {
         super(elementId);
         this.eventsByLocalId = new HashMap<>();
         this.computationEvents = new HashMap<>();
@@ -36,10 +38,17 @@ public final class RecursiveGraphModel
         this.spawnRelations = new LinkedList<>();
     }
 
-
     @Override
     public Iterable<? extends EventElement> events() {
         return eventsByLocalId.values();
+    }
+
+    @Override
+    public Iterable<? extends RelationElement> relations() {
+        List<RelationElement> relations = new LinkedList<>();
+        relations.addAll(controlFlowRelations);
+        relations.addAll(spawnRelations);
+        return Collections.unmodifiableList(relations);
     }
 
     @Override
@@ -107,7 +116,7 @@ public final class RecursiveGraphModel
     }
 
 
-    private static String tester(RecursiveGraphModel graph, String indent,
+    private static String tester(RecursiveGraphElement graph, String indent,
             Function<ModelElement, String> stringifier) {
         StringBuilder builder = new StringBuilder();
         builder.append(System.lineSeparator())
@@ -125,7 +134,7 @@ public final class RecursiveGraphModel
         graph.spawnRelations.forEach(spawn -> {
             builder.append(beginSpawn(indent, spawn.sourceId()));
             builder.append(
-                    tester((RecursiveGraphModel) spawn.subGraph(), indent + "  ", stringifier));
+                    tester((RecursiveGraphElement) spawn.subGraph(), indent + "  ", stringifier));
             builder.append(endSpawn(indent));
         });
         return builder.toString();
@@ -152,12 +161,12 @@ public final class RecursiveGraphModel
     private static final class Spawn {
 
         // static information
-        final RecursiveGraphModel graph;
+        final RecursiveGraphElement graph;
         // dynamic info
         final String trigger;
         final Environment<String> names;
 
-        Spawn(RecursiveGraphModel graph, String trigger, Environment<String> names) {
+        Spawn(RecursiveGraphElement graph, String trigger, Environment<String> names) {
             this.graph = graph;
             this.trigger = trigger;
             this.names = names;

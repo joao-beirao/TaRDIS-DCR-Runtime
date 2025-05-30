@@ -25,7 +25,7 @@ public record ReceiverExpr(String eventId)
     public UserSetVal eval(Environment<Value> valueEnv, Environment<Pair<UserVal, UserVal>> userEnv) {
         return userEnv.lookup(eventId)
                 .orElseThrow(() -> new IllegalStateException(
-                        "Internal " + "Error: bad environment - missing binding for event " +
+                        "Internal Error: bad environment - missing binding for event " +
                                 eventId))
                 .value().getRight();
     }

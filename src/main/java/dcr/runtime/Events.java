@@ -180,8 +180,8 @@ final class ComputationInstance
     }
 
     @Override
-    public ComputationExpression getComputationExpression() {
-        return ((ComputationEventElement) baseElement()).getComputationExpression();
+    public ComputationExpression computationExpression() {
+        return ((ComputationEventElement) baseElement()).computationExpression();
     }
 
     @Override
@@ -191,13 +191,13 @@ final class ComputationInstance
     public String toString() {
         return String.format("[%s] %s - %s(%s : %s) [%s] (%s) [%s]", localUID(),
                 receivers().map(ignored -> "Tx").orElse("Local"), marking().toStringPrefix(),
-                remoteID(), label(), getComputationExpression(), value(),
+                remoteID(), label(), computationExpression(), value(),
                 receivers().map(r -> String.format("@self ->" + " %s", r)).orElse("Local"));
     }
 
     public String unparse(String indentation) {
         return String.format("%s%s - (%s: %s) [%s] %s", indentation, localUID(), remoteID(), label(),
-                getComputationExpression().toString(), marking());
+                computationExpression().toString(), marking());
     }
 }
 

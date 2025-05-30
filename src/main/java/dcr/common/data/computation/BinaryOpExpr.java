@@ -25,6 +25,12 @@ public final class BinaryOpExpr implements ComputationExpression {
         return new BinaryOpExpr(left, right, op);
     }
 
+    public ComputationExpression left() {return left;}
+
+    public ComputationExpression right() {return right;}
+
+    public OpType opType() {return op;}
+
     @Override
     public Value eval(Environment<Value> env) {
         Value left = this.left.eval(env);

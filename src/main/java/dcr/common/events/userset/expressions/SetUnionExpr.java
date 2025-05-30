@@ -34,7 +34,8 @@ public record SetUnionExpr(Collection<? extends UserSetExpression> userSetExprs)
 
     // TODO - filter out duplicates
     @Override
-    public SetUnionVal eval(Environment<Value> valueEnv, Environment<Pair<UserVal, UserVal>> userEnv) {
+    public SetUnionVal eval(Environment<Value> valueEnv,
+            Environment<Pair<UserVal, UserVal>> userEnv) {
         return SetUnionVal.of(
                 userSetExprs.stream().map(expr -> expr.eval(valueEnv, userEnv)).toList());
     }
@@ -42,6 +43,8 @@ public record SetUnionExpr(Collection<? extends UserSetExpression> userSetExprs)
     @NotNull
     @Override
     public String toString() {
-        return userSetExprs.stream().map(UserSetExpression::toString).collect(Collectors.joining(","));
+        return userSetExprs.stream()
+                .map(UserSetExpression::toString)
+                .collect(Collectors.joining(","));
     }
 }

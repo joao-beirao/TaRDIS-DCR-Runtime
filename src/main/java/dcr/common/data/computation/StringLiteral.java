@@ -7,7 +7,7 @@ import dcr.common.Environment;
 
 import java.util.Objects;
 
-public class StringLiteral
+public final class StringLiteral
         implements ComputationExpression, ASTComparable<StringVal> {
 
     private static final StringLiteral EMPTY_STRING = new StringLiteral(StringVal.empty());
@@ -33,6 +33,8 @@ public class StringLiteral
     public static StringLiteral empty() {
         return EMPTY_STRING;
     }
+
+    public String value() {return value.value();}
 
     @Override
     public StringVal eval(Environment<Value> env) {

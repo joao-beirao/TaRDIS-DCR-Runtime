@@ -28,5 +28,4 @@ public record RecordTypeDTO( @JsonProperty(value = "fields",required = true) Lis
                 .map(FieldDTO::toString)
                 .collect(Collectors.joining(", ", "{", "}"));
     }
-
 }

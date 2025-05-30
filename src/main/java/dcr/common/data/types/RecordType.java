@@ -15,11 +15,11 @@ public final class RecordType
     @Serial
     private static final long serialVersionUID = 3695622628239071917L;
     private static final RecordType EMPTY_INSTANCE = new RecordType(Record.empty());
-    private final Record<? extends Type> typeRecord;
+    public final Record<? extends Type> typeRecord;
 
     public static RecordType empty() {return EMPTY_INSTANCE;}
 
-    // TODO test typeRecord and return EMPTY_INSTANCE if that is the cas
+    // TODO test typeRecord and return EMPTY_INSTANCE if so
     // TODO add isEmpty to Record
     public static RecordType of(Record<Type> typeRecord) {
         return new RecordType(Objects.requireNonNull(typeRecord));
@@ -28,6 +28,8 @@ public final class RecordType
     private RecordType(Record<? extends Type> typeRecord) {
         this.typeRecord = typeRecord;
     }
+
+    public Record<? extends Type> fields() {return typeRecord;}
 
     @Override
     public int hashCode() {

@@ -161,7 +161,7 @@ public final class DummyMembershipLayer
                 var candidates = neighboursByRole.getOrDefault(role.role(), Collections.emptySet());
                 // candidates.forEach(candidate -> System.err.println(candidate.user()));
                 // System.err.println();
-                for (var param : role.params().params()) {
+                for (var param : role.params()) {
                     candidates = candidates.stream()
                             .filter(u -> param.value()
                                     .equals(u.user()
@@ -169,7 +169,7 @@ public final class DummyMembershipLayer
                                             .fetchProp(param.name())))
                             .collect(Collectors.toSet());
                 }
-                candidates.forEach(candidate -> System.err.println(candidate.user()));
+                // candidates.forEach(candidate -> System.err.println(candidate.user()));
                 evalResult.addAll(candidates);
             }
             case SetDiffVal setDiff -> {

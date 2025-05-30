@@ -17,7 +17,7 @@ import dcr.common.data.values.Value;
 import dcr.common.events.Event;
 import dcr.common.events.userset.values.UserSetVal;
 import dcr.common.events.userset.values.UserVal;
-import dcr.model.GraphModel;
+import dcr.model.GraphElement;
 import dcr.runtime.GraphRunner;
 import dcr.runtime.communication.CommunicationLayer;
 import dcr.runtime.communication.MembershipLayer;
@@ -30,12 +30,14 @@ import protocols.dcr.DistributedDCRProtocol;
 import pt.unl.di.novasys.babel.webservices.WebAPICallback;
 import pt.unl.di.novasys.babel.webservices.application.GenericWebServiceProtocol;
 import pt.unl.di.novasys.babel.webservices.utils.EndpointPath;
+import pt.unl.di.novasys.babel.webservices.utils.GenericWebAPIResponse;
 import pt.unl.fct.di.novasys.babel.exceptions.HandlerRegistrationException;
 import pt.unl.fct.di.novasys.babel.generic.ProtoNotification;
 import pt.unl.fct.di.novasys.babel.protocols.dissemination.notifications.BroadcastDelivery;
 import pt.unl.fct.di.novasys.babel.protocols.dissemination.requests.BroadcastRequest;
 import pt.unl.fct.di.novasys.babel.protocols.membership.notifications.NeighborUp;
 import pt.unl.fct.di.novasys.network.data.Host;
+import rest.DCRGraphREST;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,25 +56,24 @@ public final class DCRApp
         extends GenericWebServiceProtocol
         implements GraphObserver, CommunicationLayer {
 
-    @Override
-    public void onUpdate(List<StateUpdate> update) {
-        logger.info("Observed state update: {}", update);
-    }
+
+
+    private static final Logger logger = LogManager.getLogger(DCRApp.class);
 
     private static final class LazyHolder {
         static final DCRApp INSTANCE = new DCRApp();
     }
 
-    public static final short PROTO_ID = 51;
     public static final String PROTOCOL_NAME = "DCRApp";
+    public static final short PROTO_ID = 51;
 
     private static final int DEFAULT_PORT = 9000; // default port to listen on
 
     // TODO add support for endpoint.role config
     private static final String CLI_ROLE_ARG = "role";
-    private static final Logger logger = LogManager.getLogger(DCRApp.class);
 
-    private GraphRunner runner;
+    private GraphRunner runner = null;
+    private Endpoint endpoint = null;
 
 
     public static DCRApp getInstance() {
@@ -114,19 +115,15 @@ public final class DCRApp
     @Override
     public void init(Properties properties) throws HandlerRegistrationException, IOException {
         logger.info("Initializing DCRApp");
-        // register protocol handlers
-        // --- none at this point ----
-        // register request handlers
+        // request handlers
         registerRequestHandler(AppRequest.REQUEST_ID, this::uponReceiveDcrRequest);
-        // register reply handler
+        // reply handlers
         // registerReplyHandler(AppReply.REPLY_ID, this::onPongReply);
         // start CLI
-        // cmdLineRunner.processCommands();
         registerRequestHandler(BroadcastRequest.REQUEST_ID, this::uponBroadCastRequest);
         subscribeNotification(BroadcastDelivery.NOTIFICATION_ID, this::uponBroadcastDelivery);
         // triggerNotification(new NeighborUp(self));
         subscribeNotification(NeighborUp.NOTIFICATION_ID, this::uponNeighborUpNotification);
-        // registerRequestHandler();
 
 
         // observation: Bootstrap is currently supported by CLI params:
@@ -141,25 +138,25 @@ public final class DCRApp
         try (InputStream in = DCRApp.class.getResourceAsStream(
                 String.format("%s.json", properties.getProperty(CLI_ROLE_ARG)))) {
             assert in != null;
-
             // the user associated with this endpoint
             UserVal self;
             // the behaviour this endpoint will enact
-            GraphModel graphModel;
+            GraphElement graphElement;
             {
                 // load the information required to deploy this endpoint
                 var jsonEncodedEndpoint = new String(in.readAllBytes(), StandardCharsets.UTF_8);
                 var endpoint = decodeEndpoint(jsonEncodedEndpoint);
+                this.endpoint = endpoint;
                 // inject runtime parameters into self
                 self = instantiateSelf(properties, endpoint.role());
-                graphModel = endpoint.graphModel();
+                graphElement = endpoint.graphElement();
             }
             // aggregates CLI-based functionality and callbacks (replaceable with GUI/REST/...)
             CLI cmdLineRunner = new CLI(this);
             // setup graph runner
             runner = new GraphRunner(self, this);
-            runner.init(graphModel);
             runner.registerGraphObserver(this);
+            runner.init(graphElement);
             // start CLI-based interaction
             cmdLineRunner.init();
         } catch (Exception e) {
@@ -168,12 +165,14 @@ public final class DCRApp
     }
 
 
+    // TODO [deprecate]
     // public DCRProtocol1(Properties props, Host self) {
     //     super(PROTOCOL_NAME, PROTO_ID);
     //     this.self = self;
     //
     // }
 
+    // TODO [deprecate]
     // public void init(Properties properties) throws HandlerRegistrationException, IOException {
     //
     //     logger.info("Initializing DCRProtocol1 - registering request handlers");
@@ -219,7 +218,6 @@ public final class DCRApp
     @Override
     public Set<UserVal> uponSendRequest(UserVal requester, String eventId, UserSetVal receivers,
             Event.Marking marking, String uidExtension) {
-        // logger.info("on uponSendRequest: from{}", requester);
         var neighbours = DummyMembershipLayer.instance()
                 .resolveParticipants(receivers)
                 .stream()
@@ -290,8 +288,6 @@ public final class DCRApp
         logger.info("Executing Receive event '{}': received {}", eventId, marking);
         try {
             runner.onReceiveEvent(eventId, marking.value(), sender, uidExtension);
-            // TODO pass on something to be printed
-            // cmdLineRunner.onReceiveEvent();
         } catch (Exception e) {
             logger.error("Error executing Receive Event '{}': {}", eventId, e.getMessage());
             e.printStackTrace();
@@ -318,7 +314,7 @@ public final class DCRApp
      * DCR Protocol handlers
      * ======================= */
 
-    // handle incoming (inner-process) DCRProtocol request (Tx/Rx)
+    // handle incoming (inner-process) DCRProtocol request (Rx)
     private void uponReceiveDcrRequest(AppRequest appRequest, short sourceProtocol) {
         try {
             onExecuteReceiveEvent(runner, appRequest.getEventId(), appRequest.getMarking(),
@@ -328,13 +324,22 @@ public final class DCRApp
         }
     }
 
+    /* =======================
+     * Observer callback
+     * ======================= */
+
+    @Override
+    public void onUpdate(List<StateUpdate> update) {
+        logger.info("Observed state update");
+    }
+
     /* =====================
      * WebService Handlers
      * ===================== */
 
 
     @Override
-    protected void createAsync(String s, Object o, WebAPICallback webAPICallback,
+    protected void createAsync(String opUniqueID, Object o, WebAPICallback webAPICallback,
             Optional<EndpointPath> optional) {
 
     }
@@ -346,14 +351,21 @@ public final class DCRApp
     }
 
     @Override
-    protected void readAsync(String s, Object o, WebAPICallback webAPICallback,
-            Optional<EndpointPath> optional) {
-
+    protected void readAsync(String opUniqueID, Object o, WebAPICallback webAPICallback,
+            Optional<EndpointPath> endpointPath) {
+        if (endpointPath.isEmpty())
+            return;
+        switch ((DCRGraphREST.DCREndpoints)endpointPath.get()) {
+            case ENDPOINT_PROCESS -> {
+                var response = new GenericWebAPIResponse("Returned endpoint-process",null);
+                webAPICallback.triggerResponse(opUniqueID, response);
+            }
+            default -> logger.info("Unexpected endpointPath call: {}", endpointPath.get());
+        }
     }
 
     @Override
     protected void deleteAsync(String s, Object o, WebAPICallback webAPICallback,
             Optional<EndpointPath> optional) {
-
     }
 }

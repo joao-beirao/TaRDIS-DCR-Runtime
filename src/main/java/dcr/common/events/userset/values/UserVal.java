@@ -31,19 +31,8 @@ public record UserVal(String role, Record<Value> params)
     public UserVal {
         Objects.requireNonNull(role);
         Objects.requireNonNull(params);// ok by construction
-        // deprecating...
-        // if (!(params.getId() instanceof StringVal)) {
-        //     // TODO BadState.. Internal Error instead - should be compiled this way
-        //     throw new IllegalArgumentException(
-        //             "'id' field of UserVal value must be a String" + " field");
-        // }
     }
 
-    // deprecating
-    // public StringVal getId() {
-    //     // cast safe by construction
-    //     return (StringVal) params.getId();
-    // }
 
     // TODO revise - quick patch
     public RecordVal getParamsAsRecordVal() {

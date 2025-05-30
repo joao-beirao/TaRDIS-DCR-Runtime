@@ -127,7 +127,5 @@ public interface Event {
         return new EventType(label());
     }
 
-    ;
-
     default Type valueType() {return marking().valueType();}
 }

@@ -3,8 +3,8 @@ package dcr.model.relations;
 import dcr.common.data.computation.BoolLiteral;
 import dcr.common.data.computation.ComputationExpression;
 import dcr.common.relations.ControlFlowRelation;
-import dcr.model.GraphModel;
-import dcr.model.RecursiveGraphModel;
+import dcr.model.GraphElement;
+import dcr.model.RecursiveGraphElement;
 import org.apache.commons.lang3.NotImplementedException;
 
 // TODO [revise]
@@ -14,7 +14,7 @@ public final class RelationElements {
     private static final ComputationExpression UNCONSTRAINED = BoolLiteral.TRUE;
 
     public static SpawnRelationElement newSpawnRelation(String elementId, String sourceId,
-            String triggerId, ComputationExpression guard, RecursiveGraphModel model,
+            String triggerId, ComputationExpression guard, RecursiveGraphElement model,
             ComputationExpression instantiationConstraint) {
         return new SpawnElement(elementId, sourceId, triggerId, guard, model,
                 instantiationConstraint);
@@ -39,7 +39,7 @@ record ControlFlowElement(String endpointElementUID, String sourceId, Computatio
 }
 
 record SpawnElement(String endpointElementUID, String sourceId, String triggerId,
-                    ComputationExpression guard, GraphModel subGraph,
+                    ComputationExpression guard, GraphElement subGraph,
                     ComputationExpression instantiationConstraint)
         implements SpawnRelationElement {
 

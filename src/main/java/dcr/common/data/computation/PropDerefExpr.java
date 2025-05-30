@@ -4,10 +4,11 @@ import dcr.common.Environment;
 import dcr.common.data.values.PropBasedVal;
 import dcr.common.data.values.Value;
 
+// TODO [javadoc] immutable object...
 public final class PropDerefExpr
         implements ComputationExpression {
-    private final ComputationExpression propBasedExpr;
-    private final String propName;
+    public final ComputationExpression propBasedExpr;
+    public final String propName;
 
     public static PropDerefExpr of(ComputationExpression propBasedExpr, String propName) {
         return new PropDerefExpr(propBasedExpr, propName);

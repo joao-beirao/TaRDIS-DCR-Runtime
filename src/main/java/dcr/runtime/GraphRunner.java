@@ -6,7 +6,7 @@ import dcr.common.data.computation.ComputationExpression;
 import dcr.common.data.values.*;
 import dcr.common.events.Event;
 import dcr.common.events.userset.values.UserVal;
-import dcr.model.GraphModel;
+import dcr.model.GraphElement;
 import dcr.model.events.EventElement;
 import dcr.model.relations.ControlFlowRelationElement;
 import dcr.model.relations.SpawnRelationElement;
@@ -118,10 +118,10 @@ public final class GraphRunner {
         spawnRelations = new HashMap<>();
     }
 
-    public void init(GraphModel graphModel) {
+    public void init(GraphElement graphElement) {
         // TODO [revisit] not really using the model after init
         List<StateUpdate> updates = new LinkedList<>();
-        instantiateGraphElement(Objects.requireNonNull(graphModel), SpawnContext.init(this.self),
+        instantiateGraphElement(Objects.requireNonNull(graphElement), SpawnContext.init(this.self),
                 "", updates);
         graphObservers.forEach(observer -> observer.onUpdate(updates));
     }
@@ -147,7 +147,7 @@ public final class GraphRunner {
         var info = requireNonNullEnabledEvent(computationEvents.get(eventId));
         assertIfcOK(info.event(), info.valueEnv());
         var event = info.event();
-        Value recomputedValue = event.getComputationExpression().eval(info.valueEnv());
+        Value recomputedValue = event.computationExpression().eval(info.valueEnv());
         List<StateUpdate> updates = new LinkedList<>();
         locallyUpdateOnEventExecution(info, recomputedValue, updates);
         onLocallyInitiatedEvent(event, info.evalContext, updates);
@@ -322,13 +322,11 @@ public final class GraphRunner {
         }
     }
 
-
-
     // called by Receive events
     private void onRemotelyInitiatedEvent(RemotelyInitiatedEventInstance event, UserVal sender,
             String idExtensionToken, List<StateUpdate> updates) {
         spawnRelations.getOrDefault(event, Collections.emptyList())
-                .forEach(info -> onSpawn(event, info, sender, self, idExtensionToken, false,
+                .forEach(info -> onSpawn(event, info, sender, self, idExtensionToken,
                         updates));
     }
 
@@ -336,7 +334,7 @@ public final class GraphRunner {
     private void onLocallyInitiatedEvent(LocallyInitiatedEventInstance event, UserVal receiver,
             String idExtensionToken, List<StateUpdate> updates) {
         spawnRelations.getOrDefault(event, Collections.emptyList())
-                .forEach(info -> onSpawn(event, info, self, receiver, idExtensionToken, true,
+                .forEach(info -> onSpawn(event, info, self, receiver, idExtensionToken,
                         updates));
     }
 
@@ -369,12 +367,12 @@ public final class GraphRunner {
 
     // upon Tx/Rx-based spawn
     private void onSpawn(EventInstance event, SpawnRelationInfo info, UserVal sender,
-            UserVal receiver, String idExtensionToken, boolean locallyInitiated,
+            UserVal receiver, String idExtensionToken,
             List<StateUpdate> updates) {
         // var remoteUser = locallyInitiated ? receiver : sender;
         var subgraph = info.spawn().subGraph();
         var newSpawnContext = info.spawnContext()
-                .beginScope(info.spawn().triggerId(), event, sender, receiver, locallyInitiated);
+                .beginScope(info.spawn().triggerId(), event, sender, receiver);
         var localIdExtension = globalIdExtensionOf(idExtensionToken, sender, receiver);
         instantiateGraphElement(subgraph, newSpawnContext, localIdExtension, updates);
     }
@@ -401,7 +399,7 @@ public final class GraphRunner {
      * ============================= */
 
     // instantiate a (sub)graph element - uidExtension expected to be empty for top-level
-    private void instantiateGraphElement(GraphModel graph, SpawnContext spawnContext,
+    private void instantiateGraphElement(GraphElement graph, SpawnContext spawnContext,
             String uidExtension, List<StateUpdate> updates) {
         List<Consumer<GraphRunner>> graphUpdates = new LinkedList<>();
         graph.events()
@@ -432,20 +430,20 @@ public final class GraphRunner {
 
         var instance = Events.newInstance(localUID, remoteID, baseElement);
         spawnContext.onNewEventInstance(instance);
-        var evalContext = new EvalContext(spawnContext.evalEnv, spawnContext.triggerCounterparts);
+        var evalContext = new EvalContext(spawnContext.evalEnv, spawnContext.userEnv);
         var eventInfo = switch (instance) {
             case ComputationInstance e -> {
                 var info = new EventInfo<>(e, evalContext);
                 computationEvents.put(instance.remoteID(), info);
                 yield info;
             }
-            case InputInstance elem -> {
-                var info = new EventInfo<>((InputInstance) instance, evalContext);
+            case InputInstance e -> {
+                var info = new EventInfo<>(e, evalContext);
                 inputEvents.put(instance.remoteID(), info);
                 yield info;
             }
-            case ReceiveInstance elem -> {
-                var info = new EventInfo<>((ReceiveInstance) instance, evalContext);
+            case ReceiveInstance e -> {
+                var info = new EventInfo<>(e, evalContext);
                 receiveEvents.put(instance.remoteID(), info);
                 yield info;
             }
@@ -472,8 +470,6 @@ public final class GraphRunner {
     // instantiate a control-flow relation element
     private InstantiatedControlFlowRelation newControlFlowRelationInstanceOf(
             ControlFlowRelationElement baseElement, SpawnContext spawnContext) {
-        // TODO [revise] exception throwing - throwing here signals an implementation error -
-        //  should probably funnel this into an InternalErrorException for similar methods
         GenericEventInstance source =
                 spawnContext.renamingEnv.lookup(baseElement.sourceId()).orElseThrow().value();
         GenericEventInstance target =
@@ -487,16 +483,15 @@ public final class GraphRunner {
             logger.info("Dropping relation instance: {}", baseElement.endpointElementUID());
             return;
         }
-        InstantiatedControlFlowRelation instance =
-                newControlFlowRelationInstanceOf(baseElement, spawnContext);
-        ControlFlowRelationInfo value = new ControlFlowRelationInfo(instance, spawnContext.evalEnv);
-        addToListMapping(instance.getSource(), value, controlFlowRelations);
-        switch (instance.relationType()) {
-            case INCLUDE -> addToListMapping(instance.getSource(), value, includes);
-            case EXCLUDE -> addToListMapping(instance.getSource(), value, excludes);
-            case RESPONSE -> addToListMapping(instance.getSource(), value, responses);
-            case CONDITION -> addToListMapping(instance.getTarget(), value, conditions);
-            case MILESTONE -> addToListMapping(instance.getTarget(), value, milestones);
+        var relInstance = newControlFlowRelationInstanceOf(baseElement, spawnContext);
+        var relInfo = new ControlFlowRelationInfo(relInstance, spawnContext.evalEnv);
+        addToListMapping(relInstance.getSource(), relInfo, controlFlowRelations);
+        switch (relInstance.relationType()) {
+            case INCLUDE -> addToListMapping(relInstance.getSource(), relInfo, includes);
+            case EXCLUDE -> addToListMapping(relInstance.getSource(), relInfo, excludes);
+            case RESPONSE -> addToListMapping(relInstance.getSource(), relInfo, responses);
+            case CONDITION -> addToListMapping(relInstance.getTarget(), relInfo, conditions);
+            case MILESTONE -> addToListMapping(relInstance.getTarget(), relInfo, milestones);
         }
 
     }
@@ -574,7 +569,7 @@ public final class GraphRunner {
      *         event (when applicable), and eval env
      */
     record SpawnContext(Environment<Value> evalEnv, Environment<GenericEventInstance> renamingEnv,
-                        Environment<Pair<UserVal, UserVal>> triggerCounterparts) {
+                        Environment<Pair<UserVal, UserVal>> userEnv) {
         // cumulative register keeping track of actual sender/receiver of each interaction
         // triggering a spawn (either Tx or Rx) - enables resolving of Receiver(e1)
         // and Sender(e1) type of expressions - empty for top-level events
@@ -593,9 +588,9 @@ public final class GraphRunner {
             renamingEnv.bindIfAbsent(instance.baseElement().endpointElementUID(), instance);
         }
 
-        // TODO extract constants
         private static PropBasedVal encodeTriggerVal(Value val, UserVal initiator,
                 UserVal receiver) {
+            // TODO extract (static final) const strings
             var initiatorVal = initiator.getParamsAsRecordVal();
             var receiverVal = receiver.getParamsAsRecordVal();
             return new RecordVal(Record.ofEntries(Record.Field.of("value", val),
@@ -605,25 +600,21 @@ public final class GraphRunner {
 
         // upon Tx/Rx trigger event
         SpawnContext beginScope(String triggerId, EventInstance triggerEvent, UserVal sender,
-                UserVal receiver, boolean isLocallyInitiated) {
-
+                UserVal receiver) {
             var triggerVal = encodeTriggerVal(triggerEvent.value(), sender, receiver);
-            // var triggerVal = isLocallyInitiated
-            //         ? encodeTriggerVal(triggerEvent.value(), self, remoteParticipant)
-            //         : encodeTriggerVal(triggerEvent.value(), remoteParticipant, self);
             var newEvalEnv = evalEnv.beginScope(triggerId, triggerVal);
-            var newAlphaRenamings = renamingEnv.beginScope();
-            var newTriggerCounterparts =
-                    triggerCounterparts.beginScope(triggerEvent.baseElement().remoteID(),
+            var newRenamingEnv = renamingEnv.beginScope();
+            var newUserEnv =
+                    userEnv.beginScope(triggerEvent.baseElement().remoteID(),
                             Pair.of(sender, receiver));
             // TODO defensive copy triggerVal - immutable snapshot
-            return new SpawnContext(newEvalEnv, newAlphaRenamings, newTriggerCounterparts);
+            return new SpawnContext(newEvalEnv, newRenamingEnv, newUserEnv);
         }
 
         // upon Local trigger event
         SpawnContext beginScope(String triggerId, EventInstance triggerEvent) {
             var newEvalEnv = evalEnv.beginScope(triggerId, triggerEvent.value());
-            return new SpawnContext(newEvalEnv, renamingEnv.beginScope(), triggerCounterparts);
+            return new SpawnContext(newEvalEnv, renamingEnv.beginScope(), userEnv);
         }
     }
 
@@ -643,7 +634,8 @@ public final class GraphRunner {
     }
 
     // context for evaluation of computation- and user-expressions
-    private record EvalContext(Environment<Value> valueEnv, Environment<Pair<UserVal, UserVal>> userEnv) {}
+    private record EvalContext(Environment<Value> valueEnv,
+                               Environment<Pair<UserVal, UserVal>> userEnv) {}
 
 
     // encloses event

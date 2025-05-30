@@ -26,6 +26,8 @@ public final class IntLiteral
         return new IntLiteral(IntVal.of(value));
     }
 
+    public int value() {return value.value();}
+
     @Override
     public IntVal eval(Environment<Value> env) {
         return this.value;

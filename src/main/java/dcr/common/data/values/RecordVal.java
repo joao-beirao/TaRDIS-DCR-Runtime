@@ -51,6 +51,8 @@ public final class RecordVal implements PropBasedVal {
     return RecordType.of(builder.build());
   }
 
+  public Record<Value> fields() {return valRecord;}
+
   @Override
   public int hashCode() {
     return valRecord.hashCode();

@@ -17,9 +17,9 @@ import java.util.function.Consumer;
 public class GraphModelBuilder {
 
     private final String elementId;
-    private final List<Consumer<RecursiveGraphModel>> eventConsumers;
-    private final List<Consumer<RecursiveGraphModel>> controlFlowRelationsConsumers;
-    private final List<Consumer<RecursiveGraphModel>> spawnGraphConsumers;
+    private final List<Consumer<RecursiveGraphElement>> eventConsumers;
+    private final List<Consumer<RecursiveGraphElement>> controlFlowRelationsConsumers;
+    private final List<Consumer<RecursiveGraphElement>> spawnGraphConsumers;
 
     public GraphModelBuilder() {
         // DUMMY elementId - not a spawn
@@ -147,8 +147,8 @@ public class GraphModelBuilder {
     }
 
     // @Override
-    public RecursiveGraphModel build() {
-        return populate(new RecursiveGraphModel(elementId));
+    public RecursiveGraphElement build() {
+        return populate(new RecursiveGraphElement(elementId));
     }
 
     private void addSpawnGraphBuilder(SpawnGraphModelBuilder builder) {
@@ -156,7 +156,7 @@ public class GraphModelBuilder {
     }
 
     // recursive "downward" call - each builder passes on its type of graph
-    protected RecursiveGraphModel populate(RecursiveGraphModel graph) {
+    protected RecursiveGraphElement populate(RecursiveGraphElement graph) {
         eventConsumers.forEach(c -> c.accept(graph));
         controlFlowRelationsConsumers.forEach(c -> c.accept(graph));
         spawnGraphConsumers.forEach(c -> c.accept(graph));
@@ -169,7 +169,7 @@ public class GraphModelBuilder {
      */
     private static final class SpawnGraphModelBuilder
             extends GraphModelBuilder
-            implements Consumer<RecursiveGraphModel> {
+            implements Consumer<RecursiveGraphElement> {
 
         private final String sourceEventId;
         private final String subgraphElementId;
@@ -195,13 +195,13 @@ public class GraphModelBuilder {
 
         //  just route the call to the top level
         @Override
-        public RecursiveGraphModel build() {
+        public RecursiveGraphElement build() {
             return outerScope.build();
         }
 
         @Override
-        public void accept(RecursiveGraphModel model) {
-            RecursiveGraphModel subgraph = populate(new RecursiveGraphModel(subgraphElementId));
+        public void accept(RecursiveGraphElement model) {
+            RecursiveGraphElement subgraph = populate(new RecursiveGraphElement(subgraphElementId));
             SpawnRelationElement spawnElement =
                     RelationElements.newSpawnRelation(getElementId(), sourceEventId,
                             triggerId, BoolLiteral.TRUE,

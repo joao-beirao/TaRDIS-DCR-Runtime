@@ -9,8 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Objects;
 
-// TODO [sanitize args]
-
+// note: not yet in use
 public record SetDiffExpr(UserSetExpression positiveSet, UserSetExpression negativeSet)
         implements UserSetExpression {
 

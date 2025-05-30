@@ -33,7 +33,7 @@ final class ComputationEvent
     }
 
     @Override
-    public ComputationExpression getComputationExpression() {
+    public ComputationExpression computationExpression() {
         return computationExpression;
     }
 
@@ -46,7 +46,7 @@ final class ComputationEvent
     public String toString() {
         return String.format("<%s, %s> %s(%s: %s) [%s] (%s) [%s] (when: %s)", choreoElementUID(),
                 endpointElementUID(),
-                this.marking().toStringPrefix(), remoteID(), label(), getComputationExpression(),
+                this.marking().toStringPrefix(), remoteID(), label(), computationExpression(),
                 value(), receivers().map(r -> String.format("@self -> %s", r)).orElse(
                 "Local"), instantiationConstraint());
     }
@@ -54,7 +54,7 @@ final class ComputationEvent
     @Override
     public String unparse() {
         return String.format("ComputationEventElement<%s>[ (%s: %s) [%s] [%s] ]", choreoElementUID(),
-                remoteID(), label(), getComputationExpression(), receivers());
+                remoteID(), label(), computationExpression(), receivers());
     }
 }
 

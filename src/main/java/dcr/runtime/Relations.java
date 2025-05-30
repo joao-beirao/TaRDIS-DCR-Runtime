@@ -1,7 +1,7 @@
 package dcr.runtime;
 
 import dcr.common.data.computation.ComputationExpression;
-import dcr.model.GraphModel;
+import dcr.model.GraphElement;
 import dcr.model.relations.*;
 import dcr.runtime.elements.relations.ControlFlowRelationInstance;
 import dcr.runtime.elements.relations.RelationInstance;
@@ -69,7 +69,7 @@ class InstantiatedSpawnRelation
     }
 
     @Override
-    public GraphModel subGraph() {
+    public GraphElement subGraph() {
         return ((SpawnRelationElement) baseElement()).subGraph();
     }
 

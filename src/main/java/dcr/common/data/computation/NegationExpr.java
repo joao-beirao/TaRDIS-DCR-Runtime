@@ -4,7 +4,7 @@ import dcr.common.Environment;
 import dcr.common.data.values.BoolVal;
 import dcr.common.data.values.Value;
 
-public class NegationExpr
+public final class NegationExpr
         implements ComputationExpression {
 
     public final ComputationExpression expr;
@@ -25,5 +25,4 @@ public class NegationExpr
     public String toString() {
         return String.format("!%s", expr);
     }
-
 }

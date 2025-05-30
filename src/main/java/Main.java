@@ -37,25 +37,25 @@ public class Main {
         // Babel setup
         // InetAddress address = InetAddress.getByName(NetworkingUtilities.getAddress("eth0"));
         // Host self = new Host(address, Short.parseShort(props.getProperty("babel.port")));
-        Host myself = new Host(address, 9001);
+        // Host myself = new Host(address, 9001);
         Babel babel = Babel.getInstance();
 
         // protocols
-        EagerPushGossipBroadcast bcast =
-                new EagerPushGossipBroadcast("channel.gossip", props, myself);
-        EpidemicGlobalView epiGlobalView = new EpidemicGlobalView("epidemic", props, myself);
+        // EagerPushGossipBroadcast bcast =
+        //         new EagerPushGossipBroadcast("channel.gossip", props, myself);
+        // EpidemicGlobalView epiGlobalView = new EpidemicGlobalView("epidemic", props, myself);
         DistributedDCRProtocol dcrProtocol = new DistributedDCRProtocol();
         DCRApp app = DCRApp.getInstance();
 
         // register protocols with babel
-        babel.registerProtocol(bcast);
-        babel.registerProtocol(epiGlobalView);
+        // babel.registerProtocol(bcast);
+        // babel.registerProtocol(epiGlobalView);
         babel.registerProtocol(dcrProtocol);
         babel.registerProtocol(app);
 
         // initialize protocols
-        bcast.init(props);
-        epiGlobalView.init(props);
+        // bcast.init(props);
+        // epiGlobalView.init(props);
         dcrProtocol.init(props);
         app.init(props);
 
@@ -72,10 +72,9 @@ public class Main {
 
         // deploy Babel and Server processes
         babel.start();
-        logger.info("Babel node started on {}", myself.toString());
+        // logger.info("Babel node started on {}", myself.toString());
         // server.start();
         // logger.info("Server started on {}", server.getURI());
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Server stopped!")));
     }
 

@@ -8,4 +8,5 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({@JsonSubTypes.Type(RoleExprDTO.class), @JsonSubTypes.Type(InitiatorExprDTO.class),
         @JsonSubTypes.Type(ReceiverExprDTO.class), @JsonSubTypes.Type(UserSetDiffExprDTO.class)})
-public interface UserSetExprDTO {}
+public sealed interface UserSetExprDTO
+        permits InitiatorExprDTO, ReceiverExprDTO, RoleExprDTO, UserSetDiffExprDTO {}
