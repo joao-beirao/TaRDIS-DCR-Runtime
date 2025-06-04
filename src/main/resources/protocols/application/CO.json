@@ -1,0 +1,166 @@
+{
+  "role": {
+    "label": "CO",
+    "params": [ { "name": "cid", "type": { "valueType": "int" } } ]
+  },
+  "graph": {
+    "events": [
+      {
+        "receiveEvent": {
+          "common": {
+            "endpointElementUID": "fault_3_RxO",
+            "choreoElementUID": "fault_3",
+            "id": "fault",
+            "label": "fault",
+            "dataType": { "valueType": "void" },
+            "marking": { "isPending": false, "isIncluded": true }
+          },
+          "initiators": [
+            {
+              "roleExpr": {
+                "roleLabel": "P",
+                "params": [
+                  { "name": "id" },
+                  {
+                    "name": "cid",
+                    "value": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "propDeref": {
+                            "propBasedExpr": {
+                              "eventRef": { "value": "_@self" }
+                            },
+                            "prop": "params"
+                          }
+                        },
+                        "prop": "cid"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "inputEvent": {
+          "common": {
+            "endpointElementUID": "accounting_1",
+            "choreoElementUID": "accounting_1",
+            "id": "accounting",
+            "label": "accounting",
+            "dataType": { "valueType": "void" },
+            "marking": { "isPending": false, "isIncluded": false },
+            "ifcConstraint": { "boolLit": { "value": true } }
+          }
+        }
+      },
+      {
+        "inputEvent": {
+          "common": {
+            "endpointElementUID": "r4c_0_TxO",
+            "choreoElementUID": "r4c_0",
+            "id": "r4c",
+            "label": "request_forecast",
+            "dataType": {
+              "recordType": {
+                "fields": [
+                  { "name": "cid", "type": { "valueType": "int" } }
+                ]
+              }
+            },
+            "marking": { "isPending": false, "isIncluded": true },
+            "ifcConstraint": { "boolLit": { "value": true } }
+          },
+          "receivers": [
+            {
+              "roleExpr": {
+                "roleLabel": "P",
+                "params": [
+                  { "name": "id" },
+                  {
+                    "name": "cid",
+                    "value": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "propDeref": {
+                            "propBasedExpr": {
+                              "eventRef": { "value": "_@self" }
+                            },
+                            "prop": "params"
+                          }
+                        },
+                        "prop": "cid"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "relations": [
+      {
+        "spawnRelation": {
+          "relationCommon": {
+            "endpointElementUID": "r4c_0_TxO_6",
+            "sourceId": "r4c_0_TxO"
+          },
+          "triggerId": "_@trigger$r4c",
+          "graph": {
+            "events": [
+              {
+                "receiveEvent": {
+                  "common": {
+                    "endpointElementUID": "reply_4_RxO",
+                    "choreoElementUID": "reply_4",
+                    "id": "reply",
+                    "label": "reply",
+                    "dataType": { "valueType": "int" },
+                    "marking": { "isPending": false, "isIncluded": true }
+                  },
+                  "initiators": [ { "receiverExpr": { "eventId": "r4c" } } ]
+                }
+              }
+            ],
+            "relations": [
+              {
+                "controlFlowRelation": {
+                  "relationCommon": {
+                    "endpointElementUID": "10",
+                    "sourceId": "reply_4_RxO"
+                  },
+                  "targetId": "accounting_1",
+                  "relationType": "include"
+                }
+              },
+              {
+                "controlFlowRelation": {
+                  "relationCommon": {
+                    "endpointElementUID": "9",
+                    "sourceId": "reply_4_RxO"
+                  },
+                  "targetId": "accounting_1",
+                  "relationType": "response"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "controlFlowRelation": {
+          "relationCommon": {
+            "endpointElementUID": "4",
+            "sourceId": "accounting_1"
+          },
+          "targetId": "accounting_1",
+          "relationType": "exclude"
+        }
+      }
+    ]
+  }
+}

@@ -1,9 +1,11 @@
 package protocols.application;
 
 import app.presentation.endpoint.EndpointDTO;
+import app.presentation.endpoint.events.EventDTO;
 import app.presentation.mappers.EndpointMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import dcr.common.Record;
 import dcr.common.data.types.BooleanType;
@@ -38,6 +40,7 @@ import pt.unl.fct.di.novasys.babel.protocols.dissemination.requests.BroadcastReq
 import pt.unl.fct.di.novasys.babel.protocols.membership.notifications.NeighborUp;
 import pt.unl.fct.di.novasys.network.data.Host;
 import rest.DCRGraphREST;
+import rest.request.InputRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,7 +58,6 @@ import java.util.stream.Collectors;
 public final class DCRApp
         extends GenericWebServiceProtocol
         implements GraphObserver, CommunicationLayer {
-
 
 
     private static final Logger logger = LogManager.getLogger(DCRApp.class);
@@ -89,7 +91,7 @@ public final class DCRApp
     }
 
     private static Record.Field<Value> fetchSelfParamField(Properties props, String key,
-            Type type) {
+                                                           Type type) {
         var prop = props.getProperty(key);
         return Record.Field.of(key, switch (type) {
             case BooleanType ignored -> BoolVal.of(Boolean.parseBoolean(prop));
@@ -217,7 +219,7 @@ public final class DCRApp
     // Callback for the Graph Runner
     @Override
     public Set<UserVal> uponSendRequest(UserVal requester, String eventId, UserSetVal receivers,
-            Event.Marking marking, String uidExtension) {
+                                        Event.Marking marking, String uidExtension) {
         var neighbours = DummyMembershipLayer.instance()
                 .resolveParticipants(receivers)
                 .stream()
@@ -248,6 +250,15 @@ public final class DCRApp
                 .map(Object::toString)
                 .collect(Collectors.joining("\n"));
     }
+
+    List<Event> getEnabledEvents() {
+        return runner.enabledEvents();
+    }
+
+    List<Event> getAllEvents() {
+        return List.of();
+    }
+
 
     // TODO maybe return something to be printed
     // called from UI
@@ -284,7 +295,7 @@ public final class DCRApp
 
     // called from Babel's internal network after a remote event has been executed
     private void onExecuteReceiveEvent(GraphRunner runner, String eventId, Event.Marking marking,
-            UserVal sender, String uidExtension) {
+                                       UserVal sender, String uidExtension) {
         logger.info("Executing Receive event '{}': received {}", eventId, marking);
         try {
             runner.onReceiveEvent(eventId, marking.value(), sender, uidExtension);
@@ -296,7 +307,7 @@ public final class DCRApp
 
     // (inner-process) DCR Protocol request to enact a Tx/RX
     private boolean deliverMessage(MembershipLayer.Neighbour receiver, String eventId,
-            Event.Marking marking, UserVal user, String uidExtension) {
+                                   Event.Marking marking, UserVal user, String uidExtension) {
         try {
             String hostName = receiver.hostName();
             InetAddress targetAddr = InetAddress.getByName(hostName);
@@ -340,32 +351,57 @@ public final class DCRApp
 
     @Override
     protected void createAsync(String opUniqueID, Object o, WebAPICallback webAPICallback,
-            Optional<EndpointPath> optional) {
+                               Optional<EndpointPath> optional) {
 
     }
 
     @Override
     protected void updateAsync(String s, Object o, WebAPICallback webAPICallback,
-            Optional<EndpointPath> optional) {
+                               Optional<EndpointPath> optional) {
+        if (optional.isEmpty())
+            return;
+        switch ((DCRGraphREST.DCREndpoints) optional.get()) {
+            case COMPUTATION:
+                this.onExecuteComputationEvent((String) o);
+                break;
+            case INPUT:
+                var input = (InputRequest) o;
+                this.onExecuteInputEvent(input.eventID(), input.inputValue());
+                break;
+            default:
+                logger.info("Unexpected endpointPath call: {}", optional.get());
+        }
 
     }
 
     @Override
     protected void readAsync(String opUniqueID, Object o, WebAPICallback webAPICallback,
-            Optional<EndpointPath> endpointPath) {
+                             Optional<EndpointPath> endpointPath) {
         if (endpointPath.isEmpty())
             return;
-        switch ((DCRGraphREST.DCREndpoints)endpointPath.get()) {
+        switch ((DCRGraphREST.DCREndpoints) endpointPath.get()) {
             case ENDPOINT_PROCESS -> {
-                var response = new GenericWebAPIResponse("Returned endpoint-process",null);
+                var response = new GenericWebAPIResponse("Returned endpoint-process", null);
                 webAPICallback.triggerResponse(opUniqueID, response);
             }
+            case ENABLE -> {
+                List<Event> events = this.getEnabledEvents();
+                var response = new GenericWebAPIResponse("Returned enabled events", events);
+                webAPICallback.triggerResponse(opUniqueID, response);
+            }
+            case EVENTS -> {
+                List<Event> events = this.getAllEvents();
+                var response = new GenericWebAPIResponse("Returned all events", events);
+                webAPICallback.triggerResponse(opUniqueID, response);
+
+            }
             default -> logger.info("Unexpected endpointPath call: {}", endpointPath.get());
+
         }
     }
 
     @Override
     protected void deleteAsync(String s, Object o, WebAPICallback webAPICallback,
-            Optional<EndpointPath> optional) {
+                               Optional<EndpointPath> optional) {
     }
 }

@@ -60,20 +60,20 @@ public class Main {
         app.init(props);
 
         // setup REST server
-        // Set<Class<? extends GenericREST>> restServices = ServerConfig.generateRestServices
-        //         (props);
-        // Set<Class<? extends GenericWebSocket>> wsServices =
-        //         ServerConfig.generateWebsocketServices(props);
-        // ServletContextHandler serverContext =
-        //         ServerConfig.createServerContextWithStaticFiles(wsServices, restServices,
-        //                 app,
-        //                 props);
-        // Server server = ServerConfig.createServer(serverContext, props);
+         Set<Class<? extends GenericREST>> restServices = ServerConfig.generateRestServices
+                 (props);
+         Set<Class<? extends GenericWebSocket>> wsServices =
+                 ServerConfig.generateWebsocketServices(props);
+         ServletContextHandler serverContext =
+                 ServerConfig.createServerContextWithStaticFiles(wsServices, restServices,
+                         app,
+                         props);
+         Server server = ServerConfig.createServer(serverContext, props);
 
         // deploy Babel and Server processes
         babel.start();
         // logger.info("Babel node started on {}", myself.toString());
-        // server.start();
+         server.start();
         // logger.info("Server started on {}", server.getURI());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Server stopped!")));
     }

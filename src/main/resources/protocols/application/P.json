@@ -1,0 +1,549 @@
+{
+  "role": {
+    "label": "P",
+    "params": [
+      { "name": "id", "type": { "valueType": "string" } },
+      { "name": "cid", "type": { "valueType": "int" } }
+    ]
+  },
+  "graph": {
+    "events": [
+      {
+        "inputEvent": {
+          "common": {
+            "endpointElementUID": "fault_3_TxO",
+            "choreoElementUID": "fault_3",
+            "id": "fault",
+            "label": "fault",
+            "dataType": { "valueType": "void" },
+            "marking": { "isPending": false, "isIncluded": true },
+            "ifcConstraint": { "boolLit": { "value": true } }
+          },
+          "receivers": [
+            {
+              "roleExpr": {
+                "roleLabel": "CO",
+                "params": [
+                  {
+                    "name": "cid",
+                    "value": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "propDeref": {
+                            "propBasedExpr": {
+                              "eventRef": { "value": "_@self" }
+                            },
+                            "prop": "params"
+                          }
+                        },
+                        "prop": "cid"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "inputEvent": {
+          "common": {
+            "endpointElementUID": "csm_2_Tx",
+            "choreoElementUID": "csm_2",
+            "id": "csm",
+            "label": "consume",
+            "dataType": {
+              "recordType": {
+                "fields": [
+                  { "name": "cid", "type": { "valueType": "int" } }
+                ]
+              }
+            },
+            "marking": { "isPending": false, "isIncluded": true },
+            "ifcConstraint": { "boolLit": { "value": true } }
+          },
+          "receivers": [
+            {
+              "roleExpr": {
+                "roleLabel": "P",
+                "params": [
+                  { "name": "id" },
+                  {
+                    "name": "cid",
+                    "value": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "propDeref": {
+                            "propBasedExpr": {
+                              "eventRef": { "value": "_@self" }
+                            },
+                            "prop": "params"
+                          }
+                        },
+                        "prop": "cid"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "receiveEvent": {
+          "common": {
+            "endpointElementUID": "csm_2_Rx",
+            "choreoElementUID": "csm_2",
+            "id": "csm",
+            "label": "consume",
+            "dataType": {
+              "recordType": {
+                "fields": [
+                  { "name": "cid", "type": { "valueType": "int" } }
+                ]
+              }
+            },
+            "marking": { "isPending": false, "isIncluded": true }
+          },
+          "initiators": [
+            {
+              "roleExpr": {
+                "roleLabel": "P",
+                "params": [
+                  { "name": "id" },
+                  {
+                    "name": "cid",
+                    "value": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "propDeref": {
+                            "propBasedExpr": {
+                              "eventRef": { "value": "_@self" }
+                            },
+                            "prop": "params"
+                          }
+                        },
+                        "prop": "cid"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "receiveEvent": {
+          "common": {
+            "endpointElementUID": "r4c_0_RxO",
+            "choreoElementUID": "r4c_0",
+            "id": "r4c",
+            "label": "request_forecast",
+            "dataType": {
+              "recordType": {
+                "fields": [
+                  { "name": "cid", "type": { "valueType": "int" } }
+                ]
+              }
+            },
+            "marking": { "isPending": false, "isIncluded": true }
+          },
+          "initiators": [
+            {
+              "roleExpr": {
+                "roleLabel": "CO",
+                "params": [
+                  {
+                    "name": "cid",
+                    "value": {
+                      "propDeref": {
+                        "propBasedExpr": {
+                          "propDeref": {
+                            "propBasedExpr": {
+                              "eventRef": { "value": "_@self" }
+                            },
+                            "prop": "params"
+                          }
+                        },
+                        "prop": "cid"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "relations": [
+      {
+        "spawnRelation": {
+          "relationCommon": {
+            "endpointElementUID": "csm_2_Rx_12",
+            "sourceId": "csm_2_Rx"
+          },
+          "triggerId": "_@trigger$csm",
+          "graph": {
+            "events": [
+              {
+                "inputEvent": {
+                  "common": {
+                    "endpointElementUID": "reply_5_TxO",
+                    "choreoElementUID": "reply_5",
+                    "id": "reply",
+                    "label": "reply",
+                    "dataType": { "valueType": "void" },
+                    "marking": { "isPending": false, "isIncluded": true },
+                    "ifcConstraint": { "boolLit": { "value": true } }
+                  },
+                  "receivers": [ { "initiatorExpr": { "eventId": "csm" } } ]
+                }
+              }
+            ],
+            "relations": [
+              {
+                "spawnRelation": {
+                  "relationCommon": {
+                    "endpointElementUID": "reply_5_TxO_15",
+                    "sourceId": "reply_5_TxO"
+                  },
+                  "triggerId": "_@trigger$reply",
+                  "graph": {
+                    "events": [
+                      {
+                        "receiveEvent": {
+                          "common": {
+                            "endpointElementUID": "reject_7_RxO",
+                            "choreoElementUID": "reject_7",
+                            "id": "reject",
+                            "label": "reject",
+                            "dataType": { "valueType": "void" },
+                            "marking": {
+                              "isPending": false,
+                              "isIncluded": true
+                            }
+                          },
+                          "initiators": [
+                            { "initiatorExpr": { "eventId": "csm" } }
+                          ]
+                        }
+                      },
+                      {
+                        "receiveEvent": {
+                          "common": {
+                            "endpointElementUID": "accept_6_RxO",
+                            "choreoElementUID": "accept_6",
+                            "id": "accept",
+                            "label": "accept",
+                            "dataType": { "valueType": "void" },
+                            "marking": {
+                              "isPending": false,
+                              "isIncluded": true
+                            }
+                          },
+                          "initiators": [
+                            { "initiatorExpr": { "eventId": "csm" } }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "controlFlowRelation": {
+                  "relationCommon": {
+                    "endpointElementUID": "14",
+                    "sourceId": "reply_5_TxO"
+                  },
+                  "targetId": "reply_5_TxO",
+                  "relationType": "exclude"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "spawnRelation": {
+          "relationCommon": {
+            "endpointElementUID": "csm_2_Tx_12",
+            "sourceId": "csm_2_Tx"
+          },
+          "triggerId": "_@trigger$csm",
+          "graph": {
+            "events": [
+              {
+                "receiveEvent": {
+                  "common": {
+                    "endpointElementUID": "reply_5_RxO",
+                    "choreoElementUID": "reply_5",
+                    "id": "reply",
+                    "label": "reply",
+                    "dataType": { "valueType": "void" },
+                    "marking": { "isPending": false, "isIncluded": true }
+                  },
+                  "initiators": [ { "receiverExpr": { "eventId": "csm" } } ]
+                }
+              }
+            ],
+            "relations": [
+              {
+                "spawnRelation": {
+                  "relationCommon": {
+                    "endpointElementUID": "reply_5_RxO_15",
+                    "sourceId": "reply_5_RxO"
+                  },
+                  "triggerId": "_@trigger$reply",
+                  "graph": {
+                    "events": [
+                      {
+                        "inputEvent": {
+                          "common": {
+                            "endpointElementUID": "reject_7_TxO",
+                            "choreoElementUID": "reject_7",
+                            "id": "reject",
+                            "label": "reject",
+                            "dataType": { "valueType": "void" },
+                            "marking": {
+                              "isPending": false,
+                              "isIncluded": true
+                            },
+                            "ifcConstraint": {
+                              "binaryOp": {
+                                "expr1": {
+                                  "binaryOp": {
+                                    "expr1": {
+                                      "binaryOp": {
+                                        "expr1": {
+                                          "propDeref": {
+                                            "propBasedExpr": {
+                                              "propDeref": {
+                                                "propBasedExpr": {
+                                                  "eventRef": {
+                                                    "value": "_@trigger$csm"
+                                                  }
+                                                },
+                                                "prop": "value"
+                                              }
+                                            },
+                                            "prop": "cid"
+                                          }
+                                        },
+                                        "expr2": {
+                                          "propDeref": {
+                                            "propBasedExpr": {
+                                              "propDeref": {
+                                                "propBasedExpr": {
+                                                  "eventRef": {
+                                                    "value": "_@trigger$csm"
+                                                  }
+                                                },
+                                                "prop": "value"
+                                              }
+                                            },
+                                            "prop": "cid"
+                                          }
+                                        },
+                                        "op": "equals"
+                                      }
+                                    },
+                                    "expr2": {
+                                      "boolLit": { "value": false }
+                                    },
+                                    "op": "or"
+                                  }
+                                },
+                                "expr2": { "boolLit": { "value": true } },
+                                "op": "and"
+                              }
+                            }
+                          },
+                          "receivers": [
+                            { "receiverExpr": { "eventId": "csm" } }
+                          ]
+                        }
+                      },
+                      {
+                        "inputEvent": {
+                          "common": {
+                            "endpointElementUID": "accept_6_TxO",
+                            "choreoElementUID": "accept_6",
+                            "id": "accept",
+                            "label": "accept",
+                            "dataType": { "valueType": "void" },
+                            "marking": {
+                              "isPending": false,
+                              "isIncluded": true
+                            },
+                            "ifcConstraint": {
+                              "binaryOp": {
+                                "expr1": {
+                                  "binaryOp": {
+                                    "expr1": {
+                                      "binaryOp": {
+                                        "expr1": {
+                                          "propDeref": {
+                                            "propBasedExpr": {
+                                              "propDeref": {
+                                                "propBasedExpr": {
+                                                  "eventRef": {
+                                                    "value": "_@trigger$csm"
+                                                  }
+                                                },
+                                                "prop": "value"
+                                              }
+                                            },
+                                            "prop": "cid"
+                                          }
+                                        },
+                                        "expr2": {
+                                          "propDeref": {
+                                            "propBasedExpr": {
+                                              "propDeref": {
+                                                "propBasedExpr": {
+                                                  "eventRef": {
+                                                    "value": "_@trigger$csm"
+                                                  }
+                                                },
+                                                "prop": "value"
+                                              }
+                                            },
+                                            "prop": "cid"
+                                          }
+                                        },
+                                        "op": "equals"
+                                      }
+                                    },
+                                    "expr2": {
+                                      "boolLit": { "value": false }
+                                    },
+                                    "op": "or"
+                                  }
+                                },
+                                "expr2": { "boolLit": { "value": true } },
+                                "op": "and"
+                              }
+                            }
+                          },
+                          "receivers": [
+                            { "receiverExpr": { "eventId": "csm" } }
+                          ]
+                        }
+                      }
+                    ],
+                    "relations": [
+                      {
+                        "controlFlowRelation": {
+                          "relationCommon": {
+                            "endpointElementUID": "21",
+                            "sourceId": "reject_7_TxO"
+                          },
+                          "targetId": "reject_7_TxO",
+                          "relationType": "exclude"
+                        }
+                      },
+                      {
+                        "controlFlowRelation": {
+                          "relationCommon": {
+                            "endpointElementUID": "20",
+                            "sourceId": "reject_7_TxO"
+                          },
+                          "targetId": "accept_6_TxO",
+                          "relationType": "exclude"
+                        }
+                      },
+                      {
+                        "controlFlowRelation": {
+                          "relationCommon": {
+                            "endpointElementUID": "19",
+                            "sourceId": "accept_6_TxO"
+                          },
+                          "targetId": "reject_7_TxO",
+                          "relationType": "exclude"
+                        }
+                      },
+                      {
+                        "controlFlowRelation": {
+                          "relationCommon": {
+                            "endpointElementUID": "18",
+                            "sourceId": "accept_6_TxO"
+                          },
+                          "targetId": "accept_6_TxO",
+                          "relationType": "exclude"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "spawnRelation": {
+          "relationCommon": {
+            "endpointElementUID": "r4c_0_RxO_6",
+            "sourceId": "r4c_0_RxO"
+          },
+          "triggerId": "_@trigger$r4c",
+          "graph": {
+            "events": [
+              {
+                "inputEvent": {
+                  "common": {
+                    "endpointElementUID": "reply_4_TxO",
+                    "choreoElementUID": "reply_4",
+                    "id": "reply",
+                    "label": "reply",
+                    "dataType": { "valueType": "void" },
+                    "marking": { "isPending": false, "isIncluded": true },
+                    "ifcConstraint": { "boolLit": { "value": true } }
+                  },
+                  "receivers": [ { "initiatorExpr": { "eventId": "r4c" } } ]
+                }
+              }
+            ],
+            "relations": [
+              {
+                "controlFlowRelation": {
+                  "relationCommon": {
+                    "endpointElementUID": "11",
+                    "sourceId": "reply_4_TxO"
+                  },
+                  "targetId": "csm_2_Tx",
+                  "relationType": "include"
+                }
+              },
+              {
+                "controlFlowRelation": {
+                  "relationCommon": {
+                    "endpointElementUID": "8",
+                    "sourceId": "reply_4_TxO"
+                  },
+                  "targetId": "reply_4_TxO",
+                  "relationType": "exclude"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "controlFlowRelation": {
+          "relationCommon": {
+            "endpointElementUID": "5",
+            "sourceId": "r4c_0_RxO"
+          },
+          "targetId": "csm_2_Tx",
+          "relationType": "exclude"
+        }
+      }
+    ]
+  }
+}
