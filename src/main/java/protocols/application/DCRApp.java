@@ -1,11 +1,9 @@
 package protocols.application;
 
 import app.presentation.endpoint.EndpointDTO;
-import app.presentation.endpoint.events.EventDTO;
 import app.presentation.mappers.EndpointMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import dcr.common.Record;
 import dcr.common.data.types.BooleanType;
@@ -25,9 +23,11 @@ import dcr.runtime.communication.CommunicationLayer;
 import dcr.runtime.communication.MembershipLayer;
 import dcr.runtime.monitoring.GraphObserver;
 import dcr.runtime.monitoring.StateUpdate;
+import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import protocols.application.requests.AppRequest;
+import protocols.application.requests.DCRAppRequest;
 import protocols.dcr.DistributedDCRProtocol;
 import pt.unl.di.novasys.babel.webservices.WebAPICallback;
 import pt.unl.di.novasys.babel.webservices.application.GenericWebServiceProtocol;
@@ -35,9 +35,14 @@ import pt.unl.di.novasys.babel.webservices.utils.EndpointPath;
 import pt.unl.di.novasys.babel.webservices.utils.GenericWebAPIResponse;
 import pt.unl.fct.di.novasys.babel.exceptions.HandlerRegistrationException;
 import pt.unl.fct.di.novasys.babel.generic.ProtoNotification;
+import pt.unl.fct.di.novasys.babel.generic.ProtoReply;
 import pt.unl.fct.di.novasys.babel.protocols.dissemination.notifications.BroadcastDelivery;
 import pt.unl.fct.di.novasys.babel.protocols.dissemination.requests.BroadcastRequest;
 import pt.unl.fct.di.novasys.babel.protocols.membership.notifications.NeighborUp;
+import pt.unl.fct.di.novasys.babel.protocols.storage.notifications.JSONDataNotification;
+import pt.unl.fct.di.novasys.babel.protocols.storage.replies.ExecuteStatusReply;
+import pt.unl.fct.di.novasys.babel.protocols.storage.utils.operations.utils.CommonOperationStatus;
+import pt.unl.fct.di.novasys.babel.protocols.storage.utils.operations.utils.CommonOperationType;
 import pt.unl.fct.di.novasys.network.data.Host;
 import rest.DCRGraphREST;
 import rest.request.InputRequest;
@@ -49,7 +54,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
-
+import pt.unl.fct.di.novasys.babel.protocols.storage.replies.ExecuteJSONReply;
 // docker run example
 // babel % docker run --network tardis-babel-backend-net --rm -h P_1_2 --name P_1_2 -it dcr-babel
 // interface=eth0 role=P cid=1 pid=2
@@ -76,7 +81,7 @@ public final class DCRApp
 
     private GraphRunner runner = null;
     private Endpoint endpoint = null;
-
+//    private Map<String, DCRAppRequest> pendingRequests =null;
 
     public static DCRApp getInstance() {
         return LazyHolder.INSTANCE;
@@ -112,6 +117,7 @@ public final class DCRApp
 
     private DCRApp() {
         super(PROTOCOL_NAME, PROTO_ID);
+//        this.pendingRequests = new HashMap<>();
     }
 
     @Override
@@ -127,6 +133,10 @@ public final class DCRApp
         // triggerNotification(new NeighborUp(self));
         subscribeNotification(NeighborUp.NOTIFICATION_ID, this::uponNeighborUpNotification);
 
+//        registerReplyHandler(ExecuteJSONReply.REPLY_ID, this::uponJsonReply);
+//        registerReplyHandler(ExecuteStatusReply.REPLY_ID, this::uponStatusReply);
+
+//        subscribeNotification(JSONDataNotification.NOTIFICATION_ID, this::uponDataNotification);
 
         // observation: Bootstrap is currently supported by CLI params:
         // - a 'role' param is required, and determines the role this endpoint should enact - based
@@ -167,35 +177,6 @@ public final class DCRApp
     }
 
 
-    // TODO [deprecate]
-    // public DCRProtocol1(Properties props, Host self) {
-    //     super(PROTOCOL_NAME, PROTO_ID);
-    //     this.self = self;
-    //
-    // }
-
-    // TODO [deprecate]
-    // public void init(Properties properties) throws HandlerRegistrationException, IOException {
-    //
-    //     logger.info("Initializing DCRProtocol1 - registering request handlers");
-    //     // register protocol handlers
-    //     // --- none at this point ----
-    //     // register request handlers
-    //     registerRequestHandler(DcrRequest.REQUEST_ID, this::uponReceiveDcrRequest);
-    //     // register reply handler
-    //     registerReplyHandler(DcrReply.REPLY_ID, this::onPongReply);
-    //     // start CLI
-    //     // cmdLineRunner.processCommands();
-    //     registerRequestHandler(BroadcastRequest.REQUEST_ID, this::uponBroadCastRequest);
-    //     subscribeNotification(BroadcastDelivery.NOTIFICATION_ID, this::uponBroadcastDelivery);
-    //     triggerNotification(new NeighborUp(self));
-    //
-    //
-    //
-    //     // subscribeNotification(NeighborUp.NOTIFICATION_ID, this::uponNeighborUpNotification);
-    //     // registerRequestHandler();
-    // }
-
     private void uponBroadcastDelivery(ProtoNotification protoNotification, short i) {
         logger.info("Broadcast delivery for " + protoNotification.toString());
         logger.info("Protocol id {}", String.valueOf(i));
@@ -214,7 +195,66 @@ public final class DCRApp
         //     setupTimer(new InitializeTimer(), this.initializeDelay);
         // }
     }
-
+//
+//    }
+//    private void uponJsonReply(ExecuteJSONReply reply, short protoID) {
+//        logger.warn(
+//                "Received operation type {} with identifier {} from collection {} with status code {} and value {} and message {}",
+//                reply.getOperationType(), reply.getObjectID(), reply.getCollection(), reply.getStatus(),
+//                reply.getResult(), reply.getMessage());
+//        String opID = reply.getObjectID();
+//        DCRAppRequest info = this.pendingRequests.get(opID);
+//        if (info == null)
+//            return;
+//
+//        if (reply.getStatus() != CommonOperationStatus.OK) {
+//            logger.error("Status: {}", reply.getStatus());
+//            logger.error("Message: {}", reply.getMessage());
+//
+//            info.getCallback().triggerResponse(opID,
+//                    new GenericWebAPIResponse(Response.Status.INTERNAL_SERVER_ERROR, reply.getMessage()));
+//
+//            return;
+//        }
+//        if (!reply.getMessage().isBlank())
+//            logger.warn("Got JSONReply OK with message: {}", reply.getMessage());
+//
+//        String jsonResult = reply.getResult();
+//        String objectID = reply.getObjectID();
+//        Class<? extends Object> type = reply.getResultType();
+//        boolean responseCompleted = false;
+//        switch (info.getPath()) {
+//            case ENDPOINT_PROCESS -> {
+//                info.addResponse(objectID, objectID, jsonResult, type);
+//                if (info.hasAllResponses()) {
+//                    var response = new GenericWebAPIResponse("Returned endpoint-process", null);
+//                    info.getCallback().triggerResponse(info.getOpID(), response);
+//                    responseCompleted = true;
+//                }
+//            }
+//            case ENABLE -> {
+//                info.addResponse(objectID, objectID, jsonResult, type);
+//                if (info.hasAllResponses()) {
+//                    List<Event> events = this.getEnabledEvents();
+//                    var response = new GenericWebAPIResponse("Returned enabled events", events);
+//                    info.getCallback().triggerResponse(info.getOpID(), response);
+//                    responseCompleted = true;
+//                }
+//            }
+//            case EVENTS -> {
+//                info.addResponse(objectID, objectID, jsonResult, type);
+//                if (info.hasAllResponses()) {
+//                    List<Event> events = this.getAllEvents();
+//                    var response = new GenericWebAPIResponse("Returned all events", events);
+//                    info.getCallback().triggerResponse(info.getOpID(), response);
+//                    responseCompleted = true;
+//                }
+//            }
+//        }
+//
+//        if (responseCompleted)
+//            pendingRequests.remove(opID);
+//    }
 
     // Callback for the Graph Runner
     @Override
@@ -360,17 +400,23 @@ public final class DCRApp
                                Optional<EndpointPath> optional) {
         if (optional.isEmpty())
             return;
+
+        GenericWebAPIResponse response ;
         switch ((DCRGraphREST.DCREndpoints) optional.get()) {
             case COMPUTATION:
                 this.onExecuteComputationEvent((String) o);
+
+                response =  new GenericWebAPIResponse("Update computation event", o);
                 break;
             case INPUT:
                 var input = (InputRequest) o;
+                response = new GenericWebAPIResponse("Update input event", o);
                 this.onExecuteInputEvent(input.eventID(), input.inputValue());
                 break;
             default:
                 logger.info("Unexpected endpointPath call: {}", optional.get());
         }
+        webAPICallback.triggerResponse(s,response);
 
     }
 
@@ -379,7 +425,8 @@ public final class DCRApp
                              Optional<EndpointPath> endpointPath) {
         if (endpointPath.isEmpty())
             return;
-        switch ((DCRGraphREST.DCREndpoints) endpointPath.get()) {
+        var path = (DCRGraphREST.DCREndpoints) endpointPath.get();
+        switch (path) {
             case ENDPOINT_PROCESS -> {
                 var response = new GenericWebAPIResponse("Returned endpoint-process", null);
                 webAPICallback.triggerResponse(opUniqueID, response);
@@ -398,6 +445,8 @@ public final class DCRApp
             default -> logger.info("Unexpected endpointPath call: {}", endpointPath.get());
 
         }
+//        DCRAppRequest request = new DCRAppRequest(opUniqueID,webAPICallback,path, 1);
+//        this.pendingRequests.put(opUniqueID, request);
     }
 
     @Override

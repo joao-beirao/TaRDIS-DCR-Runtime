@@ -74,7 +74,7 @@ public class Main {
         babel.start();
         // logger.info("Babel node started on {}", myself.toString());
          server.start();
-        // logger.info("Server started on {}", server.getURI());
+         logger.info("Server started on {}", server.getURI());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> logger.info("Server stopped!")));
     }
 

@@ -1,5 +1,9 @@
 package rest;
 
+import dcr.common.Record;
+import dcr.common.data.values.IntVal;
+import dcr.common.data.values.RecordVal;
+import dcr.common.data.values.StringVal;
 import dcr.common.data.values.Value;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.Path;
@@ -79,7 +83,7 @@ public class DCRGraphREST
     }
 
     @Override
-    public void getEvent(AsyncResponse ar, String eventId) {
+    public void getEvent(@Suspended     AsyncResponse ar, String eventId) {
         logger.info("\n\n\nGet event");
         this.sendRequest(WebServiceOperation.READ, eventId,DCREndpoints.EVENT, ar);
     }
@@ -96,10 +100,101 @@ public class DCRGraphREST
         this.sendRequest(WebServiceOperation.UPDATE, eventId,DCREndpoints.COMPUTATION, ar);
     }
 
+    private static RecordVal parseRecordVal(String content) {
+        if (content.isEmpty())
+            throw new IllegalArgumentException("Expecting record fields: empty record not        supported");
+
+        var builder = new Record.Builder<Value>();
+        String rest = content;
+        while (!rest.isEmpty()) {
+            var field_end_pos = -1;
+            var next_field_pos = -1;
+
+            var field_assign_pos = rest.indexOf(":");
+
+            if (rest.charAt(field_assign_pos + 1) == '{') {
+                // record field value follows - use '}' do detect end of record
+                field_end_pos = rest.indexOf("}");
+                if (field_end_pos < rest.length() - 1 && rest.charAt(field_end_pos + 1) == ';') {
+                    // one more field after this one
+                    next_field_pos = field_end_pos;
+
+                } else {
+                    // this is the last field
+                    next_field_pos = rest.length();
+                }
+                builder.addField(parseRecordFieldVal(rest.substring(0, field_end_pos + 1)));
+            } else {
+                // primitive field value (not record)
+                next_field_pos = rest.indexOf(";");
+                if (next_field_pos == -1) {
+                    // this is the last field
+                    field_end_pos = rest.length();
+                    next_field_pos = rest.length();
+                } else {
+                    // one more field after this one
+                    field_end_pos = next_field_pos;
+                    ++next_field_pos;
+                }
+                builder.addField(parseRecordFieldVal(rest.substring(0, field_end_pos)));
+            }
+            rest = rest.substring(next_field_pos);
+        }
+        return RecordVal.of(builder.build());
+    }
+    private static Value parseInputVal(String input) {
+        input = input.trim();
+        // TODO handle empty input values
+        if (input.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Not implemented: empty input value not allowed at this point");
+        }
+        if (input.startsWith("{") && input.endsWith("}")) {
+            return parseRecordVal(input.substring(1, input.length() - 1).trim());
+        }
+        if (input.startsWith("'") && input.endsWith("'")) {
+            String string_val = input.substring(1, input.length() - 1);
+            return StringVal.of(input.substring(1, input.length() - 1));
+        }
+        // Boolean
+        try {
+            return IntVal.of(Integer.parseInt(input));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Unable to parse input value");
+        }
+    }
+    private static Record.Field<Value> parseRecordFieldVal(String field) {
+        var split_pos = field.indexOf(":");
+        var name = field.substring(0, split_pos);
+        var valueAsString = field.substring(split_pos + 1);
+        Value val = parseInputVal(valueAsString);
+        return new Record.Field<>(name, val);
+    }
     @Override
-    public void executeInputEvent(@Suspended AsyncResponse ar, String eventId, Value input) {
+    public void executeInputEvent(@Suspended AsyncResponse ar, String eventId, String input) {
         logger.info("\n\n\n UPDATE Input event");
-        this.sendRequest(WebServiceOperation.UPDATE, new InputRequest(eventId,input),DCREndpoints.INPUT, ar);
+        Value v;
+        input = input.trim();
+        // TODO handle empty input values
+        if (input.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Not implemented: empty input value not allowed at this point");
+        }
+        if (input.startsWith("{") && input.endsWith("}")) {
+            v= parseRecordVal(input.substring(1, input.length() - 1).trim());
+        }
+        else if (input.startsWith("'") && input.endsWith("'")) {
+
+             v =StringVal.of(input.substring(1, input.length() - 1));
+        }
+        else {
+            try {
+                v = IntVal.of(Integer.parseInt(input));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Unable to parse input value");
+            }
+        }
+        this.sendRequest(WebServiceOperation.UPDATE, new InputRequest(eventId,v),DCREndpoints.INPUT, ar);
     }
 
     @Override

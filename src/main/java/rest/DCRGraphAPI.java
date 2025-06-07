@@ -55,9 +55,9 @@ public interface DCRGraphAPI {
 
     @PUT
     @Path(EVENTS+ "/" + INPUT + "/{"+ EVENT_ID + "}")
-    @Consumes( MediaType.APPLICATION_JSON)
+    @Consumes( MediaType.TEXT_PLAIN)
     @Produces (MediaType.APPLICATION_JSON)
-    void executeInputEvent(@Suspended AsyncResponse ar, @PathParam(EVENT_ID) String eventId,Value input);
+    void executeInputEvent(@Suspended AsyncResponse ar, @PathParam(EVENT_ID) String eventId, String input);
 
 
 }
