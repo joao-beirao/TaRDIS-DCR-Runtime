@@ -401,7 +401,8 @@ public final class DCRApp
         if (optional.isEmpty())
             return;
 
-        GenericWebAPIResponse response ;
+//        TODO [revisit null initialization]
+        GenericWebAPIResponse response = null;
         switch ((DCRGraphREST.DCREndpoints) optional.get()) {
             case COMPUTATION:
                 this.onExecuteComputationEvent((String) o);

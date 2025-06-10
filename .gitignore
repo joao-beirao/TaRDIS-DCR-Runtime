@@ -8,6 +8,9 @@ target/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/self/
+.idea/workspace.xml
+.idea/usage.statistics.xml
 *.iws
 *.iml
 *.ipr
@@ -37,4 +40,4 @@ build/
 ### Mac OS ###
 .DS_Store
 
-src/main/resources/protocols/application/*.json
+dependency-reduced-pom.xml
