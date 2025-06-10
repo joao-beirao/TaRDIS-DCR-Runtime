@@ -1,4 +1,4 @@
-# Step F - Dcr Choreographies
+# **! [Under Construction]**
 
 ## How to compile
 
@@ -24,18 +24,14 @@ To remove the network:
 The protocol accepts the following arguments:
 
 - ``interface``: the network interface to use (e.g., eth0)
-- ``target-name``: the host name
+- ``name``: the host name
+- ``role``: the role enacted by this endpoint
+- ``<param-name>``: value for role parameter (if any)
 
-### Run
+example:
 
-To run the protocol, for the currently hardcoded example, you need to run the following commands,
-one for each end-point projection:
+```bash 
+docker run --network tardis-babel-backend-net --rm -h P_1_1 --name P_1_1 -it dcr-babel interface=eth0 role=P id=1 cid=1
+```
 
-``docker run --network tardis-babel-backend-net --rm -h Prosumer_p1 --name Prosumer_p1 -it
-dcr-babel interface=eth0 target-name=Prosumer_p1``
-
-``docker run --network tardis-babel-backend-net --rm -h Prosumer_p2 --name Prosumer_p2 -it dcr-babel
-interface=eth0 target-name=Prosumer_p2``
-
-``docker run --network tardis-babel-backend-net --rm -h Prosumer_p3 --name Prosumer_p3 -it
-dcr-babel interface=eth0 target-name=Prosumer_p2``
+### Run (TODO)
