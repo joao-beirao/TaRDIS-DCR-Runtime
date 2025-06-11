@@ -406,13 +406,24 @@ public final class DCRApp
         switch ((DCRGraphREST.DCREndpoints) optional.get()) {
             case COMPUTATION:
                 this.onExecuteComputationEvent((String) o);
-
                 response =  new GenericWebAPIResponse("Update computation event", o);
                 break;
             case INPUT:
                 var input = (InputRequest) o;
-                response = new GenericWebAPIResponse("Update input event", o);
-                this.onExecuteInputEvent(input.eventID(), input.inputValue());
+                try {
+                    if (input.inputValue().isPresent()) {
+                        runner.executeInputEvent(input.eventID(),  EndpointMapper.fromValueDTO(input.inputValue().get()));
+                    }
+                    else{
+                        runner.executeInputEvent(input.eventID());
+                    }
+                    logger.info("\n\n Executed update\n\n");
+                    response = new GenericWebAPIResponse("Update input event", o);
+                } catch (Exception e) {
+                    logger.error("\nError executing Input Event '{}': {}\n", input.eventID(), e.getMessage());
+                    e.printStackTrace();
+                    response = new GenericWebAPIResponse("Error executing input event", Response.Status.INTERNAL_SERVER_ERROR);
+                }
                 break;
             default:
                 logger.info("Unexpected endpointPath call: {}", optional.get());

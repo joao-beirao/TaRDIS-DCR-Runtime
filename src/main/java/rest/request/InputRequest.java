@@ -1,7 +1,9 @@
 package rest.request;
 
-import dcr.common.data.values.Value;
+import app.presentation.endpoint.data.values.ValueDTO;
 
-public record InputRequest(String eventID, Value inputValue) {
+import java.util.Optional;
+
+public record InputRequest(String eventID, Optional<ValueDTO> inputValue) {
 
 }

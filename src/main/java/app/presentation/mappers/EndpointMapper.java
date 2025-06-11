@@ -135,7 +135,7 @@ public final class EndpointMapper {
         };
     }
 
-    private static Value fromValueDTO(ValueDTO dto) {
+    public static Value fromValueDTO(ValueDTO dto) {
         return switch (dto) {
             case BoolValDTO v -> BoolVal.of(v.value());
             case IntValDTO v -> IntVal.of(v.value());
