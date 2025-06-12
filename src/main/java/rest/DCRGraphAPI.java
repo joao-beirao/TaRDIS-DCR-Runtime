@@ -52,14 +52,14 @@ public interface DCRGraphAPI {
 
     @PUT
     @Path(EVENTS+ "/" + COMPUTATION + "/{"+ EVENT_ID + "}")
-    @Produces (MediaType.APPLICATION_JSON)
+//    @Produces (MediaType.APPLICATION_JSON)
     void executeComputationEvent(@Suspended AsyncResponse ar, @PathParam(EVENT_ID) String eventId);
 
 
     @PUT
     @Path(EVENTS+ "/" + INPUT + "/{"+ EVENT_ID + "}")
     @Consumes( MediaType.APPLICATION_JSON)
-    @Produces (MediaType.APPLICATION_JSON)
+//    @Produces (MediaType.APPLICATION_JSON)
     void executeInputEvent(@Suspended AsyncResponse ar, @PathParam(EVENT_ID) String eventId, InputRequest input);
 
 

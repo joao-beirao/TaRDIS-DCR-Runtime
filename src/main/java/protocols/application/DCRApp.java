@@ -21,6 +21,7 @@ import dcr.model.GraphElement;
 import dcr.runtime.GraphRunner;
 import dcr.runtime.communication.CommunicationLayer;
 import dcr.runtime.communication.MembershipLayer;
+import dcr.runtime.elements.events.EventInstance;
 import dcr.runtime.monitoring.GraphObserver;
 import dcr.runtime.monitoring.StateUpdate;
 import jakarta.ws.rs.core.Response;
@@ -55,6 +56,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import pt.unl.fct.di.novasys.babel.protocols.storage.replies.ExecuteJSONReply;
+import rest.response.Mappers;
 // docker run example
 // babel % docker run --network tardis-babel-backend-net --rm -h P_1_2 --name P_1_2 -it dcr-babel
 // interface=eth0 role=P cid=1 pid=2
@@ -406,29 +408,35 @@ public final class DCRApp
         switch ((DCRGraphREST.DCREndpoints) optional.get()) {
             case COMPUTATION:
                 this.onExecuteComputationEvent((String) o);
-                response =  new GenericWebAPIResponse("Update computation event", o);
+                response =  new GenericWebAPIResponse("Update computation event" , Response.Status.NO_CONTENT);
+                webAPICallback.triggerResponse(s,response);
                 break;
             case INPUT:
+
                 var input = (InputRequest) o;
                 try {
                     if (input.inputValue().isPresent()) {
                         runner.executeInputEvent(input.eventID(),  EndpointMapper.fromValueDTO(input.inputValue().get()));
                     }
                     else{
-                        runner.executeInputEvent(input.eventID());
+                       runner.executeInputEvent(input.eventID());
                     }
                     logger.info("\n\n Executed update\n\n");
-                    response = new GenericWebAPIResponse("Update input event", o);
+                    response = new GenericWebAPIResponse("Update input event", Response.Status.NO_CONTENT);
+                    webAPICallback.triggerResponse(s,response);
                 } catch (Exception e) {
                     logger.error("\nError executing Input Event '{}': {}\n", input.eventID(), e.getMessage());
                     e.printStackTrace();
                     response = new GenericWebAPIResponse("Error executing input event", Response.Status.INTERNAL_SERVER_ERROR);
+                    webAPICallback.triggerResponse(s,response);
                 }
                 break;
             default:
                 logger.info("Unexpected endpointPath call: {}", optional.get());
         }
-        webAPICallback.triggerResponse(s,response);
+        for(var socket : super.getWSInstances()){
+            socket.sendMessage(this.getEnabledEvents().stream().map((e) -> Mappers.toEventDTO((EventInstance) e)).collect(Collectors.toCollection(ArrayList::new)));
+        }
 
     }
 
@@ -438,24 +446,29 @@ public final class DCRApp
         if (endpointPath.isEmpty())
             return;
         var path = (DCRGraphREST.DCREndpoints) endpointPath.get();
+        List<Event> events = new ArrayList<>();
         switch (path) {
             case ENDPOINT_PROCESS -> {
                 var response = new GenericWebAPIResponse("Returned endpoint-process", null);
                 webAPICallback.triggerResponse(opUniqueID, response);
             }
             case ENABLE -> {
-                List<Event> events = this.getEnabledEvents();
+                events = this.getEnabledEvents();
                 var response = new GenericWebAPIResponse("Returned enabled events", events);
                 webAPICallback.triggerResponse(opUniqueID, response);
+
             }
             case EVENTS -> {
-                List<Event> events = this.getAllEvents();
+                events = this.getAllEvents();
                 var response = new GenericWebAPIResponse("Returned all events", events);
                 webAPICallback.triggerResponse(opUniqueID, response);
 
             }
             default -> logger.info("Unexpected endpointPath call: {}", endpointPath.get());
 
+        }
+        for(var socket : super.getWSInstances()){
+            socket.sendMessage(events.stream().map((e) -> Mappers.toEventDTO((EventInstance) e)).collect(Collectors.toCollection(ArrayList::new)));
         }
 //        DCRAppRequest request = new DCRAppRequest(opUniqueID,webAPICallback,path, 1);
 //        this.pendingRequests.put(opUniqueID, request);

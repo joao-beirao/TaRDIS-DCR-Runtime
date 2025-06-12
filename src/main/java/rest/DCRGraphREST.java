@@ -202,8 +202,12 @@ public class DCRGraphREST
                 break;
             case COMPUTATION:
             case INPUT:
-//                logger.info("\n\n\n Estou aqui\n\n");
-                sendStatusResponse(ar,genericResponse.getStatusCode(),genericResponse.getMessage());
+                if (genericResponse == null) {
+                    sendStatusResponse(ar, Response.Status.INTERNAL_SERVER_ERROR, ERROR_MESSAGE);
+                }
+                else {
+                    sendStatusResponse(ar, genericResponse.getStatusCode(), genericResponse.getMessage());
+                }
                 break;
             default:
                 break;
@@ -218,9 +222,6 @@ public class DCRGraphREST
 
     private void sendStatusResponse(AsyncResponse ar, Response.Status statusCode, String message) {
         Response response = Response.status(statusCode).entity(message).build();
-        logger.info("\n\n\n STATUS RESPONSE\n\n");
-        logger.info(response.toString());
-        logger.info("\n\n");
         ar.resume(response);
     }
 
