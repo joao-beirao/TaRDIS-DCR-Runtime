@@ -124,8 +124,8 @@ public final class Mappers {
             case BoolVal val -> new BooleanDTO(val.value());
             case IntVal val -> new IntDTO(val.value());
             case StringVal val -> new StringDTO(val.value());
-            case UndefinedVal<?> ignored -> new UnitDTO();
-            case VoidVal ignored -> new UnitDTO();
+            case UndefinedVal<?> ignored -> new UnitDTO("");
+            case VoidVal ignored -> new UnitDTO("");
             case RecordVal val ->
                     new RecordDTO(val.fields().stream().collect(Collectors.toMap(Record.Field::name, f -> fromValue(f.value()))));
             case EventVal val -> throw new NotImplementedException("EventVal not implemented");

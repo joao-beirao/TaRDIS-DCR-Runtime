@@ -12,7 +12,7 @@ public sealed interface ValueDTO permits UnitDTO, BooleanDTO, IntDTO, StringDTO,
 }
 
 @JsonTypeName(value="Unit")
-record UnitDTO() implements ValueDTO {
+record UnitDTO(@JsonProperty(value = "value", required = true) String value) implements ValueDTO {
 }
 
 @JsonTypeName(value="Boolean")
