@@ -10,10 +10,7 @@ import dcr.common.data.types.BooleanType;
 import dcr.common.data.types.IntegerType;
 import dcr.common.data.types.StringType;
 import dcr.common.data.types.Type;
-import dcr.common.data.values.BoolVal;
-import dcr.common.data.values.IntVal;
-import dcr.common.data.values.StringVal;
-import dcr.common.data.values.Value;
+import dcr.common.data.values.*;
 import dcr.common.events.Event;
 import dcr.common.events.userset.values.UserSetVal;
 import dcr.common.events.userset.values.UserVal;
@@ -28,7 +25,6 @@ import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import protocols.application.requests.AppRequest;
-import protocols.application.requests.DCRAppRequest;
 import protocols.dcr.DistributedDCRProtocol;
 import pt.unl.di.novasys.babel.webservices.WebAPICallback;
 import pt.unl.di.novasys.babel.webservices.application.GenericWebServiceProtocol;
@@ -36,17 +32,12 @@ import pt.unl.di.novasys.babel.webservices.utils.EndpointPath;
 import pt.unl.di.novasys.babel.webservices.utils.GenericWebAPIResponse;
 import pt.unl.fct.di.novasys.babel.exceptions.HandlerRegistrationException;
 import pt.unl.fct.di.novasys.babel.generic.ProtoNotification;
-import pt.unl.fct.di.novasys.babel.generic.ProtoReply;
 import pt.unl.fct.di.novasys.babel.protocols.dissemination.notifications.BroadcastDelivery;
 import pt.unl.fct.di.novasys.babel.protocols.dissemination.requests.BroadcastRequest;
 import pt.unl.fct.di.novasys.babel.protocols.membership.notifications.NeighborUp;
-import pt.unl.fct.di.novasys.babel.protocols.storage.notifications.JSONDataNotification;
-import pt.unl.fct.di.novasys.babel.protocols.storage.replies.ExecuteStatusReply;
-import pt.unl.fct.di.novasys.babel.protocols.storage.utils.operations.utils.CommonOperationStatus;
-import pt.unl.fct.di.novasys.babel.protocols.storage.utils.operations.utils.CommonOperationType;
 import pt.unl.fct.di.novasys.network.data.Host;
 import rest.DCRGraphREST;
-import rest.request.InputRequest;
+import rest.request.InputRequestDTO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,8 +46,9 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
-import pt.unl.fct.di.novasys.babel.protocols.storage.replies.ExecuteJSONReply;
-import rest.response.Mappers;
+
+import rest.resources.InputEventExecuteRequest;
+import rest.response.*;
 // docker run example
 // babel % docker run --network tardis-babel-backend-net --rm -h P_1_2 --name P_1_2 -it dcr-babel
 // interface=eth0 role=P cid=1 pid=2
@@ -412,20 +404,20 @@ public final class DCRApp
                 webAPICallback.triggerResponse(s,response);
                 break;
             case INPUT:
-
-                var input = (InputRequest) o;
+                var input = (InputEventExecuteRequest) o;
                 try {
-                    if (input.inputValue().isPresent()) {
-                        runner.executeInputEvent(input.eventID(),  Mappers.toValue(input.inputValue().get()));
+                    Value val = input.value();
+                    if (! (val instanceof VoidVal)) {
+                        runner.executeInputEvent(input.eventId(),  val);
                     }
-                    else{
-                       runner.executeInputEvent(input.eventID());
+                    else {
+                       runner.executeInputEvent(input.eventId());
                     }
                     logger.info("\n\n Executed update\n\n");
                     response = new GenericWebAPIResponse("Update input event", Response.Status.NO_CONTENT);
                     webAPICallback.triggerResponse(s,response);
                 } catch (Exception e) {
-                    logger.error("\nError executing Input Event '{}': {}\n", input.eventID(), e.getMessage());
+                    logger.error("\nError executing Input Event '{}': {}\n", input.eventId(), e.getMessage());
                     e.printStackTrace();
                     response = new GenericWebAPIResponse("Error executing input event", Response.Status.INTERNAL_SERVER_ERROR);
                     webAPICallback.triggerResponse(s,response);

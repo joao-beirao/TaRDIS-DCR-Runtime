@@ -1,92 +1,32 @@
 package rest.response;
 
-import dcr.common.data.values.*;
+import com.fasterxml.jackson.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public sealed class ValueDTO permits BooleanDTO, IntDTO, RecordDTO, StringDTO, UnitDTO {
-    private final String type;
-
-    ValueDTO(String type) {
-        this.type = type;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public static ValueDTO toValueDTO(Value v) {
-        return switch (v) {
-            case BoolVal b -> new BooleanDTO(b);
-            case IntVal i -> new IntDTO(i);
-            case StringVal s -> new StringDTO(s.value());
-            case RecordVal r -> new RecordDTO(r);
-            case EventVal event -> new StringDTO(event.value().toString());
-            default -> new UnitDTO();
-        };
-    }
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes({@JsonSubTypes.Type(BooleanDTO.class), @JsonSubTypes.Type(IntDTO.class), @JsonSubTypes.Type(StringDTO.class), @JsonSubTypes.Type(RecordDTO.class)})
+public sealed interface ValueDTO permits UnitDTO, BooleanDTO, IntDTO, StringDTO, RecordDTO {
 }
 
-final class BooleanDTO extends ValueDTO {
-    private final boolean value;
-
-    BooleanDTO(BoolVal v) {
-        super("Boolean");
-        this.value = v.value();
-    }
-
-    public boolean getValue() {
-        return value;
-    }
+@JsonTypeName(value="Unit")
+record UnitDTO() implements ValueDTO {
 }
 
-final class StringDTO extends ValueDTO {
-    private String value;
-
-    StringDTO(String v) {
-        super("String");
-        this.value = v;
-    }
-
-    public String getValue() {
-        return value;
-    }
+@JsonTypeName(value="Boolean")
+record BooleanDTO(@JsonProperty(value = "value", required = true) boolean value) implements ValueDTO {
 }
 
+@JsonTypeName(value="Integer")
+record IntDTO(@JsonProperty(value = "value", required = true) int value)
+        implements ValueDTO {}
 
-final class IntDTO extends ValueDTO {
-    private int value;
-
-    IntDTO(IntVal v) {
-        super("Integer");
-        this.value = v.value();
-    }
-
-    public int getValue() {
-        return value;
-    }
+@JsonTypeName(value="String")
+record StringDTO(@JsonProperty(value = "value", required = true) String value) implements ValueDTO {
 }
 
-
-final class RecordDTO extends ValueDTO {
-    private final Map<String, ValueDTO> value;
-
-    RecordDTO(RecordVal v) {
-        super("Record");
-        HashMap<String, ValueDTO> h = new HashMap<String, ValueDTO>();
-        v.fields().stream()
-                .forEach((e) -> h.put(e.name(), toValueDTO(e.value())));
-        this.value = h;
-    }
-
-    public Map<String, ValueDTO> getValue() {
-        return value;
-    }
-}
-
-final class UnitDTO extends ValueDTO {
-    UnitDTO() {
-        super("Unit");
-    }
+@JsonTypeName(value="Record")
+record RecordDTO(@JsonProperty(value = "value", required = true) Map<String, ValueDTO> value) implements ValueDTO {
 }

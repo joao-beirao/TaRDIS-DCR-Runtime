@@ -17,7 +17,8 @@ import pt.unl.di.novasys.babel.webservices.websocket.GenericWebSocket;
 
 import pt.unl.di.novasys.babel.webservices.websocket.utils.JSONMessageEncoder;
 
-@ServerEndpoint(value = DCRWS.PATH, encoders = JSONMessageEncoder.class)
+//@ServerEndpoint(value = DCRWS.PATH, encoders = JSONMessageEncoder.class)
+@ServerEndpoint(value = DCRWS.PATH, encoders = JacksonEncoder.class)
 
 public class DCRWS extends GenericWebSocket {
 

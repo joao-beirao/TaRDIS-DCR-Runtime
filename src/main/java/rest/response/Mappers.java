@@ -2,9 +2,11 @@ package rest.response;
 
 import dcr.common.Record;
 import dcr.common.data.values.*;
+import dcr.common.events.Event;
 import dcr.runtime.elements.events.ComputationEventInstance;
 import dcr.runtime.elements.events.EventInstance;
 import dcr.runtime.elements.events.InputEventInstance;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,23 +105,51 @@ public final class Mappers {
 //                    .collect(Collectors.toList());
 //        };
 //    }
+
+
     public static Value toValue(ValueDTO dto) {
         return switch (dto) {
-            case BooleanDTO v -> BoolVal.of(v.getValue());
-            case IntDTO v -> IntVal.of(v.getValue());
-            case StringDTO v -> StringVal.of(v.getValue());
+            case UnitDTO ignored -> VoidVal.instance();
+            case BooleanDTO v -> BoolVal.of(v.value());
+            case IntDTO v -> IntVal.of(v.value());
+            case StringDTO v -> StringVal.of(v.value());
             case RecordDTO v ->
-                    RecordVal.of(Record.ofEntries(v.getValue().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> toValue(e.getValue())))));
-            case UnitDTO v -> VoidVal.instance();
-            default -> throw new IllegalStateException("Unexpected value: " + dto);
+                    RecordVal.of(Record.ofEntries(v.value().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> toValue(e.getValue()
+                    )))));
+        };
+    }
+
+    public static ValueDTO fromValue(Value v) {
+        return switch (v) {
+            case BoolVal val -> new BooleanDTO(val.value());
+            case IntVal val -> new IntDTO(val.value());
+            case StringVal val -> new StringDTO(val.value());
+            case UndefinedVal<?> ignored -> new UnitDTO();
+            case VoidVal ignored -> new UnitDTO();
+            case RecordVal val ->
+                    new RecordDTO(val.fields().stream().collect(Collectors.toMap(Record.Field::name, f -> fromValue(f.value()))));
+            case EventVal val -> throw new NotImplementedException("EventVal not implemented");
         };
     }
 
     public static EventDTO toEventDTO(EventInstance e) {
+        MarkingDTO marking = null;
+        {
+            var hasExecuted = e.marking().hasExecuted();
+            var isPending = e.marking().isPending();
+            var isIncluded = e.marking().isIncluded();
+            var value = fromValue(e.value());
+            marking = new MarkingDTO(hasExecuted, isPending, isIncluded, value);
+        }
         return switch (e) {
             case ComputationEventInstance e1 -> new EventDTO(e1);
             case InputEventInstance e2 -> new EventDTO(e2);
             default -> throw new IllegalStateException("Unexpected value: " + e);
         };
     }
+
+    public static MarkingDTO fromMarking(Event.Marking marking) {
+        return new MarkingDTO(marking.hasExecuted(), marking.isPending(), marking.isIncluded(), fromValue(marking.value()));
+    }
+
 }

@@ -1,5 +1,6 @@
 package rest;
 
+import dcr.common.data.values.UndefinedVal;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.container.AsyncResponse;
@@ -8,39 +9,29 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pt.unl.di.novasys.babel.webservices.application.GenericWebServiceProtocol;
 import pt.unl.di.novasys.babel.webservices.application.GenericWebServiceProtocol.WebServiceOperation;
 import pt.unl.di.novasys.babel.webservices.rest.GenericREST;
 import pt.unl.di.novasys.babel.webservices.utils.EndpointPath;
 import pt.unl.di.novasys.babel.webservices.utils.GenericWebAPIResponse;
 import pt.unl.di.novasys.babel.webservices.utils.PendingResponse;
-import rest.request.InputRequest;
+import rest.request.InputRequestDTO;
+import rest.resources.InputEventExecuteRequest;
+import rest.response.Mappers;
 
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import static app.presentation.mappers.EndpointMapper.fromValueDTO;
 
 // TODO [credit where credit is due] - add pointers to actual authors (straightforward adaptation)
 
 
 @Singleton
 @Path(DCRGraphAPI.PATH)
-public class DCRGraphREST
-        extends GenericREST implements DCRGraphAPI {
+public class DCRGraphREST extends GenericREST implements DCRGraphAPI {
 
     private static final String ERROR_MESSAGE = "Internal server error!";
     private static final Logger logger = LogManager.getLogger(DCRGraphREST.class);
 
-    public enum DCREndpoints
-            implements EndpointPath {
-        ENDPOINT_PROCESS("endpoint_process"),
-        EVENT("eventId"),
-        EVENTS("events"),
-        ENABLE("enable"),
-        COMPUTATION("computation"),
-        INPUT("input");
+    public enum DCREndpoints implements EndpointPath {
+        ENDPOINT_PROCESS("endpoint_process"), EVENT("eventId"), EVENTS("events"), ENABLE("enable"), COMPUTATION("computation"), INPUT("input");
 
 
         private final String endpointPath;
@@ -63,10 +54,7 @@ public class DCRGraphREST
     public Response endpointProcess() {
         logger.info("\n\n\nEndpoint process requested");
 
-        return Response.status(Response.Status.OK)
-                .entity("all good")
-                .type(MediaType.TEXT_PLAIN)
-                .build();
+        return Response.status(Response.Status.OK).entity("all good").type(MediaType.TEXT_PLAIN).build();
     }
 
     @Override
@@ -81,9 +69,9 @@ public class DCRGraphREST
     }
 
     @Override
-    public void getEvent(@Suspended     AsyncResponse ar, String eventId) {
+    public void getEvent(@Suspended AsyncResponse ar, String eventId) {
         logger.info("\n\n\nGet event");
-        this.sendRequest(WebServiceOperation.READ, eventId,DCREndpoints.EVENT, ar);
+        this.sendRequest(WebServiceOperation.READ, eventId, DCREndpoints.EVENT, ar);
     }
 
     @Override
@@ -96,9 +84,10 @@ public class DCRGraphREST
     public void executeComputationEvent(@Suspended AsyncResponse ar, String eventId) {
         logger.info("\n\n\n UPDATE computation event");
         ar.setTimeout(60, TimeUnit.SECONDS);
-        this.sendRequest(WebServiceOperation.UPDATE, eventId,DCREndpoints.COMPUTATION, ar);
+        this.sendRequest(WebServiceOperation.UPDATE, eventId, DCREndpoints.COMPUTATION, ar);
     }
-//
+
+    //
 //    private static RecordVal parseRecordVal(String content) {
 //        if (content.isEmpty())
 //            throw new IllegalArgumentException("Expecting record fields: empty record not        supported");
@@ -170,10 +159,12 @@ public class DCRGraphREST
 //        return new Record.Field<>(name, val);
 //    }
     @Override
-    public void executeInputEvent(@Suspended AsyncResponse ar, String eventId, InputRequest input) {
+    public void executeInputEvent(@Suspended AsyncResponse ar, String eventId, InputRequestDTO request) {
         logger.info("\n\n\n UPDATE Input event");
-        ar.setTimeout(60, TimeUnit.SECONDS);
-        this.sendRequest(WebServiceOperation.UPDATE, input,DCREndpoints.INPUT, ar);
+        logger.info("Execute Input event {} with value {}", eventId, request.value());
+//        ar.setTimeout(60, TimeUnit.SECONDS);
+        var value = Mappers.toValue(request.value());
+        this.sendRequest(WebServiceOperation.UPDATE, new InputEventExecuteRequest(request.eventID(), value), DCREndpoints.INPUT, ar);
     }
 
     @Override
@@ -194,15 +185,14 @@ public class DCRGraphREST
                 if (genericResponse == null) {
                     sendStatusResponse(ar, Response.Status.INTERNAL_SERVER_ERROR, ERROR_MESSAGE);
                 } else {
-                    sendResponse(ar,genericResponse.getValue());
+                    sendResponse(ar, genericResponse.getValue());
                 }
                 break;
             case COMPUTATION:
             case INPUT:
                 if (genericResponse == null) {
                     sendStatusResponse(ar, Response.Status.INTERNAL_SERVER_ERROR, ERROR_MESSAGE);
-                }
-                else {
+                } else {
                     sendStatusResponse(ar, genericResponse.getStatusCode(), genericResponse.getMessage());
                 }
                 break;

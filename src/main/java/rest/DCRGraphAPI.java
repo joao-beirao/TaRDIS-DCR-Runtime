@@ -1,17 +1,11 @@
 package rest;
 
-import app.presentation.endpoint.data.values.ValueDTO;
-import dcr.common.data.values.Value;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.container.AsyncResponse;
 import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import pt.unl.di.novasys.babel.webservices.utils.EndpointPath;
-import rest.request.InputRequest;
-
-import javax.print.attribute.standard.Media;
-import java.util.Optional;
+import rest.request.InputRequestDTO;
 
 
 public interface DCRGraphAPI {
@@ -60,7 +54,7 @@ public interface DCRGraphAPI {
     @Path(EVENTS+ "/" + INPUT + "/{"+ EVENT_ID + "}")
     @Consumes( MediaType.APPLICATION_JSON)
 //    @Produces (MediaType.APPLICATION_JSON)
-    void executeInputEvent(@Suspended AsyncResponse ar, @PathParam(EVENT_ID) String eventId, InputRequest input);
+    void executeInputEvent(@Suspended AsyncResponse ar, @PathParam(EVENT_ID) String eventId, InputRequestDTO input);
 
 
 }

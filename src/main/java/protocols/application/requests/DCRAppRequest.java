@@ -6,6 +6,7 @@ import rest.DCRGraphREST.DCREndpoints;
 import java.util.LinkedList;
 import java.util.List;
 
+// TODO [deprecate]
 public class DCRAppRequest {
 
     private String opID;
