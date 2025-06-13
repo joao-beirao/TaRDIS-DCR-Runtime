@@ -1,5 +1,10 @@
 package rest.response;
 
+import app.presentation.endpoint.data.values.BoolValDTO;
+import app.presentation.endpoint.data.values.IntValDTO;
+import app.presentation.endpoint.data.values.RecordValDTO;
+import app.presentation.endpoint.data.values.StringValDTO;
+import dcr.common.Record;
 import dcr.common.data.computation.*;
 import dcr.common.data.types.*;
 import dcr.common.data.values.*;
@@ -110,6 +115,18 @@ public final class Mappers {
 //                    .collect(Collectors.toList());
 //        };
 //    }
+    public static Value toValue(ValueDTO dto) {
+        return switch (dto) {
+            case BooleanDTO v -> BoolVal.of(v.getValue());
+            case IntDTO v -> IntVal.of(v.getValue());
+            case StringDTO v -> StringVal.of(v.getValue());
+            case RecordDTO v -> v.getValue().entrySet().stream().collect(Collectors.toMap(k -> { }, v -> {})
+            ));
+//                    .stream()
+//                    .collect(Collectors.toMap(RecordValDTO.FieldDTO::name,
+//                            x -> fromValueDTO(x.value())))));
+        };
+    }
     public static EventDTO toEventDTO(EventInstance e){ 
         return switch (e){
             case ComputationEventInstance e1 -> new EventDTO(e1);

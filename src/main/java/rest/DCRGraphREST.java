@@ -1,8 +1,5 @@
 package rest;
 
-import app.presentation.endpoint.data.values.ValueDTO;
-import dcr.common.Record;
-import dcr.common.data.values.*;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.container.AsyncResponse;

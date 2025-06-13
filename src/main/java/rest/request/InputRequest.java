@@ -1,6 +1,10 @@
 package rest.request;
 
-import app.presentation.endpoint.data.values.ValueDTO;
+
+
+
+
+import rest.response.ValueDTO;
 
 import java.util.Optional;
 
