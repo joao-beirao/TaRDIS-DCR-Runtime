@@ -1,29 +1,17 @@
 package rest.response;
 
-import app.presentation.endpoint.data.values.BoolValDTO;
-import app.presentation.endpoint.data.values.IntValDTO;
-import app.presentation.endpoint.data.values.RecordValDTO;
-import app.presentation.endpoint.data.values.StringValDTO;
 import dcr.common.Record;
-import dcr.common.data.computation.*;
-import dcr.common.data.types.*;
 import dcr.common.data.values.*;
-import dcr.common.events.Event;
-import dcr.common.events.userset.expressions.*;
 import dcr.runtime.elements.events.ComputationEventInstance;
 import dcr.runtime.elements.events.EventInstance;
 import dcr.runtime.elements.events.InputEventInstance;
-import org.apache.commons.lang3.NotImplementedException;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class Mappers {
 
-//
+    //
 //    private static TypeDTO toTypeDTO(Type type) {
 //        return switch (type) {
 //            case BooleanType ignored -> ValueTypeDTO.BOOL;
@@ -120,15 +108,15 @@ public final class Mappers {
             case BooleanDTO v -> BoolVal.of(v.getValue());
             case IntDTO v -> IntVal.of(v.getValue());
             case StringDTO v -> StringVal.of(v.getValue());
-            case RecordDTO v -> v.getValue().entrySet().stream().collect(Collectors.toMap(k -> { }, v -> {})
-            ));
-//                    .stream()
-//                    .collect(Collectors.toMap(RecordValDTO.FieldDTO::name,
-//                            x -> fromValueDTO(x.value())))));
+            case RecordDTO v ->
+                    RecordVal.of(Record.ofEntries(v.getValue().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> toValue(e.getValue())))));
+            case UnitDTO v -> VoidVal.instance();
+            default -> throw new IllegalStateException("Unexpected value: " + dto);
         };
     }
-    public static EventDTO toEventDTO(EventInstance e){ 
-        return switch (e){
+
+    public static EventDTO toEventDTO(EventInstance e) {
+        return switch (e) {
             case ComputationEventInstance e1 -> new EventDTO(e1);
             case InputEventInstance e2 -> new EventDTO(e2);
             default -> throw new IllegalStateException("Unexpected value: " + e);

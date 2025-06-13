@@ -416,7 +416,7 @@ public final class DCRApp
                 var input = (InputRequest) o;
                 try {
                     if (input.inputValue().isPresent()) {
-                        runner.executeInputEvent(input.eventID(),  Mappers.(input.inputValue().get()));
+                        runner.executeInputEvent(input.eventID(),  Mappers.toValue(input.inputValue().get()));
                     }
                     else{
                        runner.executeInputEvent(input.eventID());
