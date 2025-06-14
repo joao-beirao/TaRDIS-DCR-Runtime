@@ -1,11 +1,10 @@
 package rest.response;
 
 import com.fasterxml.jackson.annotation.*;
-import dcr.common.data.types.*;
-import dcr.runtime.elements.events.ComputationEventInstance;
-import dcr.runtime.elements.events.InputEventInstance;
 
 public class EventDTO {
+    private static final String COMPUTATION_ACTION = "computation";
+    private static final String INPUT_ACTION = "input";
 
     @JsonProperty(value = "id", required = true)
     private final String id;
@@ -14,26 +13,27 @@ public class EventDTO {
     @JsonProperty(value = "kind", required = true)
     private final KindDTO kind;
     @JsonProperty(value = "marking", required = true)
-    private MarkingDTO marking;
+    private final MarkingDTO marking;
     @JsonProperty(value = "typeExpr", required = true)
-    private TypeDTO typeExpr;
+    private final TypeDTO typeExpr;
 
-    public EventDTO(ComputationEventInstance event) {
-        this.id = event.remoteID();
-        this.action = "computation";
-        this.kind = event.receivers().isPresent() ? KindDTO.COMPUTATION_SEND : KindDTO.COMPUTATION;
-        this.typeExpr = Mappers.fromType(event.baseElement().valueType());
-        this.marking = Mappers.fromMarking(event.marking());
+    private EventDTO(String id, String action, TypeDTO typeExpr, KindDTO kind,
+                     MarkingDTO marking) {
+        this.id = id;
+        this.action = action;
+        this.typeExpr = typeExpr;
+        this.kind = kind;
+        this.marking = marking;
     }
 
-    public EventDTO(InputEventInstance event) {
-        this.id = event.remoteID();
-        this.action = "input";
-        this.kind = event.receivers().isPresent() ? KindDTO.INPUT_SEND : KindDTO.INPUT;
+    static EventDTO newComputationEventDTO(String id, TypeDTO typeExpr, KindDTO kind,
+                                           MarkingDTO marking) {
+        return new EventDTO(id, COMPUTATION_ACTION, typeExpr, kind, marking);
+    }
 
-        this.typeExpr = Mappers.fromType(event.baseElement().valueType());
-        this.marking = Mappers.fromMarking(event.marking());
-
+    static EventDTO newInputEventDTO(String id, TypeDTO typeExpr, KindDTO kind,
+                                     MarkingDTO marking) {
+        return new EventDTO(id, INPUT_ACTION, typeExpr, kind, marking);
     }
 }
 
@@ -50,16 +50,13 @@ record MarkingDTO(
 }
 
 enum KindDTO {
-    COMPUTATION("computation-action"),
-    COMPUTATION_SEND("computation-send"),
-    INPUT_SEND("input-send"),
-    INPUT("input-action");
+    COMPUTATION("computation-action"), COMPUTATION_SEND("computation-send"),
+    INPUT_SEND("input-send"), INPUT("input-action");
 
     @JsonProperty(value = "value")
     private final String value;
 
-    @JsonCreator
-    KindDTO(@JsonProperty(value = "value") String v) {
+    @JsonCreator KindDTO(@JsonProperty(value = "value") String v) {
         value = v;
     }
 

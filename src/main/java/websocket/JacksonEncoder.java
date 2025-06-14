@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.websocket.Encoder;
 
 public class JacksonEncoder implements Encoder.Text<Object> {
-
     @Override
     public String encode(Object o) {
         try {
