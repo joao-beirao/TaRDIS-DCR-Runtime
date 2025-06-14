@@ -1,6 +1,7 @@
 package rest.response;
 
 import dcr.common.Record;
+import dcr.common.data.types.*;
 import dcr.common.data.values.*;
 import dcr.common.events.Event;
 import dcr.runtime.elements.events.ComputationEventInstance;
@@ -107,6 +108,18 @@ public final class Mappers {
 //    }
 
 
+    public static TypeDTO fromType(Type type) {
+        return switch (type) {
+            case VoidType ignored -> new UnitTypeDTO();
+            case BooleanType ignored -> new BooleanTypeDTO();
+            case IntegerType ignored -> new IntegerTypeDTO();
+            case StringType ignored -> new StringTypeDTO();
+            case RecordType ty -> new RecordTypeDTO(ty.fields().stream()
+                    .collect(Collectors.toMap(Record.Field::name, f -> fromType(f.value()))));
+            default -> throw new NotImplementedException("Unsupported type: " + type);
+        };
+    }
+
     public static Value toValue(ValueDTO dto) {
         return switch (dto) {
             case UnitDTO ignored -> VoidVal.instance();
@@ -114,8 +127,8 @@ public final class Mappers {
             case IntDTO v -> IntVal.of(v.value());
             case StringDTO v -> StringVal.of(v.value());
             case RecordDTO v ->
-                    RecordVal.of(Record.ofEntries(v.value().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> toValue(e.getValue()
-                    )))));
+                    RecordVal.of(Record.ofEntries(v.value().entrySet().stream()
+                            .collect(Collectors.toMap(Map.Entry::getKey, e -> toValue(e.getValue())))));
         };
     }
 
@@ -126,9 +139,10 @@ public final class Mappers {
             case StringVal val -> new StringDTO(val.value());
             case UndefinedVal<?> ignored -> new UnitDTO("");
             case VoidVal ignored -> new UnitDTO("");
-            case RecordVal val ->
-                    new RecordDTO(val.fields().stream().collect(Collectors.toMap(Record.Field::name, f -> fromValue(f.value()))));
-            case EventVal val -> throw new NotImplementedException("EventVal not implemented");
+            case RecordVal val -> new RecordDTO(val.fields().stream()
+                    .collect(Collectors.toMap(Record.Field::name, f -> fromValue(f.value()))));
+            case EventVal val ->
+                    throw new NotImplementedException("EventVal not implemented");
         };
     }
 
