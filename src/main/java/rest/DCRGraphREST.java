@@ -133,12 +133,13 @@ import java.util.concurrent.TimeUnit;
 
     private void sendResponse(AsyncResponse ar, Object value) {
         Response response = Response.status(Response.Status.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Credentials", "true")
-                .header("Access-Control-Allow-Methods",
-                        "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-                .header("Access-Control-Allow-Headers",
-                        "origin, content-type, accept, authorization").entity(value)
+//                .header("Access-Control-Allow-Origin", "*")
+//                .header("Access-Control-Allow-Credentials", "true")
+//                .header("Access-Control-Allow-Methods",
+//                        "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+//                .header("Access-Control-Allow-Headers",
+//                        "origin, content-type, accept, authorization,access-control-allow-origin")
+                .entity(value)
                 .build();
         ar.resume(response);
     }
@@ -146,12 +147,13 @@ import java.util.concurrent.TimeUnit;
     private void sendStatusResponse(AsyncResponse ar, Response.Status statusCode,
                                     String message) {
         Response response =
-                Response.status(statusCode).header("Access-Control-Allow-Origin", "*")
-                        .header("Access-Control-Allow-Credentials", "true")
-                        .header("Access-Control-Allow-Methods",
-                                "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-                        .header("Access-Control-Allow-Headers",
-                                "origin, content-type, accept, authorization")
+                Response.status(statusCode)
+//                        .header("Access-Control-Allow-Origin", "*")
+//                        .header("Access-Control-Allow-Credentials", "true")
+//                        .header("Access-Control-Allow-Methods",
+//                                "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+//                        .header("Access-Control-Allow-Headers",
+//                                "origin, content-type, accept, authorization,access-control-allow-origin")
                         .entity(message).build();
         ar.resume(response);
     }

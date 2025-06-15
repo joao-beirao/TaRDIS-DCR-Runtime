@@ -31,13 +31,8 @@ import pt.unl.di.novasys.babel.webservices.application.GenericWebServiceProtocol
 import pt.unl.di.novasys.babel.webservices.utils.EndpointPath;
 import pt.unl.di.novasys.babel.webservices.utils.GenericWebAPIResponse;
 import pt.unl.fct.di.novasys.babel.exceptions.HandlerRegistrationException;
-import pt.unl.fct.di.novasys.babel.generic.ProtoNotification;
-import pt.unl.fct.di.novasys.babel.protocols.dissemination.notifications.BroadcastDelivery;
-import pt.unl.fct.di.novasys.babel.protocols.dissemination.requests.BroadcastRequest;
-import pt.unl.fct.di.novasys.babel.protocols.membership.notifications.NeighborUp;
 import pt.unl.fct.di.novasys.network.data.Host;
 import rest.DCRGraphREST;
-import rest.request.InputRequestDTO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,15 +44,10 @@ import java.util.stream.Collectors;
 
 import rest.resources.InputEventExecuteRequest;
 import rest.response.*;
-// docker run example
-// babel % docker run --network tardis-babel-backend-net --rm -h P_1_2 --name P_1_2 -it dcr-babel
-// interface=eth0 role=P cid=1 pid=2
 
-// TODO revisit bootstrap config process - currently loading a json resource based on role name
 public final class DCRApp
         extends GenericWebServiceProtocol
         implements GraphObserver, CommunicationLayer {
-
 
     private static final Logger logger = LogManager.getLogger(DCRApp.class);
 
@@ -69,17 +59,14 @@ public final class DCRApp
     public static final short PROTO_ID = 51;
 
     private static final int DEFAULT_PORT = 9000; // default port to listen on
-
-    // TODO add support for endpoint.role config
     private static final String CLI_ROLE_ARG = "role";
 
     private GraphRunner runner = null;
+    //    TODO [revisit] not being used at this point
     private Endpoint endpoint = null;
-//    private Map<String, DCRAppRequest> pendingRequests =null;
 
     public static DCRApp getInstance() {
         return LazyHolder.INSTANCE;
-        // return new DCRApp();
     }
 
     private static UserVal instantiateSelf(Properties props, Endpoint.Role roleDecl) {
@@ -108,45 +95,28 @@ public final class DCRApp
         return EndpointMapper.mapEndpoint(deserializedEndpoint);
     }
 
-
     private DCRApp() {
         super(PROTOCOL_NAME, PROTO_ID);
-//        this.pendingRequests = new HashMap<>();
     }
 
     @Override
     public void init(Properties properties) throws HandlerRegistrationException, IOException {
         logger.info("Initializing DCRApp");
-        // request handlers
+
         registerRequestHandler(AppRequest.REQUEST_ID, this::uponReceiveDcrRequest);
-        // reply handlers
-        // registerReplyHandler(AppReply.REPLY_ID, this::onPongReply);
-        // start CLI
-        registerRequestHandler(BroadcastRequest.REQUEST_ID, this::uponBroadCastRequest);
-        subscribeNotification(BroadcastDelivery.NOTIFICATION_ID, this::uponBroadcastDelivery);
-        // triggerNotification(new NeighborUp(self));
-        subscribeNotification(NeighborUp.NOTIFICATION_ID, this::uponNeighborUpNotification);
-
-//        registerReplyHandler(ExecuteJSONReply.REPLY_ID, this::uponJsonReply);
-//        registerReplyHandler(ExecuteStatusReply.REPLY_ID, this::uponStatusReply);
-
-//        subscribeNotification(JSONDataNotification.NOTIFICATION_ID, this::uponDataNotification);
-
-        // observation: Bootstrap is currently supported by CLI params:
+        // observation: bootstrap requires parameterized role parameters:
         // - a 'role' param is required, and determines the role this endpoint should enact - based
         // on the role, the json-encoded endpoint resource is loaded and used to instantiate,
-        // both the DCR Model and the Role for the active participant;
+        // both the DCR Model and the Role for the actirve participant;
         // - similarly, CLI params are used to inject the runtime parameter values for the
         // role (when applicable), and are expected to follow the parameter names declared by the
         // selected endpoint.
-        logger.info("role property: {}", properties.getProperty(CLI_ROLE_ARG));
-
         try (InputStream in = DCRApp.class.getResourceAsStream(
                 String.format("%s.json", properties.getProperty(CLI_ROLE_ARG)))) {
             assert in != null;
             // the user associated with this endpoint
             UserVal self;
-            // the behaviour this endpoint will enact
+            // the behavior this endpoint will enact
             GraphElement graphElement;
             {
                 // load the information required to deploy this endpoint
@@ -166,91 +136,16 @@ public final class DCRApp
             // start CLI-based interaction
             cmdLineRunner.init();
         } catch (Exception e) {
+            logger.error("Caught runtime exception {}", e.getMessage());
             e.printStackTrace();
         }
     }
 
 
-    private void uponBroadcastDelivery(ProtoNotification protoNotification, short i) {
-        logger.info("Broadcast delivery for " + protoNotification.toString());
-        logger.info("Protocol id {}", String.valueOf(i));
-    }
+    // ========================================================================
+    // CommunicationLayer  (callback to request communication to other nodes)
+    // ========================================================================
 
-    private void uponBroadCastRequest(BroadcastRequest broadcastRequest, short sourceProtocol) {
-        logger.info("BroadCast Request: {}", broadcastRequest);
-    }
-
-    private void uponNeighborUpNotification(NeighborUp up, short protoID) {
-        logger.info("NeighborUp notification triggered for protoID: {}", protoID);
-        // if(protoID == EpidemicGlobalView.PROTOCOL_ID) return; //It is a good idea to ignore
-        // notifications issued by ourselves
-        //
-        // if(this.status == Status.STOP) {
-        //     setupTimer(new InitializeTimer(), this.initializeDelay);
-        // }
-    }
-//
-//    }
-//    private void uponJsonReply(ExecuteJSONReply reply, short protoID) {
-//        logger.warn(
-//                "Received operation type {} with identifier {} from collection {} with status code {} and value {} and message {}",
-//                reply.getOperationType(), reply.getObjectID(), reply.getCollection(), reply.getStatus(),
-//                reply.getResult(), reply.getMessage());
-//        String opID = reply.getObjectID();
-//        DCRAppRequest info = this.pendingRequests.get(opID);
-//        if (info == null)
-//            return;
-//
-//        if (reply.getStatus() != CommonOperationStatus.OK) {
-//            logger.error("Status: {}", reply.getStatus());
-//            logger.error("Message: {}", reply.getMessage());
-//
-//            info.getCallback().triggerResponse(opID,
-//                    new GenericWebAPIResponse(Response.Status.INTERNAL_SERVER_ERROR, reply.getMessage()));
-//
-//            return;
-//        }
-//        if (!reply.getMessage().isBlank())
-//            logger.warn("Got JSONReply OK with message: {}", reply.getMessage());
-//
-//        String jsonResult = reply.getResult();
-//        String objectID = reply.getObjectID();
-//        Class<? extends Object> type = reply.getResultType();
-//        boolean responseCompleted = false;
-//        switch (info.getPath()) {
-//            case ENDPOINT_PROCESS -> {
-//                info.addResponse(objectID, objectID, jsonResult, type);
-//                if (info.hasAllResponses()) {
-//                    var response = new GenericWebAPIResponse("Returned endpoint-process", null);
-//                    info.getCallback().triggerResponse(info.getOpID(), response);
-//                    responseCompleted = true;
-//                }
-//            }
-//            case ENABLE -> {
-//                info.addResponse(objectID, objectID, jsonResult, type);
-//                if (info.hasAllResponses()) {
-//                    List<Event> events = this.getEnabledEvents();
-//                    var response = new GenericWebAPIResponse("Returned enabled events", events);
-//                    info.getCallback().triggerResponse(info.getOpID(), response);
-//                    responseCompleted = true;
-//                }
-//            }
-//            case EVENTS -> {
-//                info.addResponse(objectID, objectID, jsonResult, type);
-//                if (info.hasAllResponses()) {
-//                    List<Event> events = this.getAllEvents();
-//                    var response = new GenericWebAPIResponse("Returned all events", events);
-//                    info.getCallback().triggerResponse(info.getOpID(), response);
-//                    responseCompleted = true;
-//                }
-//            }
-//        }
-//
-//        if (responseCompleted)
-//            pendingRequests.remove(opID);
-//    }
-
-    // Callback for the Graph Runner
     @Override
     public Set<UserVal> uponSendRequest(UserVal requester, String eventId, UserSetVal receivers,
                                         Event.Marking marking, String uidExtension) {
@@ -265,14 +160,15 @@ public final class DCRApp
                 reachable.add(neighbour);
             }
         });
-        // return neighbours.stream().map(MembershipLayer.Neighbour::user).collect(Collectors
-        // .toSet());
         return reachable.stream().map(MembershipLayer.Neighbour::user).collect(Collectors.toSet());
     }
 
+    // ========================================================================
+    // UI (GUI/CLI) callbacks
+    // ========================================================================
 
-    // TODO some renaming
-    // called from UI
+
+    // current graph as string
     String onDisplayGraph() {
         return runner.toString();
     }
@@ -285,17 +181,17 @@ public final class DCRApp
                 .collect(Collectors.joining("\n"));
     }
 
-    List<Event> getEnabledEvents() {
+    // returns currently enabled events
+    List<EventInstance> getEnabledEvents() {
         return runner.enabledEvents();
     }
 
-    List<Event> getAllEvents() {
+    // returns all currently instantiated events
+    List<EventInstance> getAllEvents() {
         return List.of();
     }
 
-
-    // TODO maybe return something to be printed
-    // called from UI
+    // on request to execute a Computation event
     void onExecuteComputationEvent(String eventId) {
         logger.info("Executing Computation event '{}'", eventId);
         try {
@@ -306,7 +202,7 @@ public final class DCRApp
         }
     }
 
-    // called from UI
+    // on request to execute an Input event
     void onExecuteInputEvent(String eventId, Value inputValue) {
         logger.info("Executing Input event '{}' with input value {}", eventId, inputValue);
         try {
@@ -317,6 +213,7 @@ public final class DCRApp
         }
     }
 
+    // on request to execute an "empty" Input event
     void onExecuteInputEvent(String eventId) {
         logger.info("Executing (void) Input event '{}'", eventId);
         try {
@@ -327,7 +224,7 @@ public final class DCRApp
         }
     }
 
-    // called from Babel's internal network after a remote event has been executed
+    // on request to execute a Receive event (called from Babel's internal network after a remote event has been executed
     private void onExecuteReceiveEvent(GraphRunner runner, String eventId, Event.Marking marking,
                                        UserVal sender, String uidExtension) {
         logger.info("Executing Receive event '{}': received {}", eventId, marking);
@@ -339,7 +236,7 @@ public final class DCRApp
         }
     }
 
-    // (inner-process) DCR Protocol request to enact a Tx/RX
+    // (Distributed-DCR protocol) propagate call to execute Rx events (following a Tx)
     private boolean deliverMessage(MembershipLayer.Neighbour receiver, String eventId,
                                    Event.Marking marking, UserVal user, String uidExtension) {
         try {
@@ -364,6 +261,11 @@ public final class DCRApp
         try {
             onExecuteReceiveEvent(runner, appRequest.getEventId(), appRequest.getMarking(),
                     appRequest.getSender(), appRequest.getIdExtensionToken());
+            for (var socket : super.getWSInstances()) {
+//                var events = this.getEnabledEvents().stream().map((e) -> Mappers.toEventDTO((EventInstance) e)).collect(Collectors.toCollection(ArrayList::new));
+
+                socket.sendMessage(Mappers.fromEndpoint(this.runner.self, this.getEnabledEvents()));
+            }
         } catch (Exception e) {
             logger.error("Error reading command: {}", e.getMessage());
         }
@@ -382,11 +284,14 @@ public final class DCRApp
      * WebService Handlers
      * ===================== */
 
-
     @Override
     protected void createAsync(String opUniqueID, Object o, WebAPICallback webAPICallback,
-                               Optional<EndpointPath> optional) {
-
+                               Optional<EndpointPath> endpointPath) {
+        // not used in this application
+        if (endpointPath.isEmpty())
+            logger.info("Unexpected call from POST endpoint");
+        else
+            logger.info("Unexpected call from POST endpoint: {}", endpointPath.get());
     }
 
     @Override
@@ -395,39 +300,37 @@ public final class DCRApp
         if (optional.isEmpty())
             return;
 
-//        TODO [revisit null initialization]
-        GenericWebAPIResponse response = null;
+        GenericWebAPIResponse response;
         switch ((DCRGraphREST.DCREndpoints) optional.get()) {
             case COMPUTATION:
                 this.onExecuteComputationEvent((String) o);
-                response =  new GenericWebAPIResponse("Update computation event" , Response.Status.NO_CONTENT);
-                webAPICallback.triggerResponse(s,response);
+                response = new GenericWebAPIResponse("Update computation event", Response.Status.NO_CONTENT);
+                webAPICallback.triggerResponse(s, response);
                 break;
             case INPUT:
                 var input = (InputEventExecuteRequest) o;
                 try {
                     Value val = input.value();
-                    if (! (val instanceof VoidVal)) {
-                        runner.executeInputEvent(input.eventId(),  val);
-                    }
-                    else {
-                       runner.executeInputEvent(input.eventId());
+                    if (!(val instanceof VoidVal)) {
+                        runner.executeInputEvent(input.eventId(), val);
+                    } else {
+                        runner.executeInputEvent(input.eventId());
                     }
                     logger.info("\n\n Executed update\n\n");
                     response = new GenericWebAPIResponse("Update input event", Response.Status.NO_CONTENT);
-                    webAPICallback.triggerResponse(s,response);
+                    webAPICallback.triggerResponse(s, response);
                 } catch (Exception e) {
                     logger.error("\nError executing Input Event '{}': {}\n", input.eventId(), e.getMessage());
                     e.printStackTrace();
                     response = new GenericWebAPIResponse("Error executing input event", Response.Status.INTERNAL_SERVER_ERROR);
-                    webAPICallback.triggerResponse(s,response);
+                    webAPICallback.triggerResponse(s, response);
                 }
                 break;
             default:
                 logger.info("Unexpected endpointPath call: {}", optional.get());
         }
-        for(var socket : super.getWSInstances()){
-            socket.sendMessage(this.getEnabledEvents().stream().map((e) -> Mappers.toEventDTO((EventInstance) e)).collect(Collectors.toCollection(ArrayList::new)));
+        for (var socket : super.getWSInstances()) {
+            socket.sendMessage(Mappers.fromEndpoint(this.runner.self, this.getEnabledEvents()));
         }
 
     }
@@ -438,7 +341,7 @@ public final class DCRApp
         if (endpointPath.isEmpty())
             return;
         var path = (DCRGraphREST.DCREndpoints) endpointPath.get();
-        List<Event> events = new ArrayList<>();
+        List<EventInstance> events = new ArrayList<>();
         switch (path) {
             case ENDPOINT_PROCESS -> {
                 var response = new GenericWebAPIResponse("Returned endpoint-process", null);
@@ -448,26 +351,27 @@ public final class DCRApp
                 events = this.getEnabledEvents();
                 var response = new GenericWebAPIResponse("Returned enabled events", events);
                 webAPICallback.triggerResponse(opUniqueID, response);
-
             }
             case EVENTS -> {
                 events = this.getAllEvents();
                 var response = new GenericWebAPIResponse("Returned all events", events);
                 webAPICallback.triggerResponse(opUniqueID, response);
-
             }
             default -> logger.info("Unexpected endpointPath call: {}", endpointPath.get());
 
         }
-        for(var socket : super.getWSInstances()){
-            socket.sendMessage(events.stream().map((e) -> Mappers.toEventDTO((EventInstance) e)).collect(Collectors.toCollection(ArrayList::new)));
+        for (var socket : super.getWSInstances()) {
+            socket.sendMessage(Mappers.fromEndpoint(this.runner.self, this.getEnabledEvents()));
         }
-//        DCRAppRequest request = new DCRAppRequest(opUniqueID,webAPICallback,path, 1);
-//        this.pendingRequests.put(opUniqueID, request);
     }
 
     @Override
     protected void deleteAsync(String s, Object o, WebAPICallback webAPICallback,
-                               Optional<EndpointPath> optional) {
+                               Optional<EndpointPath> endpointPath) {
+        // not used in this application
+        if (endpointPath.isEmpty())
+            logger.info("Unexpected call from DELETE endpoint");
+        else
+            logger.info("Unexpected call from DELETE endpoint: {}", endpointPath.get());
     }
 }

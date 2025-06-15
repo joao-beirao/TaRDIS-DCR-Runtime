@@ -17,6 +17,8 @@ public class DCRWS extends GenericWebSocket {
         super(babelApp);
     }
 
+
+
     @Override
     public void onMessage(Session session, String message) {
         // not used in this app.
@@ -26,6 +28,7 @@ public class DCRWS extends GenericWebSocket {
     public void sendMessage(Object value) {
         try {
             session.getBasicRemote().sendObject(value);
+//            session.getBasicRemote().flushBatch();
         } catch (IOException | EncodeException e) {
             e.printStackTrace();
         }

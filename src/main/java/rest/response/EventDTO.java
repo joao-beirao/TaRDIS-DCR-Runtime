@@ -8,6 +8,8 @@ public class EventDTO {
 
     @JsonProperty(value = "id", required = true)
     private final String id;
+    @JsonProperty(value = "label", required = true)
+    private final String label;
     @JsonProperty(value = "action", required = true)
     private final String action;
     @JsonProperty(value = "kind", required = true)
@@ -17,23 +19,24 @@ public class EventDTO {
     @JsonProperty(value = "typeExpr", required = true)
     private final TypeDTO typeExpr;
 
-    private EventDTO(String id, String action, TypeDTO typeExpr, KindDTO kind,
+    private EventDTO(String id, String label, String action, TypeDTO typeExpr, KindDTO kind,
                      MarkingDTO marking) {
         this.id = id;
+        this.label = label;
         this.action = action;
         this.typeExpr = typeExpr;
         this.kind = kind;
         this.marking = marking;
     }
 
-    static EventDTO newComputationEventDTO(String id, TypeDTO typeExpr, KindDTO kind,
+    static EventDTO newComputationEventDTO(String id, String label, TypeDTO typeExpr, KindDTO kind,
                                            MarkingDTO marking) {
-        return new EventDTO(id, COMPUTATION_ACTION, typeExpr, kind, marking);
+        return new EventDTO(id, label, COMPUTATION_ACTION, typeExpr, kind, marking);
     }
 
-    static EventDTO newInputEventDTO(String id, TypeDTO typeExpr, KindDTO kind,
+    static EventDTO newInputEventDTO(String id, String label, TypeDTO typeExpr, KindDTO kind,
                                      MarkingDTO marking) {
-        return new EventDTO(id, INPUT_ACTION, typeExpr, kind, marking);
+        return new EventDTO(id, label, INPUT_ACTION, typeExpr, kind, marking);
     }
 }
 
@@ -42,10 +45,10 @@ public class EventDTO {
 record MarkingDTO(
         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "hasExecuted",
                 required = true) boolean hasExecuted,
-        @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "isIncluded",
-                required = true) boolean isIncluded,
         @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "isPending",
                 required = true) boolean isPending,
+        @JsonInclude(JsonInclude.Include.NON_EMPTY) @JsonProperty(value = "isIncluded",
+                required = true) boolean isIncluded,
         @JsonProperty("value") ValueDTO value) {
 }
 

@@ -16,25 +16,16 @@ public class DCRRequest
     private final Event.Marking marking;
 
     private final UserVal sender;
-    //
     private final String idExtensionToken;
 
-    // private final String marking;
-
-    // public PingMessage(int pingId, String message, String marking) {
     public DCRRequest(String remoteEventUID, Event.Marking marking, UserVal sender,
             String idExtensionToken) {
         super(MSG_ID);
-        // this.pingId = pingId;
         this.message = remoteEventUID;
         this.marking = marking;
         this.sender = sender;
         this.idExtensionToken = idExtensionToken;
     }
-
-    // public int getPingId() {
-    //     return pingId;
-    // }
 
     public String getMessage() {
         return message;
@@ -50,8 +41,6 @@ public class DCRRequest
 
     public static ISerializer<? extends ProtoMessage> serializer = new ISerializer<DCRRequest>() {
         public void serialize(DCRRequest msg, ByteBuf out) {
-
-            // out.writeInt(msg.pingId);
             Utils.encodeUTF8(msg.message, out);
             Utils.encodeUTF8(msg.getIdExtensionToken(), out);
             try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -76,7 +65,6 @@ public class DCRRequest
         }
 
         public DCRRequest deserialize(ByteBuf in) {
-            // int pingId = in.readInt();
             String message = Utils.decodeUTF8(in);
             String idExtensionToken = Utils.decodeUTF8(in);
             byte[] markingBytes = new byte[in.readInt()];
@@ -108,8 +96,6 @@ public class DCRRequest
                 e.printStackTrace();
             }
             return new DCRRequest(message, val, sender, idExtensionToken);
-            // String marking = Utils.decodeUTF8(in);
-            // return new PingMessage(pingId, message, marking);
         }
     };
 

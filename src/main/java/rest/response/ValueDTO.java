@@ -25,7 +25,7 @@ record BooleanDTO(
         @JsonProperty(value = "value", required = true) boolean value) implements ValueDTO {
 }
 
-@JsonTypeName(value = "Integer")
+@JsonTypeName(value = "Number")
 record IntDTO(
         @JsonProperty(value = "value", required = true) int value) implements ValueDTO {
 }
