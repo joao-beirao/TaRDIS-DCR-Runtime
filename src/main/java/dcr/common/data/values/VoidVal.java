@@ -5,6 +5,7 @@ import dcr.common.data.types.VoidType;
 
 import java.io.Serial;
 
+//TODO deprecate
 public final class VoidVal
         implements Value {
     @Serial

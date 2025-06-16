@@ -56,7 +56,7 @@ public final class GraphRunner {
     private final Map<EventInstance, List<SpawnRelationInfo>> spawnRelations;
 
     // whoami
-    private final UserVal self;
+    public final UserVal self;
     private final CommunicationLayer communicationLayer;
     private final Collection<GraphObserver> graphObservers;
 
@@ -383,7 +383,7 @@ public final class GraphRunner {
      *
      * @return the currently enabled events
      */
-    public List<Event> enabledEvents() {
+    public List<EventInstance> enabledEvents() {
         return eventsByUuid.values()
                 .stream()
                 .map(EventInfo::event)

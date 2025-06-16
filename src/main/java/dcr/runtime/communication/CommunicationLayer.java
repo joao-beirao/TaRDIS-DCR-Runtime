@@ -7,7 +7,7 @@ import dcr.common.events.userset.values.UserVal;
 import java.util.Set;
 
 public interface CommunicationLayer {
-    public Set<UserVal> uponSendRequest(UserVal requester, String eventId, UserSetVal receivers,
+    Set<UserVal> uponSendRequest(UserVal requester, String eventId, UserSetVal receivers,
             Event.Marking marking,
             String uidExtension);
 }

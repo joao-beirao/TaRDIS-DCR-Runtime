@@ -8,4 +8,4 @@ COPY resources/log4j2.xml /app/log4j2.xml
 
 ENTRYPOINT ["java", "-Dlog4j2.configurationFile=log4j2.xml", "-jar", "babel-backend.jar"]
 
-EXPOSE 8080
+EXPOSE 1234
