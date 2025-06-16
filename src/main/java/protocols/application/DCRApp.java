@@ -25,6 +25,7 @@ import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import protocols.application.requests.AppRequest;
+import protocols.application.requests.InformationFlowException;
 import protocols.dcr.DistributedDCRProtocol;
 import pt.unl.di.novasys.babel.webservices.WebAPICallback;
 import pt.unl.di.novasys.babel.webservices.application.GenericWebServiceProtocol;
@@ -192,10 +193,12 @@ public final class DCRApp
     }
 
     // on request to execute a Computation event
-    void onExecuteComputationEvent(String eventId) {
+    void onExecuteComputationEvent(String eventId) throws InformationFlowException {
         logger.info("Executing Computation event '{}'", eventId);
         try {
             runner.executeComputationEvent(eventId);
+        } catch (InformationFlowException e) {
+            throw new InformationFlowException(e.getMessage());
         } catch (Exception e) {
             logger.error("Error executing Computation Event '{}': {}", eventId, e.getMessage());
             e.printStackTrace();
@@ -203,10 +206,12 @@ public final class DCRApp
     }
 
     // on request to execute an Input event
-    void onExecuteInputEvent(String eventId, Value inputValue) {
+    void onExecuteInputEvent(String eventId, Value inputValue) throws InformationFlowException {
         logger.info("Executing Input event '{}' with input value {}", eventId, inputValue);
         try {
             runner.executeInputEvent(eventId, inputValue);
+        } catch (InformationFlowException e) {
+            throw new InformationFlowException(e.getMessage());
         } catch (Exception e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
@@ -214,10 +219,12 @@ public final class DCRApp
     }
 
     // on request to execute an "empty" Input event
-    void onExecuteInputEvent(String eventId) {
+    void onExecuteInputEvent(String eventId) throws InformationFlowException {
         logger.info("Executing (void) Input event '{}'", eventId);
         try {
             runner.executeInputEvent(eventId);
+        } catch (InformationFlowException e) {
+           throw new InformationFlowException(e.getMessage());
         } catch (Exception e) {
             logger.error("Error executing Input Event '{}': {}", eventId, e.getMessage());
             e.printStackTrace();
@@ -262,8 +269,6 @@ public final class DCRApp
             onExecuteReceiveEvent(runner, appRequest.getEventId(), appRequest.getMarking(),
                     appRequest.getSender(), appRequest.getIdExtensionToken());
             for (var socket : super.getWSInstances()) {
-//                var events = this.getEnabledEvents().stream().map((e) -> Mappers.toEventDTO((EventInstance) e)).collect(Collectors.toCollection(ArrayList::new));
-
                 socket.sendMessage(Mappers.fromEndpoint(this.runner.self, this.getEnabledEvents()));
             }
         } catch (Exception e) {
@@ -303,8 +308,14 @@ public final class DCRApp
         GenericWebAPIResponse response;
         switch ((DCRGraphREST.DCREndpoints) optional.get()) {
             case COMPUTATION:
-                this.onExecuteComputationEvent((String) o);
-                response = new GenericWebAPIResponse("Update computation event", Response.Status.NO_CONTENT);
+                try {
+                    this.onExecuteComputationEvent((String) o);
+                    response = new GenericWebAPIResponse("Update computation event", Response.Status.NO_CONTENT);
+
+                } catch (InformationFlowException e) {
+                    e.printStackTrace();
+                    response = new GenericWebAPIResponse(e.getMessage(), Response.Status.FORBIDDEN);
+                }
                 webAPICallback.triggerResponse(s, response);
                 break;
             case INPUT:
@@ -319,7 +330,12 @@ public final class DCRApp
                     logger.info("\n\n Executed update\n\n");
                     response = new GenericWebAPIResponse("Update input event", Response.Status.NO_CONTENT);
                     webAPICallback.triggerResponse(s, response);
-                } catch (Exception e) {
+                } catch (InformationFlowException e) {
+                    e.printStackTrace();
+                    response = new GenericWebAPIResponse(e.getMessage(), Response.Status.FORBIDDEN);
+                    webAPICallback.triggerResponse(s, response);
+                }
+                catch (Exception e) {
                     logger.error("\nError executing Input Event '{}': {}\n", input.eventId(), e.getMessage());
                     e.printStackTrace();
                     response = new GenericWebAPIResponse("Error executing input event", Response.Status.INTERNAL_SERVER_ERROR);

@@ -20,6 +20,7 @@ import dcr.runtime.monitoring.StateUpdate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import protocols.application.requests.InformationFlowException;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -143,7 +144,7 @@ public final class GraphRunner {
      * @param eventId
      *         the event's unique identifier in this graph
      */
-    public void executeComputationEvent(String eventId) {
+    public void executeComputationEvent(String eventId) throws InformationFlowException {
         var info = requireNonNullEnabledEvent(computationEvents.get(eventId));
         assertIfcOK(info.event(), info.valueEnv());
         var event = info.event();
@@ -163,7 +164,7 @@ public final class GraphRunner {
      * @param inputValue
      *         the event's updated value
      */
-    public void executeInputEvent(String eventId, Value inputValue) {
+    public void executeInputEvent(String eventId, Value inputValue) throws InformationFlowException {
         var info = requireNonNullEnabledEvent(inputEvents.get(eventId));
         assertAdmissibleValueType(info.event, inputValue);
         assertIfcOK(info.event(), info.valueEnv());
@@ -180,7 +181,7 @@ public final class GraphRunner {
      * @param eventId
      *         the event's unique identifier in this graph
      */
-    public void executeInputEvent(String eventId) {
+    public void executeInputEvent(String eventId) throws InformationFlowException {
         var info = requireNonNullEnabledEvent(inputEvents.get(eventId));
         assertAdmissibleValueType(info.event(), VoidVal.instance());
         assertIfcOK(info.event(), info.valueEnv());
@@ -644,8 +645,8 @@ public final class GraphRunner {
     }
 
     // ifc-leak detection handler
-    private static void onIfcLeakDetection(Event event) {
-        throw new RuntimeException(
+    private static void onIfcLeakDetection(Event event) throws InformationFlowException {
+        throw new InformationFlowException(
                 "Event execution prevented due to information-flow control policy: " +
                         event.remoteID());
     }
@@ -653,7 +654,7 @@ public final class GraphRunner {
     // Reminder: caller is responsible for providing the correct environment for the purpose
     // of ifc evaluation (namely, whether the evalEnv should already reflect the event being
     // created - maybe not a good idea... just like referencing 'this' from the constructor)
-    private static void assertIfcOK(Event event, Environment<Value> env) {
+    private static void assertIfcOK(Event event, Environment<Value> env) throws InformationFlowException {
         if (!event.ifcConstraint().eval(env).value()) {
             onIfcLeakDetection(event);
         }

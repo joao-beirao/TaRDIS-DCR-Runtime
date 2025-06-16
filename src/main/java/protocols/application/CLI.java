@@ -7,6 +7,7 @@ import dcr.common.data.values.StringVal;
 import dcr.common.data.values.Value;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import protocols.application.requests.InformationFlowException;
 
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -89,7 +90,7 @@ public final class CLI {
     }
 
     private void processCommand(String command) throws UnknownHostException,
-            InterruptedException {
+            InterruptedException, InformationFlowException {
         StringTokenizer tokenizer = new StringTokenizer(command);
         if (!tokenizer.hasMoreTokens()) {return;}
         String cmd = tokenizer.nextToken();
