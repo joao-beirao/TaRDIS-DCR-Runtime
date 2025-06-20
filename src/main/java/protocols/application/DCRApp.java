@@ -135,7 +135,7 @@ public final class DCRApp
             runner.registerGraphObserver(this);
             runner.init(graphElement);
             // start CLI-based interaction
-            cmdLineRunner.init();
+//            cmdLineRunner.init();
         } catch (Exception e) {
             logger.error("Caught runtime exception {}", e.getMessage());
             e.printStackTrace();
@@ -213,7 +213,7 @@ public final class DCRApp
         } catch (InformationFlowException e) {
             throw new InformationFlowException(e.getMessage());
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            logger.error("Error executing Input Event '{}': {}", eventId, e.getMessage());
             e.printStackTrace();
         }
     }
@@ -226,7 +226,7 @@ public final class DCRApp
         } catch (InformationFlowException e) {
            throw new InformationFlowException(e.getMessage());
         } catch (Exception e) {
-            logger.error("Error executing Input Event '{}': {}", eventId, e.getMessage());
+            logger.error("Error executing empty Input Event '{}': {}", eventId, e.getMessage());
             e.printStackTrace();
         }
     }

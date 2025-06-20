@@ -10,8 +10,8 @@ services:
       - cid=1
     ports:
       - "1234:8080"
-    networks:
-      - dcr-network
+#    networks:
+#      - dcr-network
   p_2_1:
     build:
       context: .
@@ -23,8 +23,8 @@ services:
       - cid=1
     ports:
       - "1235:8080"
-    networks:
-      - dcr-network
+#    networks:
+#      - dcr-network
   p_3_1:
     build:
       context: .
@@ -36,11 +36,24 @@ services:
       - cid=1
     ports:
       - "1236:8080"
-    networks:
-      - dcr-network
+#    networks:
+#      - dcr-network
+  p_4_1:
+      build:
+        context: .
+      image: dcr-babel
+      hostname: P_4_1
+      command:
+        - role=P
+        - id=4
+        - cid=1
+      ports:
+        - "1237:8080"
+#      networks:
+#        - dcr-network
 
 
-networks:
-  dcr-network:
-    name: tardis-babel-backend-net
-    external: true
+#networks:
+#  dcr-network:
+#    name: tardis-babel-backend-net
+#    external: true

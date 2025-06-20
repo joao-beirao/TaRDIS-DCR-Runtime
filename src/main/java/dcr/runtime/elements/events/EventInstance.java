@@ -26,5 +26,7 @@ public interface EventInstance
     default BooleanExpression ifcConstraint() {
         return baseElement().ifcConstraint();
     }
+
+    long creationTimestamp();
 }
 

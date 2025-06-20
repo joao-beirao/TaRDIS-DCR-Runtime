@@ -106,6 +106,7 @@ sealed abstract class GenericEventInstance
     private final String remoteID;
     private final EventElement baseElement;
     private final MutableMarking marking;
+    private final long creationTimestamp;
 
     // TODO [revisit] not accounting for subtyping - it should - revisit Type
     // TODO [revisit] proper IllegalValueType exception
@@ -121,6 +122,7 @@ sealed abstract class GenericEventInstance
         this.remoteID = remoteID;
         this.baseElement = baseElement;
         this.marking = MutableMarking.of(baseElement.marking());
+        this.creationTimestamp = System.currentTimeMillis();
     }
 
     @Override
@@ -151,6 +153,11 @@ sealed abstract class GenericEventInstance
     @Override
     public Optional<? extends UserSetExpression> remoteParticipants() {
         return baseElement.remoteParticipants();
+    }
+
+    @Override
+    public long creationTimestamp() {
+        return creationTimestamp;
     }
 
     void onExecuted(Value value) {

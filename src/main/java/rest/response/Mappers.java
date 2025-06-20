@@ -68,13 +68,14 @@ public final class Mappers {
         var label = e.label();
         var typeExpr = fromType(e.baseElement().valueType());
         var marking = fromMarking(e.marking());
+        var timestamp = e.creationTimestamp();
         return switch (e) {
             case ComputationEventInstance e1 ->
                     EventDTO.newComputationEventDTO(id, label, typeExpr, e1.receivers()
-                            .isPresent() ? KindDTO.COMPUTATION_SEND : KindDTO.COMPUTATION, marking);
+                            .isPresent() ? KindDTO.COMPUTATION_SEND : KindDTO.COMPUTATION, marking, timestamp);
             case InputEventInstance e2 ->
                     EventDTO.newInputEventDTO(id, label, typeExpr, e2.receivers()
-                            .isPresent() ? KindDTO.INPUT_SEND : KindDTO.INPUT, marking);
+                            .isPresent() ? KindDTO.INPUT_SEND : KindDTO.INPUT, marking, timestamp);
             default -> throw new IllegalStateException("Unexpected value: " + e);
         };
     }

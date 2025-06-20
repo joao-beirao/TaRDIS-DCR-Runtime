@@ -18,25 +18,28 @@ public class EventDTO {
     private final MarkingDTO marking;
     @JsonProperty(value = "typeExpr", required = true)
     private final TypeDTO typeExpr;
+    @JsonProperty(value = "timestamp", required = true)
+    private final long timestamp;
 
     private EventDTO(String id, String label, String action, TypeDTO typeExpr, KindDTO kind,
-                     MarkingDTO marking) {
+                     MarkingDTO marking, long timestamp) {
         this.id = id;
         this.label = label;
         this.action = action;
         this.typeExpr = typeExpr;
         this.kind = kind;
         this.marking = marking;
+        this.timestamp = timestamp;
     }
 
     static EventDTO newComputationEventDTO(String id, String label, TypeDTO typeExpr, KindDTO kind,
-                                           MarkingDTO marking) {
-        return new EventDTO(id, label, COMPUTATION_ACTION, typeExpr, kind, marking);
+                                           MarkingDTO marking, long timestamp) {
+        return new EventDTO(id, label, COMPUTATION_ACTION, typeExpr, kind, marking, timestamp);
     }
 
     static EventDTO newInputEventDTO(String id, String label, TypeDTO typeExpr, KindDTO kind,
-                                     MarkingDTO marking) {
-        return new EventDTO(id, label, INPUT_ACTION, typeExpr, kind, marking);
+                                     MarkingDTO marking, long timestamp) {
+        return new EventDTO(id, label, INPUT_ACTION, typeExpr, kind, marking, timestamp);
     }
 }
 
