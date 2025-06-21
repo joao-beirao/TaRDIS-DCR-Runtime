@@ -36,7 +36,8 @@ public final class GraphRunner {
     private final Map<String, EventInfo<? extends GenericEventInstance>> eventsByUuid;
 
     // ==
-    // convenience mappings indexed by element_uid + uuid_extension (not unique across maps)
+    // convenience mappings indexed by element_uid + uuid_extension (not unique across
+    // maps)
     private final Map<String, EventInfo<ComputationInstance>> computationEvents;
     private final Map<String, EventInfo<InputInstance>> inputEvents;
     private final Map<String, EventInfo<ReceiveInstance>> receiveEvents;
@@ -77,25 +78,24 @@ public final class GraphRunner {
     private static <V> void bindIfAbsent(Environment<V> env, String identifier, V value) {
         if (env.bindIfAbsent(identifier, value).isPresent()) {
             throw new IllegalStateException(
-                    "Internal error: environment binding should not already exist (" + identifier +
-                            ")");
+                    "Internal error: environment binding should not already exist (" +
+                            identifier + ")");
         }
     }
 
     private static <V> V lookupPresent(Environment<V> env, String identifier) {
-        return env.lookup(identifier)
-                .map(Environment.Binding::value)
-                .orElseThrow(() -> new IllegalStateException(
-                        "Internal error: environment binding should not be missing (" + identifier +
-                                ")"));
+        return env.lookup(identifier).map(Environment.Binding::value).orElseThrow(
+                () -> new IllegalStateException(
+                        "Internal error: environment binding should not be missing (" +
+                                identifier + ")"));
     }
 
-    private static <V> void rebindPresent(String identifier, V newValue, Environment<V> env) {
-        env.rebindIfPresent(identifier, newValue)
-                .orElseThrow(() -> new IllegalStateException(
-                        "Internal error: environment binding should not be missing (" + identifier +
-                                ")"))
-                .setValue(newValue);
+    private static <V> void rebindPresent(String identifier, V newValue,
+                                          Environment<V> env) {
+        env.rebindIfPresent(identifier, newValue).orElseThrow(
+                () -> new IllegalStateException(
+                        "Internal error: environment binding should not be missing (" +
+                                identifier + ")")).setValue(newValue);
     }
 
     // =====================================================================
@@ -122,8 +122,8 @@ public final class GraphRunner {
     public void init(GraphElement graphElement) {
         // TODO [revisit] not really using the model after init
         List<StateUpdate> updates = new LinkedList<>();
-        instantiateGraphElement(Objects.requireNonNull(graphElement), SpawnContext.init(this.self),
-                "", updates);
+        instantiateGraphElement(Objects.requireNonNull(graphElement),
+                SpawnContext.init(this.self), "", updates);
         graphObservers.forEach(observer -> observer.onUpdate(updates));
     }
 
@@ -138,11 +138,11 @@ public final class GraphRunner {
 
 
     /**
-     * Executes the {@link dcr.common.events.ComputationEvent Computation Event} identified by
+     * Executes the {@link dcr.common.events.ComputationEvent Computation Event}
+     * identified by
      * {@code eventId}
      *
-     * @param eventId
-     *         the event's unique identifier in this graph
+     * @param eventId the event's unique identifier in this graph
      */
     public void executeComputationEvent(String eventId) throws InformationFlowException {
         var info = requireNonNullEnabledEvent(computationEvents.get(eventId));
@@ -156,15 +156,15 @@ public final class GraphRunner {
     }
 
     /**
-     * Executes the {@link dcr.common.events.InputEvent Input Event} identified by {@code eventId },
+     * Executes the {@link dcr.common.events.InputEvent Input Event} identified by
+     * {@code eventId },
      * with {@code inputValue} as the expected input.
      *
-     * @param eventId
-     *         the event's unique identifier in this graph
-     * @param inputValue
-     *         the event's updated value
+     * @param eventId    the event's unique identifier in this graph
+     * @param inputValue the event's updated value
      */
-    public void executeInputEvent(String eventId, Value inputValue) throws InformationFlowException {
+    public void executeInputEvent(String eventId, Value inputValue)
+            throws InformationFlowException {
         var info = requireNonNullEnabledEvent(inputEvents.get(eventId));
         assertAdmissibleValueType(info.event, inputValue);
         assertIfcOK(info.event(), info.valueEnv());
@@ -175,11 +175,11 @@ public final class GraphRunner {
     }
 
     /**
-     * Executes the {@link dcr.common.events.InputEvent Input Event} identified by {@code eventId }
+     * Executes the {@link dcr.common.events.InputEvent Input Event} identified by
+     * {@code eventId }
      * (no input value expected).
      *
-     * @param eventId
-     *         the event's unique identifier in this graph
+     * @param eventId the event's unique identifier in this graph
      */
     public void executeInputEvent(String eventId) throws InformationFlowException {
         var info = requireNonNullEnabledEvent(inputEvents.get(eventId));
@@ -195,18 +195,15 @@ public final class GraphRunner {
      * Executes the {@link dcr.common.events.ReceiveEvent Receive Event} identified by
      * {@code eventId }.
      *
-     * @param eventId
-     *         the event's unique identifier in this graph
-     * @param receivedValue
-     *         the event's updated value
-     * @param sender
-     *         the participant that triggered this event's dual
-     * @param idExtensionToken
-     *         the token to be used to generate the names of any events potentially created due to
-     *         the triggering of this event
+     * @param eventId          the event's unique identifier in this graph
+     * @param receivedValue    the event's updated value
+     * @param sender           the participant that triggered this event's dual
+     * @param idExtensionToken the token to be used to generate the names of any events
+     *                         potentially created due to
+     *                         the triggering of this event
      */
     public void onReceiveEvent(String eventId, Value receivedValue, UserVal sender,
-            String idExtensionToken) {
+                               String idExtensionToken) {
         var info = receiveEvents.get(eventId);
         requireNonNullEnabledEvent(info);
         assertAdmissibleValueType(info.event, receivedValue);
@@ -233,54 +230,69 @@ public final class GraphRunner {
     // Computation expressions and guard expressions support leverage primitive values
     // and references to event-data values. Effects MUST apply in the following order
     //
-    // 1. update the event's value - for a computation event this requires previous evaluation of
+    // 1. update the event's value - for a computation event this requires previous
+    // evaluation of
     // the data expression;
     // 2. set the event as 'executed' and 'not-pending';
-    // 3. Propagate side effects (relations) - guards are evaluated against the previous marking,
+    // 3. Propagate side effects (relations) - guards are evaluated against the
+    // previous marking,
     // except for the event being executed, for which the updated marking is considered
     // instead;
-    // - 3.1 Evaluate responses first: if there's a self-response relation, the event becomes
+    // - 3.1 Evaluate responses first: if there's a self-response relation, the event
+    // becomes
     // pending again;
-    // - 3.2 Evaluate includes/excludes next: add all included events first, and remove all
-    // excluded events after - this means exclusion wins over inclusion, regardless of the order in
+    // - 3.2 Evaluate includes/excludes next: add all included events first, and remove
+    // all
+    // excluded events after - this means exclusion wins over inclusion, regardless of
+    // the order in
     // which the relations are defined;
     // - 3.3 go through spawns last
     private void onPropagateControlFlowConstraints(EventInfo<?> eventInfo,
-            List<StateUpdate> updates) {
-        responses.getOrDefault(eventInfo.event, Collections.emptyList()).forEach(response -> {
-            if (!response.target().isPending()) {
-                if (response.guard().eval(eventInfo.valueEnv()).equals(BoolVal.TRUE)) {
-                    updates.add(new EventUpdate(response.target(), StateUpdate.UpdateType.UPDATED));
-                    response.target().onResponse();
-                }
-            }
-        });
-        includes.getOrDefault(eventInfo.event, Collections.emptyList()).forEach(include -> {
-            if (!include.target().isIncluded()) {
-                if (include.guard().eval(eventInfo.valueEnv()).equals(BoolVal.TRUE)) {
-                    updates.add(new EventUpdate(include.target(), StateUpdate.UpdateType.UPDATED));
-                    include.target().onInclude();
-                }
-            }
-        });
-        excludes.getOrDefault(eventInfo.event, Collections.emptyList()).forEach(exclude -> {
-            if (exclude.target().isIncluded()) {
-                if (exclude.guard().eval(eventInfo.valueEnv()).equals(BoolVal.TRUE)) {
-                    updates.add(new EventUpdate(exclude.target(), StateUpdate.UpdateType.UPDATED));
-                    exclude.target().onExclude();
-                }
-            }
-        });
+                                                   List<StateUpdate> updates) {
+        responses.getOrDefault(eventInfo.event, Collections.emptyList())
+                .forEach(response -> {
+                    if (!response.target().isPending()) {
+                        if (response.guard().eval(eventInfo.valueEnv())
+                                .equals(BoolVal.TRUE)) {
+                            updates.add(new EventUpdate(response.target(),
+                                    StateUpdate.UpdateType.UPDATED));
+                            response.target().onResponse();
+                        }
+                    }
+                });
+        includes.getOrDefault(eventInfo.event, Collections.emptyList())
+                .forEach(include -> {
+                    if (!include.target().isIncluded()) {
+                        if (include.guard().eval(eventInfo.valueEnv())
+                                .equals(BoolVal.TRUE)) {
+                            updates.add(new EventUpdate(include.target(),
+                                    StateUpdate.UpdateType.UPDATED));
+                            include.target().onInclude();
+                        }
+                    }
+                });
+        excludes.getOrDefault(eventInfo.event, Collections.emptyList())
+                .forEach(exclude -> {
+                    if (exclude.target().isIncluded()) {
+                        if (exclude.guard().eval(eventInfo.valueEnv())
+                                .equals(BoolVal.TRUE)) {
+                            updates.add(new EventUpdate(exclude.target(),
+                                    StateUpdate.UpdateType.UPDATED));
+                            exclude.target().onExclude();
+                        }
+                    }
+                });
     }
 
     // for local events only
-    private static String localIdExtensionOf(String choreoElementUID, String idTokenExtension) {
+    private static String localIdExtensionOf(String choreoElementUID,
+                                             String idTokenExtension) {
         return String.format("%s_%s", choreoElementUID, idTokenExtension);
     }
 
     // extend localUID to
     private static String globalIdExtensionOf(String idExtensionToken, UserVal sender,
-            UserVal receiver) {
+                                              UserVal receiver) {
         return String.format("%s_%s", idExtensionToken,
                 Integer.toHexString(sender.hashCode() + receiver.hashCode()));
     }
@@ -291,10 +303,11 @@ public final class GraphRunner {
         return UUID.randomUUID().toString();
     }
 
-    // TODO [revisit] updateEnv exception should reflect an implementation error: bug, not a feature
+    // TODO [revisit] updateEnv exception should reflect an implementation error: bug,
+    //  not a feature
     // TODO [revisit] removal of conditions upon first execute
     private void locallyUpdateOnEventExecution(EventInfo<?> eventInfo, Value newValue,
-            List<StateUpdate> updates) {
+                                               List<StateUpdate> updates) {
         GenericEventInstance event = eventInfo.event;
         var hasExecuted = event.hasExecuted();
         event.onExecuted(newValue);
@@ -315,61 +328,68 @@ public final class GraphRunner {
 
     // TODO [proper exception]
     // TODO [revisit] moved to Marking?
-    private void assertAdmissibleValueType(GenericEventInstance event, Value replaceValue) {
+    private void assertAdmissibleValueType(GenericEventInstance event,
+                                           Value replaceValue) {
         if (!event.value().type().equals(replaceValue.type())) {
-            logger.info("Unexpected value type {} for event of value type {}", replaceValue.type(),
-                    event.value().type());
+            logger.info("Unexpected value type {} for event of value type {}",
+                    replaceValue.type(), event.value().type());
             throw new RuntimeException("Event value rejected: illegal value type");
         }
     }
 
     // called by Receive events
-    private void onRemotelyInitiatedEvent(RemotelyInitiatedEventInstance event, UserVal sender,
-            String idExtensionToken, List<StateUpdate> updates) {
-        spawnRelations.getOrDefault(event, Collections.emptyList())
-                .forEach(info -> onSpawn(event, info, sender, self, idExtensionToken,
-                        updates));
+    private void onRemotelyInitiatedEvent(RemotelyInitiatedEventInstance event,
+                                          UserVal sender, String idExtensionToken,
+                                          List<StateUpdate> updates) {
+        spawnRelations.getOrDefault(event, Collections.emptyList()).forEach(
+                info -> onSpawn(event, info, sender, self, idExtensionToken, updates));
     }
 
-    // called in the context of applying the effects of a triggered Input/Computation event
-    private void onLocallyInitiatedEvent(LocallyInitiatedEventInstance event, UserVal receiver,
-            String idExtensionToken, List<StateUpdate> updates) {
-        spawnRelations.getOrDefault(event, Collections.emptyList())
-                .forEach(info -> onSpawn(event, info, self, receiver, idExtensionToken,
-                        updates));
+    // called in the context of applying the effects of a triggered Input/Computation
+    // event
+    private void onLocallyInitiatedEvent(LocallyInitiatedEventInstance event,
+                                         UserVal receiver, String idExtensionToken,
+                                         List<StateUpdate> updates) {
+        spawnRelations.getOrDefault(event, Collections.emptyList()).forEach(
+                info -> onSpawn(event, info, self, receiver, idExtensionToken, updates));
     }
 
     // called by either Input or Computation events
-    private void onLocallyInitiatedEvent(LocallyInitiatedEventInstance event, EvalContext evalCtxt,
-            List<StateUpdate> updates) {
+    private void onLocallyInitiatedEvent(LocallyInitiatedEventInstance event,
+                                         EvalContext evalCtxt,
+                                         List<StateUpdate> updates) {
         // we
         var idExtensionToken = generateIdExtensionToken();
         event.receivers().ifPresentOrElse(rcvExpr -> {
             var rcvVal = rcvExpr.eval(evalCtxt.valueEnv(), evalCtxt.userEnv());
-            var receivers = communicationLayer.uponSendRequest(self, event.remoteID(), rcvVal,
-                    event.marking(), idExtensionToken);
-            receivers.forEach(receiver -> onLocallyInitiatedEvent(event, receiver, idExtensionToken,
-                    updates));
+            var receivers =
+                    communicationLayer.uponSendRequest(self, event.remoteID(), rcvVal,
+                            event.marking(), idExtensionToken);
+            receivers.forEach(
+                    receiver -> onLocallyInitiatedEvent(event, receiver, idExtensionToken,
+                            updates));
         }, () -> onSpawn((GenericEventInstance) event, idExtensionToken, updates));
     }
 
     // upon Local-based spawn
     private void onSpawn(GenericEventInstance event, String idExtensionToken,
-            List<StateUpdate> updates) {
+                         List<StateUpdate> updates) {
         var spawns = spawnRelations.getOrDefault(event, new LinkedList<>());
         if (spawns.isEmpty()) {return;}
         spawns.forEach(info -> {
             var subgraph = info.spawn().subGraph();
-            var newSpawnContext = info.spawnContext().beginScope(info.spawn().triggerId(), event);
-            var idExtension = localIdExtensionOf(subgraph.endpointElementUID(), idExtensionToken);
+            var newSpawnContext =
+                    info.spawnContext().beginScope(info.spawn().triggerId(), event);
+            var idExtension =
+                    localIdExtensionOf(subgraph.endpointElementUID(), idExtensionToken);
             instantiateGraphElement(subgraph, newSpawnContext, idExtension, updates);
         });
     }
 
     // upon Tx/Rx-based spawn
     private void onSpawn(EventInstance event, SpawnRelationInfo info, UserVal sender,
-            UserVal receiver, String idExtensionToken,
-            List<StateUpdate> updates) {
+                         UserVal receiver, String idExtensionToken,
+                         List<StateUpdate> updates) {
         // var remoteUser = locallyInitiated ? receiver : sender;
         var subgraph = info.spawn().subGraph();
         var newSpawnContext = info.spawnContext()
@@ -379,21 +399,18 @@ public final class GraphRunner {
     }
 
 
+//    TODO [revisit] temporary fix for frontend purposes
+
     /**
      * Returns the currently enabled events
      *
      * @return the currently enabled events
      */
     public List<EventInstance> enabledEvents() {
-        return eventsByUuid.values()
-                .stream()
-                .map(EventInfo::event)
-                .filter(this::isEnabled)
-                .filter(e -> !(e instanceof ReceiveInstance))
+        return eventsByUuid.values().stream().map(EventInfo::event)
+                .filter(this::isEnabled).filter(e -> !(e instanceof ReceiveInstance))
                 .collect(Collectors.toList());
     }
-
-
 
     /* =============================
      * Model-elements instantiation
@@ -401,28 +418,28 @@ public final class GraphRunner {
 
     // instantiate a (sub)graph element - uidExtension expected to be empty for top-level
     private void instantiateGraphElement(GraphElement graph, SpawnContext spawnContext,
-            String uidExtension, List<StateUpdate> updates) {
+                                         String uidExtension, List<StateUpdate> updates) {
         List<Consumer<GraphRunner>> graphUpdates = new LinkedList<>();
-        graph.events()
-                .forEach(element -> graphUpdates.add(
-                        runner -> runner.instantiateEventElement(element, uidExtension,
-                                spawnContext, updates)));
-        graph.controlFlowRelations()
-                .forEach(element -> graphUpdates.add(
-                        runner -> runner.instantiateControlFlowRelationElement(element,
-                                spawnContext)));
-        graph.spawnRelations()
-                .forEach(element -> graphUpdates.add(
-                        runner -> runner.instantiateSpawnRelation(element, spawnContext)));
+        graph.events().forEach(element -> graphUpdates.add(
+                runner -> runner.instantiateEventElement(element, uidExtension,
+                        spawnContext, updates)));
+        graph.controlFlowRelations().forEach(element -> graphUpdates.add(
+                runner -> runner.instantiateControlFlowRelationElement(element,
+                        spawnContext)));
+        graph.spawnRelations().forEach(element -> graphUpdates.add(
+                runner -> runner.instantiateSpawnRelation(element, spawnContext)));
         updateState(graphUpdates);
     }
 
     // TODO [revisit] also add to specific computation/input/receive mappings?
     // updates the graph's state by instantiating an event element
     private void instantiateEventElement(EventElement baseElement, String idExtension,
-            SpawnContext spawnContext, List<StateUpdate> updates) {
-        if (!canInstantiate(baseElement.instantiationConstraint(), spawnContext.evalEnv)) {
-            logger.info("Dropping event: endpointElementUID {}", baseElement.endpointElementUID());
+                                         SpawnContext spawnContext,
+                                         List<StateUpdate> updates) {
+        if (!canInstantiate(baseElement.instantiationConstraint(),
+                spawnContext.evalEnv)) {
+            logger.info("Dropping event: endpointElementUID {}",
+                    baseElement.endpointElementUID());
             return;
         }
         String localUID = newEventUuidOf(baseElement.endpointElementUID(), idExtension);
@@ -434,11 +451,19 @@ public final class GraphRunner {
         var evalContext = new EvalContext(spawnContext.evalEnv, spawnContext.userEnv);
         var eventInfo = switch (instance) {
             case ComputationInstance e -> {
+                // TODO [remove] this is a temporary patch for demo purposes
+                e.receivers = e.baseElement().remoteParticipants()
+                        .map(rcvExpr -> rcvExpr.eval(evalContext.valueEnv(),
+                                evalContext.userEnv())).orElse(null);
                 var info = new EventInfo<>(e, evalContext);
                 computationEvents.put(instance.remoteID(), info);
                 yield info;
             }
             case InputInstance e -> {
+                // TODO [remove] this is a temporary patch for demo purposes
+                e.receivers = e.baseElement().remoteParticipants()
+                        .map(rcvExpr -> rcvExpr.eval(evalContext.valueEnv(),
+                                evalContext.userEnv())).orElse(null);
                 var info = new EventInfo<>(e, evalContext);
                 inputEvents.put(instance.remoteID(), info);
                 yield info;
@@ -455,15 +480,18 @@ public final class GraphRunner {
 
     // instantiate a spawn relation element
     private void instantiateSpawnRelation(SpawnRelationElement baseElement,
-            SpawnContext spawnContext) {
-        if (!canInstantiate(baseElement.instantiationConstraint(), spawnContext.evalEnv)) {
-            logger.info("Dropping relation instance {}", baseElement.endpointElementUID());
+                                          SpawnContext spawnContext) {
+        if (!canInstantiate(baseElement.instantiationConstraint(),
+                spawnContext.evalEnv)) {
+            logger.info("Dropping relation instance {}",
+                    baseElement.endpointElementUID());
             return;
         }
         var relInstance = Relations.newSpawnRelationInstance(baseElement,
                 lookupPresent(spawnContext.renamingEnv, baseElement.sourceId()));
         List<SpawnRelationInfo> spawnRelations =
-                this.spawnRelations.getOrDefault(relInstance.getSource(), new LinkedList<>());
+                this.spawnRelations.getOrDefault(relInstance.getSource(),
+                        new LinkedList<>());
         spawnRelations.add(new SpawnRelationInfo(relInstance, spawnContext));
         this.spawnRelations.putIfAbsent(relInstance.getSource(), spawnRelations);
     }
@@ -472,16 +500,20 @@ public final class GraphRunner {
     private InstantiatedControlFlowRelation newControlFlowRelationInstanceOf(
             ControlFlowRelationElement baseElement, SpawnContext spawnContext) {
         GenericEventInstance source =
-                spawnContext.renamingEnv.lookup(baseElement.sourceId()).orElseThrow().value();
+                spawnContext.renamingEnv.lookup(baseElement.sourceId()).orElseThrow()
+                        .value();
         GenericEventInstance target =
-                spawnContext.renamingEnv.lookup(baseElement.targetId()).orElseThrow().value();
+                spawnContext.renamingEnv.lookup(baseElement.targetId()).orElseThrow()
+                        .value();
         return Relations.newControlFlowRelation(baseElement, source, target);
     }
 
-    private void instantiateControlFlowRelationElement(ControlFlowRelationElement baseElement,
-            SpawnContext spawnContext) {
-        if (!canInstantiate(baseElement.instantiationConstraint(), spawnContext.evalEnv)) {
-            logger.info("Dropping relation instance: {}", baseElement.endpointElementUID());
+    private void instantiateControlFlowRelationElement(
+            ControlFlowRelationElement baseElement, SpawnContext spawnContext) {
+        if (!canInstantiate(baseElement.instantiationConstraint(),
+                spawnContext.evalEnv)) {
+            logger.info("Dropping relation instance: {}",
+                    baseElement.endpointElementUID());
             return;
         }
         var relInstance = newControlFlowRelationInstanceOf(baseElement, spawnContext);
@@ -490,19 +522,24 @@ public final class GraphRunner {
         switch (relInstance.relationType()) {
             case INCLUDE -> addToListMapping(relInstance.getSource(), relInfo, includes);
             case EXCLUDE -> addToListMapping(relInstance.getSource(), relInfo, excludes);
-            case RESPONSE -> addToListMapping(relInstance.getSource(), relInfo, responses);
-            case CONDITION -> addToListMapping(relInstance.getTarget(), relInfo, conditions);
-            case MILESTONE -> addToListMapping(relInstance.getTarget(), relInfo, milestones);
+            case RESPONSE ->
+                    addToListMapping(relInstance.getSource(), relInfo, responses);
+            case CONDITION ->
+                    addToListMapping(relInstance.getTarget(), relInfo, conditions);
+            case MILESTONE ->
+                    addToListMapping(relInstance.getTarget(), relInfo, milestones);
         }
 
     }
 
-    private boolean canInstantiate(ComputationExpression constraint, Environment<Value> evalEnv) {
+    private boolean canInstantiate(ComputationExpression constraint,
+                                   Environment<Value> evalEnv) {
         return constraint.eval(evalEnv).equals(BoolVal.of(true));
     }
 
 
-    // Applies a sequence of updates to the graph's state as a single update step; each update
+    // Applies a sequence of updates to the graph's state as a single update step; each
+    // update
     // step should leave the graph in a consistent state (or else...)
     private void updateState(Iterable<Consumer<GraphRunner>> updates) {
         updates.forEach(update -> update.accept(this));
@@ -512,24 +549,19 @@ public final class GraphRunner {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(eventsByUuid.values()
-                .stream()
-                .map(ctxt -> ctxt.event.toString())
+        builder.append(eventsByUuid.values().stream().map(ctxt -> ctxt.event.toString())
                 .collect(Collectors.joining("\n", "\n", "")));
         if (!controlFlowRelations.isEmpty()) {
             builder.append(System.lineSeparator()).append(";");
-            controlFlowRelations.values()
-                    .forEach(listing -> listing.forEach(
-                            relInfo -> builder.append(System.lineSeparator())
-                                    .append(relInfo.relation().toString())));
+            controlFlowRelations.values().forEach(listing -> listing.forEach(
+                    relInfo -> builder.append(System.lineSeparator())
+                            .append(relInfo.relation().toString())));
         }
         if (!spawnRelations.isEmpty()) {
             builder.append(System.lineSeparator()).append(";");
-            spawnRelations.values()
-                    .forEach(list -> list.stream()
-                            .map(info -> "\n" + info.spawn.baseElement().sourceId() + " -->> " +
-                                    info.spawn.subGraph())
-                            .forEach(builder::append));
+            spawnRelations.values().forEach(list -> list.stream()
+                    .map(info -> "\n" + info.spawn.baseElement().sourceId() + " -->> " +
+                            info.spawn.subGraph()).forEach(builder::append));
         }
         return builder.toString();
     }
@@ -539,7 +571,8 @@ public final class GraphRunner {
     //     Objects.requireNonNull(indent);
     //     StringBuilder builder = new StringBuilder();
     //     builder.append("   == Runtime Graph State ==\n");
-    //     Consumer<Map<EventInstance, List<ControlFlowRelationInfo>>> ctrlFlowRelUnparser =
+    //     Consumer<Map<EventInstance, List<ControlFlowRelationInfo>>>
+    //     ctrlFlowRelUnparser =
     //             infoVals -> {
     //                 infoVals.values()
     //                         .stream()
@@ -548,7 +581,8 @@ public final class GraphRunner {
     //                                 .collect(Collectors.joining("\n")))
     //                         .forEach(builder::append);
     //             };
-    //     Consumer<Map<EventInstance, List<SpawnRelationInfo>>> spawnRelUnparser = infoVals -> {
+    //     Consumer<Map<EventInstance, List<SpawnRelationInfo>>> spawnRelUnparser =
+    //     infoVals -> {
     //         infoVals.values()
     //                 .forEach(list -> list.stream()
     //                         .map(info -> info.spawn.unparse(indent) + "\n")
@@ -565,19 +599,20 @@ public final class GraphRunner {
     // }
 
     /**
-     * @param evalEnv
-     *         cumulative register keeping track of alpha-renaming, sender/receiver of triggering
-     *         event (when applicable), and eval env
+     * @param evalEnv cumulative register keeping track of alpha-renaming,
+     *                sender/receiver of triggering
+     *                event (when applicable), and eval env
      */
-    record SpawnContext(Environment<Value> evalEnv, Environment<GenericEventInstance> renamingEnv,
+    record SpawnContext(Environment<Value> evalEnv,
+                        Environment<GenericEventInstance> renamingEnv,
                         Environment<Pair<UserVal, UserVal>> userEnv) {
         // cumulative register keeping track of actual sender/receiver of each interaction
         // triggering a spawn (either Tx or Rx) - enables resolving of Receiver(e1)
         // and Sender(e1) type of expressions - empty for top-level events
 
         static SpawnContext init(UserVal self) {
-            var selfVal = RecordVal.of(
-                    Record.ofEntries(Record.Field.of("params", self.getParamsAsRecordVal())));
+            var selfVal = RecordVal.of(Record.ofEntries(
+                    Record.Field.of("params", self.getParamsAsRecordVal())));
             Environment<Value> evalEnv = Environment.empty();
             // _@self must always be available for evaluation of constraints
             evalEnv.bindIfAbsent(SELF, selfVal);
@@ -586,11 +621,12 @@ public final class GraphRunner {
 
         void onNewEventInstance(GenericEventInstance instance) {
             evalEnv.bindIfAbsent(instance.remoteID(), instance.value());
-            renamingEnv.bindIfAbsent(instance.baseElement().endpointElementUID(), instance);
+            renamingEnv.bindIfAbsent(instance.baseElement().endpointElementUID(),
+                    instance);
         }
 
         private static PropBasedVal encodeTriggerVal(Value val, UserVal initiator,
-                UserVal receiver) {
+                                                     UserVal receiver) {
             // TODO extract (static final) const strings
             var initiatorVal = initiator.getParamsAsRecordVal();
             var receiverVal = receiver.getParamsAsRecordVal();
@@ -600,14 +636,13 @@ public final class GraphRunner {
         }
 
         // upon Tx/Rx trigger event
-        SpawnContext beginScope(String triggerId, EventInstance triggerEvent, UserVal sender,
-                UserVal receiver) {
+        SpawnContext beginScope(String triggerId, EventInstance triggerEvent,
+                                UserVal sender, UserVal receiver) {
             var triggerVal = encodeTriggerVal(triggerEvent.value(), sender, receiver);
             var newEvalEnv = evalEnv.beginScope(triggerId, triggerVal);
             var newRenamingEnv = renamingEnv.beginScope();
-            var newUserEnv =
-                    userEnv.beginScope(triggerEvent.baseElement().remoteID(),
-                            Pair.of(sender, receiver));
+            var newUserEnv = userEnv.beginScope(triggerEvent.baseElement().remoteID(),
+                    Pair.of(sender, receiver));
             // TODO defensive copy triggerVal - immutable snapshot
             return new SpawnContext(newEvalEnv, newRenamingEnv, newUserEnv);
         }
@@ -619,7 +654,8 @@ public final class GraphRunner {
         }
     }
 
-    private record SpawnRelationInfo(InstantiatedSpawnRelation spawn, SpawnContext spawnContext) {}
+    private record SpawnRelationInfo(InstantiatedSpawnRelation spawn,
+                                     SpawnContext spawnContext) {}
 
     private record ControlFlowRelationInfo(InstantiatedControlFlowRelation relation,
                                            Environment<Value> evalEnv) {
@@ -640,7 +676,8 @@ public final class GraphRunner {
 
 
     // encloses event
-    private record EventInfo<E extends GenericEventInstance>(E event, EvalContext evalContext) {
+    private record EventInfo<E extends GenericEventInstance>(E event,
+                                                             EvalContext evalContext) {
         Environment<Value> valueEnv() {return evalContext().valueEnv;}
     }
 
@@ -651,10 +688,14 @@ public final class GraphRunner {
                         event.remoteID());
     }
 
-    // Reminder: caller is responsible for providing the correct environment for the purpose
-    // of ifc evaluation (namely, whether the evalEnv should already reflect the event being
-    // created - maybe not a good idea... just like referencing 'this' from the constructor)
-    private static void assertIfcOK(Event event, Environment<Value> env) throws InformationFlowException {
+    // Reminder: caller is responsible for providing the correct environment for the
+    // purpose
+    // of ifc evaluation (namely, whether the evalEnv should already reflect the event
+    // being
+    // created - maybe not a good idea... just like referencing 'this' from the
+    // constructor)
+    private static void assertIfcOK(Event event, Environment<Value> env)
+            throws InformationFlowException {
         if (!event.ifcConstraint().eval(env).value()) {
             onIfcLeakDetection(event);
         }

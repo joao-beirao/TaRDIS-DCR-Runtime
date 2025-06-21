@@ -14,6 +14,8 @@ public class EventDTO {
     private final String action;
     @JsonProperty(value = "kind", required = true)
     private final KindDTO kind;
+    @JsonProperty(value = "receivers", required = false)
+    private final UserSetValDTO receivers;
     @JsonProperty(value = "marking", required = true)
     private final MarkingDTO marking;
     @JsonProperty(value = "typeExpr", required = true)
@@ -21,25 +23,26 @@ public class EventDTO {
     @JsonProperty(value = "timestamp", required = true)
     private final long timestamp;
 
-    private EventDTO(String id, String label, String action, TypeDTO typeExpr, KindDTO kind,
+    private EventDTO(String id, String label, String action, UserSetValDTO receivers, TypeDTO typeExpr, KindDTO kind,
                      MarkingDTO marking, long timestamp) {
         this.id = id;
         this.label = label;
         this.action = action;
+        this.receivers = receivers;
         this.typeExpr = typeExpr;
         this.kind = kind;
         this.marking = marking;
         this.timestamp = timestamp;
     }
 
-    static EventDTO newComputationEventDTO(String id, String label, TypeDTO typeExpr, KindDTO kind,
+    static EventDTO newComputationEventDTO(String id, String label, UserSetValDTO receivers, TypeDTO typeExpr, KindDTO kind,
                                            MarkingDTO marking, long timestamp) {
-        return new EventDTO(id, label, COMPUTATION_ACTION, typeExpr, kind, marking, timestamp);
+        return new EventDTO(id, label, COMPUTATION_ACTION, receivers,typeExpr, kind, marking, timestamp);
     }
 
-    static EventDTO newInputEventDTO(String id, String label, TypeDTO typeExpr, KindDTO kind,
+    static EventDTO newInputEventDTO(String id, String label, UserSetValDTO receivers, TypeDTO typeExpr, KindDTO kind,
                                      MarkingDTO marking, long timestamp) {
-        return new EventDTO(id, label, INPUT_ACTION, typeExpr, kind, marking, timestamp);
+        return new EventDTO(id, label, INPUT_ACTION, receivers ,typeExpr, kind, marking, timestamp);
     }
 }
 

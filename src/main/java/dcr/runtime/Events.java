@@ -3,6 +3,8 @@ package dcr.runtime;
 import dcr.common.data.computation.ComputationExpression;
 import dcr.common.data.values.Value;
 import dcr.common.events.userset.expressions.UserSetExpression;
+import dcr.common.events.userset.values.SetUnionVal;
+import dcr.common.events.userset.values.UserSetVal;
 import dcr.model.events.*;
 import dcr.runtime.elements.events.ComputationEventInstance;
 import dcr.runtime.elements.events.EventInstance;
@@ -11,6 +13,7 @@ import dcr.runtime.elements.events.ReceiveEventInstance;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 
 final class Events {
@@ -42,6 +45,14 @@ final class Events {
     }
 
     public static GenericEventInstance newInstance(String localUID, String remoteID, EventElement baseElement) {
+        return switch (baseElement) {
+            case ComputationEventElement e -> newComputationInstance(localUID, remoteID, e);
+            case InputEventElement e -> newInputInstance(localUID, remoteID, e);
+            case ReceiveEventElement e -> newReceiveInstance(localUID, remoteID, e);
+        };
+    }
+
+    public static GenericEventInstance instantiate(String localUID, String remoteID, EventElement baseElement) {
         return switch (baseElement) {
             case ComputationEventElement e -> newComputationInstance(localUID, remoteID, e);
             case InputEventElement e -> newInputInstance(localUID, remoteID, e);
@@ -181,9 +192,16 @@ sealed abstract class GenericEventInstance
 final class ComputationInstance
         extends GenericEventInstance
         implements ComputationEventInstance {
+    // TODO [remove] this is a temporary patch for demo purposes
+    UserSetVal receivers;
+
+    ComputationInstance(String localUID, String remoteID, ComputationEventElement baseElement, UserSetVal receivers) {
+        super(localUID, remoteID, baseElement);
+        this.receivers = receivers;
+    }
 
     ComputationInstance(String localUID, String remoteID, ComputationEventElement baseElement) {
-        super(localUID, remoteID, baseElement);
+        this(localUID, remoteID, baseElement, new SetUnionVal(List.of()));
     }
 
     @Override
@@ -193,6 +211,12 @@ final class ComputationInstance
 
     @Override
     public Optional<? extends UserSetExpression> receivers() {return baseElement().remoteParticipants();}
+
+    // TODO [remove] this is a temporary broken fix
+    @Override
+    public UserSetVal receiverUsers() {
+        return receivers;
+    }
 
     @Override
     public String toString() {
@@ -215,16 +239,30 @@ final class InputInstance
         extends GenericEventInstance
         implements InputEventInstance {
 
-    private InputInstance(String localUID, String remoteID, InputEventElement baseElement) {
+    // TODO [remove] this is a temporary patch for demo purposes
+    UserSetVal receivers;
+
+    private InputInstance(String localUID, String remoteID, InputEventElement baseElement, UserSetVal receivers) {
         super(localUID, remoteID, baseElement);
+        this.receivers = receivers;
     }
 
     static InputInstance of(String localUID, String remoteID, InputEventElement baseElement) {
-        return new InputInstance(localUID, remoteID, baseElement);
+        return new InputInstance(localUID, remoteID, baseElement, new SetUnionVal(List.of()));
+    }
+
+    static InputInstance of(String localUID, String remoteID, InputEventElement baseElement, UserSetVal receivers) {
+        return new InputInstance(localUID, remoteID, baseElement, receivers);
     }
 
     @Override
     public Optional<? extends UserSetExpression> receivers() {return baseElement().remoteParticipants();}
+
+    // TODO [remove] this is a temporary broken fix
+    @Override
+    public UserSetVal receiverUsers() {
+        return receivers;
+    }
 
     @Override
     public String toString() {

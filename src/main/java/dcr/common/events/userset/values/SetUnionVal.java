@@ -11,10 +11,10 @@ public record SetUnionVal(Collection<? extends UserSetVal> userSetVals)
         implements UserSetVal {
     public SetUnionVal(Collection<? extends UserSetVal> userSetVals) {
         Objects.requireNonNull(userSetVals);
-        if (userSetVals.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Requires at least two expressions: have " + userSetVals.size());
-        }
+//        if (userSetVals.isEmpty()) {
+//            throw new IllegalArgumentException(
+//                    "Requires at least two expressions: have " + userSetVals.size());
+//        }
         if (userSetVals.stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("List argument contains null entries - not allowed");
         }
