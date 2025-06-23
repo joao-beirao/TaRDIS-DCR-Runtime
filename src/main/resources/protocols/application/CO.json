@@ -6,54 +6,17 @@
   "graph": {
     "events": [
       {
-        "receiveEvent": {
-          "common": {
-            "endpointElementUID": "fault_3_RxO",
-            "choreoElementUID": "fault_3",
-            "id": "fault",
-            "label": "fault",
-            "dataType": { "valueType": "void" },
-            "marking": { "isPending": false, "isIncluded": true }
-          },
-          "initiators": [
-            {
-              "roleExpr": {
-                "roleLabel": "P",
-                "params": [
-                  { "name": "id" },
-                  {
-                    "name": "cid",
-                    "value": {
-                      "propDeref": {
-                        "propBasedExpr": {
-                          "propDeref": {
-                            "propBasedExpr": {
-                              "eventRef": { "value": "_@self" }
-                            },
-                            "prop": "params"
-                          }
-                        },
-                        "prop": "cid"
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      {
         "inputEvent": {
           "common": {
-            "endpointElementUID": "accounting_1",
+            "endpointElementUID": "accounting_1_TxO",
             "choreoElementUID": "accounting_1",
             "id": "accounting",
             "label": "accounting",
-            "dataType": { "valueType": "void" },
+            "dataType": { "valueType": "int" },
             "marking": { "isPending": false, "isIncluded": false },
             "ifcConstraint": { "boolLit": { "value": true } }
-          }
+          },
+          "receivers": []
         }
       },
       {
@@ -63,13 +26,7 @@
             "choreoElementUID": "r4c_0",
             "id": "r4c",
             "label": "request_forecast",
-            "dataType": {
-              "recordType": {
-                "fields": [
-                  { "name": "cid", "type": { "valueType": "int" } }
-                ]
-              }
-            },
+            "dataType": { "valueType": "void" },
             "marking": { "isPending": false, "isIncluded": true },
             "ifcConstraint": { "boolLit": { "value": true } }
           },
@@ -106,7 +63,7 @@
       {
         "spawnRelation": {
           "relationCommon": {
-            "endpointElementUID": "r4c_0_TxO_6",
+            "endpointElementUID": "r4c_0_TxO_5",
             "sourceId": "r4c_0_TxO"
           },
           "triggerId": "_@trigger$r4c",
@@ -115,12 +72,12 @@
               {
                 "receiveEvent": {
                   "common": {
-                    "endpointElementUID": "reply_4_RxO",
-                    "choreoElementUID": "reply_4",
+                    "endpointElementUID": "reply_3_RxO",
+                    "choreoElementUID": "reply_3",
                     "id": "reply",
-                    "label": "reply",
+                    "label": "r4c_reply",
                     "dataType": { "valueType": "int" },
-                    "marking": { "isPending": false, "isIncluded": true }
+                    "marking": { "isPending": true, "isIncluded": true }
                   },
                   "initiators": [ { "receiverExpr": { "eventId": "r4c" } } ]
                 }
@@ -130,20 +87,20 @@
               {
                 "controlFlowRelation": {
                   "relationCommon": {
-                    "endpointElementUID": "10",
-                    "sourceId": "reply_4_RxO"
+                    "endpointElementUID": "9",
+                    "sourceId": "reply_3_RxO"
                   },
-                  "targetId": "accounting_1",
+                  "targetId": "accounting_1_TxO",
                   "relationType": "include"
                 }
               },
               {
                 "controlFlowRelation": {
                   "relationCommon": {
-                    "endpointElementUID": "9",
-                    "sourceId": "reply_4_RxO"
+                    "endpointElementUID": "8",
+                    "sourceId": "reply_3_RxO"
                   },
-                  "targetId": "accounting_1",
+                  "targetId": "accounting_1_TxO",
                   "relationType": "response"
                 }
               }
@@ -154,10 +111,10 @@
       {
         "controlFlowRelation": {
           "relationCommon": {
-            "endpointElementUID": "4",
-            "sourceId": "accounting_1"
+            "endpointElementUID": "3",
+            "sourceId": "accounting_1_TxO"
           },
-          "targetId": "accounting_1",
+          "targetId": "accounting_1_TxO",
           "relationType": "exclude"
         }
       }
