@@ -43,7 +43,7 @@ public record RoleExpr(String role,
                 .map(field -> Record.Field.of(field.name(),
                         (PrimitiveVal) field.value().eval(valueEnv)))
                 .forEach(evalParams::addField);
-        return RoleVal.of(role, evalParams.build());
+        return RoleVal.of(role, evalParams.build(), unconstrainedParams);
     }
 
     // TODO revisit to include unconstrainedParams

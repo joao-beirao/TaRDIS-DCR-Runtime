@@ -11,8 +11,13 @@
       {
         "inputEvent": {
           "common": {
+<<<<<<< HEAD
             "endpointElementUID": "csm_2_Tx",
             "choreoElementUID": "csm_2",
+=======
+            "endpointElementUID": "csm_0_Tx",
+            "choreoElementUID": "csm_0",
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
             "id": "csm",
             "label": "consume",
             "dataType": {
@@ -56,8 +61,8 @@
       {
         "receiveEvent": {
           "common": {
-            "endpointElementUID": "csm_2_Rx",
-            "choreoElementUID": "csm_2",
+            "endpointElementUID": "csm_0_Rx",
+            "choreoElementUID": "csm_0",
             "id": "csm",
             "label": "consume",
             "dataType": {
@@ -96,6 +101,7 @@
             }
           ]
         }
+<<<<<<< HEAD
       },
       {
         "receiveEvent": {
@@ -133,14 +139,21 @@
             }
           ]
         }
+=======
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
       }
     ],
     "relations": [
       {
         "spawnRelation": {
           "relationCommon": {
+<<<<<<< HEAD
             "endpointElementUID": "csm_2_Rx_11",
             "sourceId": "csm_2_Rx"
+=======
+            "endpointElementUID": "csm_0_Rx_1",
+            "sourceId": "csm_0_Rx"
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
           },
           "triggerId": "_@trigger$csm",
           "graph": {
@@ -148,6 +161,7 @@
               {
                 "inputEvent": {
                   "common": {
+<<<<<<< HEAD
                     "endpointElementUID": "reply_4_TxO",
                     "choreoElementUID": "reply_4",
                     "id": "reply",
@@ -156,6 +170,15 @@
                       "recordType": {
                         "fields": [
                           { "name": "cost", "type": { "valueType": "int" } },
+=======
+                    "endpointElementUID": "reply_1_TxO",
+                    "choreoElementUID": "reply_1",
+                    "id": "reply",
+                    "label": "reply",
+                    "dataType": {
+                      "recordType": {
+                        "fields": [
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                           { "name": "kw", "type": { "valueType": "int" } }
                         ]
                       }
@@ -171,8 +194,13 @@
               {
                 "spawnRelation": {
                   "relationCommon": {
+<<<<<<< HEAD
                     "endpointElementUID": "reply_4_TxO_14",
                     "sourceId": "reply_4_TxO"
+=======
+                    "endpointElementUID": "reply_1_TxO_4",
+                    "sourceId": "reply_1_TxO"
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                   },
                   "triggerId": "_@trigger$reply",
                   "graph": {
@@ -180,13 +208,22 @@
                       {
                         "receiveEvent": {
                           "common": {
+<<<<<<< HEAD
                             "endpointElementUID": "reject_6_RxO",
                             "choreoElementUID": "reject_6",
+=======
+                            "endpointElementUID": "reject_3_RxO",
+                            "choreoElementUID": "reject_3",
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                             "id": "reject",
                             "label": "reject",
                             "dataType": { "valueType": "void" },
                             "marking": {
+<<<<<<< HEAD
                               "isPending": false,
+=======
+                              "isPending": true,
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                               "isIncluded": true
                             }
                           },
@@ -198,6 +235,7 @@
                       {
                         "receiveEvent": {
                           "common": {
+<<<<<<< HEAD
                             "endpointElementUID": "accept_5_RxO",
                             "choreoElementUID": "accept_5",
                             "id": "accept",
@@ -205,6 +243,15 @@
                             "dataType": { "valueType": "int" },
                             "marking": {
                               "isPending": false,
+=======
+                            "endpointElementUID": "accept_2_RxO",
+                            "choreoElementUID": "accept_2",
+                            "id": "accept",
+                            "label": "accept",
+                            "dataType": { "valueType": "void" },
+                            "marking": {
+                              "isPending": true,
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                               "isIncluded": true
                             }
                           },
@@ -220,10 +267,17 @@
               {
                 "controlFlowRelation": {
                   "relationCommon": {
+<<<<<<< HEAD
                     "endpointElementUID": "13",
                     "sourceId": "reply_4_TxO"
                   },
                   "targetId": "reply_4_TxO",
+=======
+                    "endpointElementUID": "3",
+                    "sourceId": "reply_1_TxO"
+                  },
+                  "targetId": "reply_1_TxO",
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                   "relationType": "exclude"
                 }
               }
@@ -234,8 +288,13 @@
       {
         "spawnRelation": {
           "relationCommon": {
+<<<<<<< HEAD
             "endpointElementUID": "csm_2_Tx_11",
             "sourceId": "csm_2_Tx"
+=======
+            "endpointElementUID": "csm_0_Tx_1",
+            "sourceId": "csm_0_Tx"
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
           },
           "triggerId": "_@trigger$csm",
           "graph": {
@@ -243,6 +302,7 @@
               {
                 "receiveEvent": {
                   "common": {
+<<<<<<< HEAD
                     "endpointElementUID": "reply_4_RxO",
                     "choreoElementUID": "reply_4",
                     "id": "reply",
@@ -251,6 +311,15 @@
                       "recordType": {
                         "fields": [
                           { "name": "cost", "type": { "valueType": "int" } },
+=======
+                    "endpointElementUID": "reply_1_RxO",
+                    "choreoElementUID": "reply_1",
+                    "id": "reply",
+                    "label": "reply",
+                    "dataType": {
+                      "recordType": {
+                        "fields": [
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                           { "name": "kw", "type": { "valueType": "int" } }
                         ]
                       }
@@ -265,8 +334,13 @@
               {
                 "spawnRelation": {
                   "relationCommon": {
+<<<<<<< HEAD
                     "endpointElementUID": "reply_4_RxO_14",
                     "sourceId": "reply_4_RxO"
+=======
+                    "endpointElementUID": "reply_1_RxO_4",
+                    "sourceId": "reply_1_RxO"
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                   },
                   "triggerId": "_@trigger$reply",
                   "graph": {
@@ -274,13 +348,22 @@
                       {
                         "inputEvent": {
                           "common": {
+<<<<<<< HEAD
                             "endpointElementUID": "reject_6_TxO",
                             "choreoElementUID": "reject_6",
+=======
+                            "endpointElementUID": "reject_3_TxO",
+                            "choreoElementUID": "reject_3",
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                             "id": "reject",
                             "label": "reject",
                             "dataType": { "valueType": "void" },
                             "marking": {
+<<<<<<< HEAD
                               "isPending": false,
+=======
+                              "isPending": true,
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                               "isIncluded": true
                             },
                             "ifcConstraint": { "boolLit": { "value": true } }
@@ -293,6 +376,7 @@
                       {
                         "inputEvent": {
                           "common": {
+<<<<<<< HEAD
                             "endpointElementUID": "accept_5_TxO",
                             "choreoElementUID": "accept_5",
                             "id": "accept",
@@ -300,6 +384,15 @@
                             "dataType": { "valueType": "int" },
                             "marking": {
                               "isPending": false,
+=======
+                            "endpointElementUID": "accept_2_TxO",
+                            "choreoElementUID": "accept_2",
+                            "id": "accept",
+                            "label": "accept",
+                            "dataType": { "valueType": "void" },
+                            "marking": {
+                              "isPending": true,
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                               "isIncluded": true
                             },
                             "ifcConstraint": { "boolLit": { "value": true } }
@@ -314,40 +407,68 @@
                       {
                         "controlFlowRelation": {
                           "relationCommon": {
+<<<<<<< HEAD
                             "endpointElementUID": "20",
                             "sourceId": "reject_6_TxO"
                           },
                           "targetId": "reject_6_TxO",
+=======
+                            "endpointElementUID": "10",
+                            "sourceId": "reject_3_TxO"
+                          },
+                          "targetId": "reject_3_TxO",
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                           "relationType": "exclude"
                         }
                       },
                       {
                         "controlFlowRelation": {
                           "relationCommon": {
+<<<<<<< HEAD
                             "endpointElementUID": "19",
                             "sourceId": "reject_6_TxO"
                           },
                           "targetId": "accept_5_TxO",
+=======
+                            "endpointElementUID": "9",
+                            "sourceId": "reject_3_TxO"
+                          },
+                          "targetId": "accept_2_TxO",
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                           "relationType": "exclude"
                         }
                       },
                       {
                         "controlFlowRelation": {
                           "relationCommon": {
+<<<<<<< HEAD
                             "endpointElementUID": "18",
                             "sourceId": "accept_5_TxO"
                           },
                           "targetId": "reject_6_TxO",
+=======
+                            "endpointElementUID": "8",
+                            "sourceId": "accept_2_TxO"
+                          },
+                          "targetId": "reject_3_TxO",
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                           "relationType": "exclude"
                         }
                       },
                       {
                         "controlFlowRelation": {
                           "relationCommon": {
+<<<<<<< HEAD
                             "endpointElementUID": "17",
                             "sourceId": "accept_5_TxO"
                           },
                           "targetId": "accept_5_TxO",
+=======
+                            "endpointElementUID": "7",
+                            "sourceId": "accept_2_TxO"
+                          },
+                          "targetId": "accept_2_TxO",
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
                           "relationType": "exclude"
                         }
                       }
@@ -358,6 +479,7 @@
             ]
           }
         }
+<<<<<<< HEAD
       },
       {
         "spawnRelation": {
@@ -417,6 +539,8 @@
           "targetId": "csm_2_Tx",
           "relationType": "exclude"
         }
+=======
+>>>>>>> aaca2f70d40321aa5ee684b59e03881a6b77e07a
       }
     ]
   }
