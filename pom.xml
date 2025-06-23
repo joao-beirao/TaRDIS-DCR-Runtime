@@ -153,12 +153,6 @@
 
 
     <dependencies>
-        <!--                <dependency>-->
-        <!--                    <groupId>com.github.pfouto</groupId>-->
-        <!--                    <artifactId>babel-core</artifactId>-->
-        <!--                    <version>0.5.01</version>-->
-        <!--                </dependency>-->
-
         <dependency>
             <groupId>pt.unl.fct.di.novasys.babel</groupId>
             <artifactId>babel-core</artifactId>
@@ -179,42 +173,16 @@
             <artifactId>babel-protocol-epiglobalview</artifactId>
             <version>[1.0.0,)</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>pt.unl.fct.di.novasys.babel</groupId>-->
-<!--            <artifactId>babel-protocol-floodbcast</artifactId>-->
-<!--            <version>[1.0.0,)</version>-->
-<!--        </dependency>-->
-
-                <dependency>
+        <dependency>
             <groupId>pt.unl.fct.di.novasys.babel</groupId>
             <artifactId>babel-protocol-eagerpushgossip</artifactId>
             <version>[1.0.0,)</version>
         </dependency>
-
-
-
-        <!--        <dependency>-->
-        <!--            <groupId>pt.unl.fct.di.novasys.babel</groupId>-->
-        <!--            <artifactId>nimbus-anti-entropy</artifactId>-->
-        <!--            <version>[0.0.1,)</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>pt.unl.fct.di.novasys.babel</groupId>-->
-        <!--            <artifactId>hyparview-discovery</artifactId>-->
-        <!--            <version>[0.1.16,)</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>com.github.javafaker</groupId>-->
-        <!--            <artifactId>javafaker</artifactId>-->
-        <!--            <version>1.0.2</version>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>pt.unl.fct.di.novasys.babel</groupId>
             <artifactId>babel-webservices</artifactId>
             <version>[0.0.1,)</version>
         </dependency>
-
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>

@@ -11,52 +11,14 @@
       {
         "inputEvent": {
           "common": {
-            "endpointElementUID": "fault_3_TxO",
-            "choreoElementUID": "fault_3",
-            "id": "fault",
-            "label": "fault",
-            "dataType": { "valueType": "void" },
-            "marking": { "isPending": false, "isIncluded": true },
-            "ifcConstraint": { "boolLit": { "value": true } }
-          },
-          "receivers": [
-            {
-              "roleExpr": {
-                "roleLabel": "CO",
-                "params": [
-                  {
-                    "name": "cid",
-                    "value": {
-                      "propDeref": {
-                        "propBasedExpr": {
-                          "propDeref": {
-                            "propBasedExpr": {
-                              "eventRef": { "value": "_@self" }
-                            },
-                            "prop": "params"
-                          }
-                        },
-                        "prop": "cid"
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      {
-        "inputEvent": {
-          "common": {
-            "endpointElementUID": "csm_2_Tx",
-            "choreoElementUID": "csm_2",
+            "endpointElementUID": "csm_0_Tx",
+            "choreoElementUID": "csm_0",
             "id": "csm",
             "label": "consume",
             "dataType": {
               "recordType": {
                 "fields": [
-                  { "name": "cid", "type": { "valueType": "int" } }
+                  { "name": "kw", "type": { "valueType": "int" } }
                 ]
               }
             },
@@ -94,14 +56,14 @@
       {
         "receiveEvent": {
           "common": {
-            "endpointElementUID": "csm_2_Rx",
-            "choreoElementUID": "csm_2",
+            "endpointElementUID": "csm_0_Rx",
+            "choreoElementUID": "csm_0",
             "id": "csm",
             "label": "consume",
             "dataType": {
               "recordType": {
                 "fields": [
-                  { "name": "cid", "type": { "valueType": "int" } }
+                  { "name": "kw", "type": { "valueType": "int" } }
                 ]
               }
             },
@@ -113,49 +75,6 @@
                 "roleLabel": "P",
                 "params": [
                   { "name": "id" },
-                  {
-                    "name": "cid",
-                    "value": {
-                      "propDeref": {
-                        "propBasedExpr": {
-                          "propDeref": {
-                            "propBasedExpr": {
-                              "eventRef": { "value": "_@self" }
-                            },
-                            "prop": "params"
-                          }
-                        },
-                        "prop": "cid"
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      {
-        "receiveEvent": {
-          "common": {
-            "endpointElementUID": "r4c_0_RxO",
-            "choreoElementUID": "r4c_0",
-            "id": "r4c",
-            "label": "request_forecast",
-            "dataType": {
-              "recordType": {
-                "fields": [
-                  { "name": "cid", "type": { "valueType": "int" } }
-                ]
-              }
-            },
-            "marking": { "isPending": false, "isIncluded": true }
-          },
-          "initiators": [
-            {
-              "roleExpr": {
-                "roleLabel": "CO",
-                "params": [
                   {
                     "name": "cid",
                     "value": {
@@ -183,8 +102,8 @@
       {
         "spawnRelation": {
           "relationCommon": {
-            "endpointElementUID": "csm_2_Rx_12",
-            "sourceId": "csm_2_Rx"
+            "endpointElementUID": "csm_0_Rx_1",
+            "sourceId": "csm_0_Rx"
           },
           "triggerId": "_@trigger$csm",
           "graph": {
@@ -192,11 +111,17 @@
               {
                 "inputEvent": {
                   "common": {
-                    "endpointElementUID": "reply_5_TxO",
-                    "choreoElementUID": "reply_5",
+                    "endpointElementUID": "reply_1_TxO",
+                    "choreoElementUID": "reply_1",
                     "id": "reply",
                     "label": "reply",
-                    "dataType": { "valueType": "void" },
+                    "dataType": {
+                      "recordType": {
+                        "fields": [
+                          { "name": "kw", "type": { "valueType": "int" } }
+                        ]
+                      }
+                    },
                     "marking": { "isPending": false, "isIncluded": true },
                     "ifcConstraint": { "boolLit": { "value": true } }
                   },
@@ -208,8 +133,8 @@
               {
                 "spawnRelation": {
                   "relationCommon": {
-                    "endpointElementUID": "reply_5_TxO_15",
-                    "sourceId": "reply_5_TxO"
+                    "endpointElementUID": "reply_1_TxO_4",
+                    "sourceId": "reply_1_TxO"
                   },
                   "triggerId": "_@trigger$reply",
                   "graph": {
@@ -217,13 +142,13 @@
                       {
                         "receiveEvent": {
                           "common": {
-                            "endpointElementUID": "reject_7_RxO",
-                            "choreoElementUID": "reject_7",
+                            "endpointElementUID": "reject_3_RxO",
+                            "choreoElementUID": "reject_3",
                             "id": "reject",
                             "label": "reject",
                             "dataType": { "valueType": "void" },
                             "marking": {
-                              "isPending": false,
+                              "isPending": true,
                               "isIncluded": true
                             }
                           },
@@ -235,13 +160,13 @@
                       {
                         "receiveEvent": {
                           "common": {
-                            "endpointElementUID": "accept_6_RxO",
-                            "choreoElementUID": "accept_6",
+                            "endpointElementUID": "accept_2_RxO",
+                            "choreoElementUID": "accept_2",
                             "id": "accept",
                             "label": "accept",
                             "dataType": { "valueType": "void" },
                             "marking": {
-                              "isPending": false,
+                              "isPending": true,
                               "isIncluded": true
                             }
                           },
@@ -257,10 +182,10 @@
               {
                 "controlFlowRelation": {
                   "relationCommon": {
-                    "endpointElementUID": "14",
-                    "sourceId": "reply_5_TxO"
+                    "endpointElementUID": "3",
+                    "sourceId": "reply_1_TxO"
                   },
-                  "targetId": "reply_5_TxO",
+                  "targetId": "reply_1_TxO",
                   "relationType": "exclude"
                 }
               }
@@ -271,8 +196,8 @@
       {
         "spawnRelation": {
           "relationCommon": {
-            "endpointElementUID": "csm_2_Tx_12",
-            "sourceId": "csm_2_Tx"
+            "endpointElementUID": "csm_0_Tx_1",
+            "sourceId": "csm_0_Tx"
           },
           "triggerId": "_@trigger$csm",
           "graph": {
@@ -280,11 +205,17 @@
               {
                 "receiveEvent": {
                   "common": {
-                    "endpointElementUID": "reply_5_RxO",
-                    "choreoElementUID": "reply_5",
+                    "endpointElementUID": "reply_1_RxO",
+                    "choreoElementUID": "reply_1",
                     "id": "reply",
                     "label": "reply",
-                    "dataType": { "valueType": "void" },
+                    "dataType": {
+                      "recordType": {
+                        "fields": [
+                          { "name": "kw", "type": { "valueType": "int" } }
+                        ]
+                      }
+                    },
                     "marking": { "isPending": false, "isIncluded": true }
                   },
                   "initiators": [ { "receiverExpr": { "eventId": "csm" } } ]
@@ -295,8 +226,8 @@
               {
                 "spawnRelation": {
                   "relationCommon": {
-                    "endpointElementUID": "reply_5_RxO_15",
-                    "sourceId": "reply_5_RxO"
+                    "endpointElementUID": "reply_1_RxO_4",
+                    "sourceId": "reply_1_RxO"
                   },
                   "triggerId": "_@trigger$reply",
                   "graph": {
@@ -304,64 +235,16 @@
                       {
                         "inputEvent": {
                           "common": {
-                            "endpointElementUID": "reject_7_TxO",
-                            "choreoElementUID": "reject_7",
+                            "endpointElementUID": "reject_3_TxO",
+                            "choreoElementUID": "reject_3",
                             "id": "reject",
                             "label": "reject",
                             "dataType": { "valueType": "void" },
                             "marking": {
-                              "isPending": false,
+                              "isPending": true,
                               "isIncluded": true
                             },
-                            "ifcConstraint": {
-                              "binaryOp": {
-                                "expr1": {
-                                  "binaryOp": {
-                                    "expr1": {
-                                      "binaryOp": {
-                                        "expr1": {
-                                          "propDeref": {
-                                            "propBasedExpr": {
-                                              "propDeref": {
-                                                "propBasedExpr": {
-                                                  "eventRef": {
-                                                    "value": "_@trigger$csm"
-                                                  }
-                                                },
-                                                "prop": "value"
-                                              }
-                                            },
-                                            "prop": "cid"
-                                          }
-                                        },
-                                        "expr2": {
-                                          "propDeref": {
-                                            "propBasedExpr": {
-                                              "propDeref": {
-                                                "propBasedExpr": {
-                                                  "eventRef": {
-                                                    "value": "_@trigger$csm"
-                                                  }
-                                                },
-                                                "prop": "value"
-                                              }
-                                            },
-                                            "prop": "cid"
-                                          }
-                                        },
-                                        "op": "equals"
-                                      }
-                                    },
-                                    "expr2": {
-                                      "boolLit": { "value": false }
-                                    },
-                                    "op": "or"
-                                  }
-                                },
-                                "expr2": { "boolLit": { "value": true } },
-                                "op": "and"
-                              }
-                            }
+                            "ifcConstraint": { "boolLit": { "value": true } }
                           },
                           "receivers": [
                             { "receiverExpr": { "eventId": "csm" } }
@@ -371,64 +254,16 @@
                       {
                         "inputEvent": {
                           "common": {
-                            "endpointElementUID": "accept_6_TxO",
-                            "choreoElementUID": "accept_6",
+                            "endpointElementUID": "accept_2_TxO",
+                            "choreoElementUID": "accept_2",
                             "id": "accept",
                             "label": "accept",
                             "dataType": { "valueType": "void" },
                             "marking": {
-                              "isPending": false,
+                              "isPending": true,
                               "isIncluded": true
                             },
-                            "ifcConstraint": {
-                              "binaryOp": {
-                                "expr1": {
-                                  "binaryOp": {
-                                    "expr1": {
-                                      "binaryOp": {
-                                        "expr1": {
-                                          "propDeref": {
-                                            "propBasedExpr": {
-                                              "propDeref": {
-                                                "propBasedExpr": {
-                                                  "eventRef": {
-                                                    "value": "_@trigger$csm"
-                                                  }
-                                                },
-                                                "prop": "value"
-                                              }
-                                            },
-                                            "prop": "cid"
-                                          }
-                                        },
-                                        "expr2": {
-                                          "propDeref": {
-                                            "propBasedExpr": {
-                                              "propDeref": {
-                                                "propBasedExpr": {
-                                                  "eventRef": {
-                                                    "value": "_@trigger$csm"
-                                                  }
-                                                },
-                                                "prop": "value"
-                                              }
-                                            },
-                                            "prop": "cid"
-                                          }
-                                        },
-                                        "op": "equals"
-                                      }
-                                    },
-                                    "expr2": {
-                                      "boolLit": { "value": false }
-                                    },
-                                    "op": "or"
-                                  }
-                                },
-                                "expr2": { "boolLit": { "value": true } },
-                                "op": "and"
-                              }
-                            }
+                            "ifcConstraint": { "boolLit": { "value": true } }
                           },
                           "receivers": [
                             { "receiverExpr": { "eventId": "csm" } }
@@ -440,40 +275,40 @@
                       {
                         "controlFlowRelation": {
                           "relationCommon": {
-                            "endpointElementUID": "21",
-                            "sourceId": "reject_7_TxO"
+                            "endpointElementUID": "10",
+                            "sourceId": "reject_3_TxO"
                           },
-                          "targetId": "reject_7_TxO",
+                          "targetId": "reject_3_TxO",
                           "relationType": "exclude"
                         }
                       },
                       {
                         "controlFlowRelation": {
                           "relationCommon": {
-                            "endpointElementUID": "20",
-                            "sourceId": "reject_7_TxO"
+                            "endpointElementUID": "9",
+                            "sourceId": "reject_3_TxO"
                           },
-                          "targetId": "accept_6_TxO",
+                          "targetId": "accept_2_TxO",
                           "relationType": "exclude"
                         }
                       },
                       {
                         "controlFlowRelation": {
                           "relationCommon": {
-                            "endpointElementUID": "19",
-                            "sourceId": "accept_6_TxO"
+                            "endpointElementUID": "8",
+                            "sourceId": "accept_2_TxO"
                           },
-                          "targetId": "reject_7_TxO",
+                          "targetId": "reject_3_TxO",
                           "relationType": "exclude"
                         }
                       },
                       {
                         "controlFlowRelation": {
                           "relationCommon": {
-                            "endpointElementUID": "18",
-                            "sourceId": "accept_6_TxO"
+                            "endpointElementUID": "7",
+                            "sourceId": "accept_2_TxO"
                           },
-                          "targetId": "accept_6_TxO",
+                          "targetId": "accept_2_TxO",
                           "relationType": "exclude"
                         }
                       }
@@ -483,65 +318,6 @@
               }
             ]
           }
-        }
-      },
-      {
-        "spawnRelation": {
-          "relationCommon": {
-            "endpointElementUID": "r4c_0_RxO_6",
-            "sourceId": "r4c_0_RxO"
-          },
-          "triggerId": "_@trigger$r4c",
-          "graph": {
-            "events": [
-              {
-                "inputEvent": {
-                  "common": {
-                    "endpointElementUID": "reply_4_TxO",
-                    "choreoElementUID": "reply_4",
-                    "id": "reply",
-                    "label": "reply",
-                    "dataType": { "valueType": "void" },
-                    "marking": { "isPending": false, "isIncluded": true },
-                    "ifcConstraint": { "boolLit": { "value": true } }
-                  },
-                  "receivers": [ { "initiatorExpr": { "eventId": "r4c" } } ]
-                }
-              }
-            ],
-            "relations": [
-              {
-                "controlFlowRelation": {
-                  "relationCommon": {
-                    "endpointElementUID": "11",
-                    "sourceId": "reply_4_TxO"
-                  },
-                  "targetId": "csm_2_Tx",
-                  "relationType": "include"
-                }
-              },
-              {
-                "controlFlowRelation": {
-                  "relationCommon": {
-                    "endpointElementUID": "8",
-                    "sourceId": "reply_4_TxO"
-                  },
-                  "targetId": "reply_4_TxO",
-                  "relationType": "exclude"
-                }
-              }
-            ]
-          }
-        }
-      },
-      {
-        "controlFlowRelation": {
-          "relationCommon": {
-            "endpointElementUID": "5",
-            "sourceId": "r4c_0_RxO"
-          },
-          "targetId": "csm_2_Tx",
-          "relationType": "exclude"
         }
       }
     ]

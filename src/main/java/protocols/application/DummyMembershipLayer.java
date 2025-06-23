@@ -52,6 +52,9 @@ public final class DummyMembershipLayer
         singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
                 Record.ofEntries(Record.Field.of("id", StringVal.of("3")),
                         Record.Field.of("cid", IntVal.of(1)))), "P_3_1"));
+        singleton.onNeighborUp(new DummyNeighbour(UserVal.of("P",
+                Record.ofEntries(Record.Field.of("id", StringVal.of("4")),
+                        Record.Field.of("cid", IntVal.of(1)))), "P_4_1"));
         // EC 2
         singleton.onNeighborUp(new DummyNeighbour(
                 UserVal.of("CO", Record.ofEntries(Record.Field.of("cid", IntVal.of(2)))), "CO_2"));
