@@ -5,6 +5,8 @@ import dcr.common.Record;
 import dcr.common.data.computation.ComputationExpression;
 import dcr.common.data.values.*;
 import dcr.common.events.Event;
+import dcr.common.events.userset.values.SetUnionVal;
+import dcr.common.events.userset.values.UserSetVal;
 import dcr.common.events.userset.values.UserVal;
 import dcr.model.GraphElement;
 import dcr.model.events.EventElement;
@@ -451,21 +453,21 @@ public final class GraphRunner {
         var evalContext = new EvalContext(spawnContext.evalEnv, spawnContext.userEnv);
         var eventInfo = switch (instance) {
             case ComputationInstance e -> {
+                var info = new EventInfo<>(e, evalContext);
+                computationEvents.put(instance.remoteID(), info);
                 // TODO [remove] this is a temporary patch for demo purposes
                 e.receivers = e.baseElement().remoteParticipants()
                         .map(rcvExpr -> rcvExpr.eval(evalContext.valueEnv(),
-                                evalContext.userEnv())).orElse(null);
-                var info = new EventInfo<>(e, evalContext);
-                computationEvents.put(instance.remoteID(), info);
+                                evalContext.userEnv())).orElse(new SetUnionVal(List.of()));
                 yield info;
             }
             case InputInstance e -> {
+                var info = new EventInfo<>(e, evalContext);
+                inputEvents.put(instance.remoteID(), info);
                 // TODO [remove] this is a temporary patch for demo purposes
                 e.receivers = e.baseElement().remoteParticipants()
                         .map(rcvExpr -> rcvExpr.eval(evalContext.valueEnv(),
-                                evalContext.userEnv())).orElse(null);
-                var info = new EventInfo<>(e, evalContext);
-                inputEvents.put(instance.remoteID(), info);
+                                evalContext.userEnv())).orElse(new SetUnionVal(List.of()));
                 yield info;
             }
             case ReceiveInstance e -> {
