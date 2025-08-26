@@ -72,10 +72,10 @@
               {
                 "receiveEvent": {
                   "common": {
-                    "endpointElementUID": "reply_3_RxO",
-                    "choreoElementUID": "reply_3",
-                    "id": "reply",
-                    "label": "r4c_reply",
+                    "endpointElementUID": "replyForecast_3_RxO",
+                    "choreoElementUID": "replyForecast_3",
+                    "id": "replyForecast",
+                    "label": "r4c_replyForecast",
                     "dataType": { "valueType": "int" },
                     "marking": { "isPending": true, "isIncluded": true }
                   },
@@ -88,7 +88,7 @@
                 "controlFlowRelation": {
                   "relationCommon": {
                     "endpointElementUID": "9",
-                    "sourceId": "reply_3_RxO"
+                    "sourceId": "replyForecast_3_RxO"
                   },
                   "targetId": "accounting_1_TxO",
                   "relationType": "include"
@@ -98,7 +98,7 @@
                 "controlFlowRelation": {
                   "relationCommon": {
                     "endpointElementUID": "8",
-                    "sourceId": "reply_3_RxO"
+                    "sourceId": "replyForecast_3_RxO"
                   },
                   "targetId": "accounting_1_TxO",
                   "relationType": "response"
