@@ -26,7 +26,7 @@ public class DistributedDCRProtocol
 
     public static final String PROTOCOL_NAME = "DistributedDCRProtocol";
     public static final short PROTO_ID = 1;
-    public static final int DEFAULT_PORT = 9000;
+    public static final int DEFAULT_PORT = 9001;
 
     private int channelId;
 
