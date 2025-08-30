@@ -59,7 +59,7 @@ public final class DCRApp
     public static final String PROTOCOL_NAME = "DCRApp";
     public static final short PROTO_ID = 51;
 
-    private static final int DEFAULT_PORT = 9001; // default port to listen on
+    private static final int DEFAULT_PORT = 9000; // default port to send to
     private static final String CLI_ROLE_ARG = "role";
 
     private GraphRunner runner = null;
